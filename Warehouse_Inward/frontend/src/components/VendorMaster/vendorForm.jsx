@@ -57,77 +57,119 @@ function VendorForm() {
   };
 
   return (
-    <div className="max-w-lg mx-auto bg-white shadow-md p-6 rounded-md">
-      <h2 className="text-xl font-bold mb-4">
+    <div className="max-w-4xl mx-auto bg-white shadow-lg p-8 rounded-xl border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         {id ? "Edit Vendor" : "Add Vendor"}
       </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          value={formData.email}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-        <input
-          type="text"
-          name="contact_person"
-          placeholder="Contact Person"
-          value={formData.contact_person}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-        <input
-          type="text"
-          name="contact_number"
-          placeholder="Contact Number"
-          value={formData.contact_number}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-        <input
-          type="text"
-          name="gst_number"
-          placeholder="GST Number"
-          value={formData.gst_number}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        />
-        <textarea
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        ></textarea>
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Name */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Vendor Name</label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter vendor name"
+          />
+        </div>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-        <div className="flex justify-between">
-          <button type="button" onClick={() => navigate("/vendor")} className="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {id ? "Update Vendor" : "Add Vendor"}
-        </button>
+        {/* Email */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Email</label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter email address"
+          />
+        </div>
+
+        {/* Contact Person */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Contact Person</label>
+          <input
+            type="text"
+            name="contact_person"
+            value={formData.contact_person}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter contact person name"
+          />
+        </div>
+
+        {/* Contact Number */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Contact Number</label>
+          <input
+            type="text"
+            name="contact_number"
+            value={formData.contact_number}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter contact number"
+          />
+        </div>
+
+        {/* GST Number */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">GST Number</label>
+          <input
+            type="text"
+            name="gst_number"
+            value={formData.gst_number}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter GST number"
+          />
+        </div>
+
+        {/* Status */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        {/* Address (full width row) */}
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-medium mb-1">Address</label>
+          <textarea
+            name="address"
+            value={formData.address}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+            placeholder="Enter vendor address"
+            rows="3"
+          ></textarea>
+        </div>
+
+        {/* Buttons (full width row) */}
+        <div className="md:col-span-2 flex justify-between mt-6">
+          <button
+            type="button"
+            onClick={() => navigate("/vendor")}
+            className="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
+          >
+            {id ? "Update Vendor" : "Add Vendor"}
+          </button>
         </div>
       </form>
     </div>

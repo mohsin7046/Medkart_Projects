@@ -6,7 +6,6 @@ function GrnForm() {
   const navigate = useNavigate();
   const { order } = location.state || {};
 
-
   const [formData, setFormData] = useState({
     purchase_order_number: order?.order_number || "",
     received_date: new Date().toISOString().split("T")[0],
@@ -17,7 +16,9 @@ function GrnForm() {
       order?.purchaseOrderItems?.map((item) => ({
         product_code: item.product_code,
         batch_number: "",
-        expiry_date: "",
+        expiry_date: item.expiry_date
+          ? new Date(item.expiry_date).toISOString().split("T")[0]
+          : "",
         ordered_qty: item.quantity,
         received_qty: item.quantity,
         damaged_qty: 0,
@@ -32,13 +33,11 @@ function GrnForm() {
     const updatedItems = [...formData.items];
     updatedItems[index][field] = value;
 
-
     if (field === "received_qty" || field === "item_price") {
       updatedItems[index].totalAmount =
         (parseInt(updatedItems[index].received_qty) || 0) *
         (parseFloat(updatedItems[index].item_price) || 0);
     }
-
 
     if (field === "received_qty") {
       updatedItems[index].shortage_qty =
@@ -73,7 +72,9 @@ function GrnForm() {
       items: formData.items.map((i) => ({
         product_code: i.product_code,
         batch_number: i.batch_number,
-        expiry_date: new Date(i.expiry_date),
+        expiry_date: i.expiry_date
+          ? new Date(i.expiry_date).toISOString()
+          : null,
         recevied_qty: i.received_qty,
         item_price: i.item_price,
         item_mrp: i.item_mrp,
@@ -82,7 +83,10 @@ function GrnForm() {
     };
 
     console.log("Submitting GRN:", payload);
-    
+
+    if (!payload.items[0].batch_number || !payload.items[0].expiry_date) {
+      alert("Please fill all batch numbers and expiry dates.");
+    }
 
     try {
       const response = await fetch("http://localhost:3000/grn/create-grn", {
@@ -91,7 +95,7 @@ function GrnForm() {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok){
+      if (!response.ok) {
         const errorData = await response.json();
         alert(errorData.error || "Failed to create GRN");
         return;
@@ -111,51 +115,37 @@ function GrnForm() {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-  
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="text"
-            value={formData.grn_number}
-            readOnly
-            className="border px-3 py-2 rounded w-full bg-gray-100"
-            placeholder="GRN Number"
-          />
-          <input
-            type="date"
-            value={formData.received_date}
-            onChange={(e) =>
-              setFormData({ ...formData, received_date: e.target.value })
-            }
-            className="border px-3 py-2 rounded w-full"
-          />
-          <input
-            type="text"
-            value={formData.purchase_order_number}
-            readOnly
-            className="border px-3 py-2 rounded w-full bg-gray-100"
-            placeholder="PO Number"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+          
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Received Date
+            </label>
+            <input
+              type="date"
+              value={formData.received_date}
+              onChange={(e) =>
+                setFormData({ ...formData, received_date: e.target.value })
+              }
+              className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+
+          
+          <div className="flex flex-col">
+            <label className="text-sm font-medium text-gray-700 mb-1">
+              Purchase Order Number
+            </label>
+            <input
+              type="text"
+              value={formData.purchase_order_number}
+              readOnly
+              className="border border-gray-300 px-3 py-2 rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
+              placeholder="PO Number"
+            />
+          </div>
         </div>
 
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input
-            type="number"
-            placeholder="Total Damaged Qty"
-            value={formData.damaged_qty}
-            readOnly
-            className="border px-3 py-2 rounded w-full bg-gray-100"
-          />
-          <input
-            type="number"
-            placeholder="Total Shortage Qty"
-            value={formData.shortage_qty}
-            readOnly
-            className="border px-3 py-2 rounded w-full bg-gray-100"
-          />
-        </div>
-
-      
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
@@ -255,7 +245,6 @@ function GrnForm() {
           </table>
         </div>
 
-        
         <div className="flex justify-end">
           <button
             type="submit"

@@ -7,35 +7,52 @@ function GRNView() {
   const grn = state?.grn;
 
   if (!grn) {
-    return <p className="text-red-500">No GRN data found.</p>;
+    return <p className="text-red-500 text-center mt-6 text-lg">⚠️ No GRN data found.</p>;
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+      
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 px-3 py-1 bg-gray-500 text-white rounded-md"
+        className="mb-6 px-4 py-2 bg-gray-700 hover:bg-gray-800 text-white font-medium rounded-lg shadow-md transition"
       >
         ← Back
       </button>
 
-      <h2 className="text-2xl font-bold mb-4">GRN Details</h2>
+      <h2 className="text-3xl font-bold mb-6 text-gray-800">📦 GRN Details</h2>
 
-      <div className="bg-white shadow-md p-4 rounded-md mb-6">
-        <p><strong>GRN Number:</strong> {grn.grn_number}</p>
-        <p><strong>Order Number:</strong> {grn.order_number}</p>
-        <p><strong>Received Date:</strong> {new Date(grn.received_date).toLocaleDateString()}</p>
-        <p><strong>Damaged Qty:</strong> {grn.damaged_qty}</p>
-        <p><strong>Shortage Qty:</strong> {grn.shortage_qty}</p>
-        <p><strong>Total Amount:</strong> ₹{grn.total_amount}</p>
-        <p><strong>Status:</strong> {grn.status}</p>
+      <div className="bg-white shadow-lg rounded-xl p-6 mb-8 border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
+          <p><span className="font-semibold">GRN Number:</span> {grn.grn_number}</p>
+          <p><span className="font-semibold">Order Number:</span> {grn.order_number}</p>
+          <p><span className="font-semibold">Received Date:</span> {new Date(grn.received_date).toLocaleDateString()}</p>
+          <p><span className="font-semibold">Damaged Qty:</span> {grn.damaged_qty}</p>
+          <p><span className="font-semibold">Shortage Qty:</span> {grn.shortage_qty}</p>
+          <p><span className="font-semibold">Total Amount:</span> ₹{grn.total_amount}</p>
+          <p className="col-span-2">
+            <span className="font-semibold">Status:</span>{" "}
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                grn.status === "Completed"
+                  ? "bg-green-100 text-green-700"
+                  : grn.status === "Pending"
+                  ? "bg-yellow-100 text-yellow-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {grn.status}
+            </span>
+          </p>
+        </div>
       </div>
 
-      <h3 className="text-xl font-semibold mb-2">Items</h3>
-      <div className="bg-white shadow-md p-4 rounded-md">
-        <table className="w-full border-collapse">
+      
+      <h3 className="text-2xl font-semibold mb-3 text-gray-800">🛒 Items</h3>
+      <div className="overflow-x-auto shadow-lg  border border-gray-100">
+        <table className="w-full border-collapse text-sm md:text-base">
           <thead>
-            <tr className="bg-gray-100 text-left">
+            <tr className="bg-gray-200 text-gray-800">
               <th className="border px-4 py-2">Product Code</th>
               <th className="border px-4 py-2">Batch</th>
               <th className="border px-4 py-2">Expiry</th>
@@ -46,8 +63,13 @@ function GRNView() {
             </tr>
           </thead>
           <tbody>
-            {grn.goodReceiptNoteItems?.map((item) => (
-              <tr key={item.id} className="text-center">
+            {grn.goodReceiptNoteItems?.map((item, index) => (
+              <tr
+                key={item.id}
+                className={`text-center ${
+                  index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                } hover:bg-blue-50 transition`}
+              >
                 <td className="border px-4 py-2">{item.product_code}</td>
                 <td className="border px-4 py-2">{item.batch_number}</td>
                 <td className="border px-4 py-2">
@@ -56,7 +78,7 @@ function GRNView() {
                 <td className="border px-4 py-2">{item.recevied_qty}</td>
                 <td className="border px-4 py-2">₹{item.item_price}</td>
                 <td className="border px-4 py-2">₹{item.item_mrp}</td>
-                <td className="border px-4 py-2">₹{item.totalAmount}</td>
+                <td className="border px-4 py-2 font-semibold">₹{item.totalAmount}</td>
               </tr>
             ))}
           </tbody>

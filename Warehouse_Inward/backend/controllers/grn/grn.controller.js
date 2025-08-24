@@ -91,8 +91,8 @@ export const createGRN = async (req, res) => {
         goodReceiptNoteItems: {
           create: items.map((item) => ({
             product_code: item.product_code,
-            expiry_date: new Date(item.expiry_date),
             batch_number: item.batch_number,
+            expiry_date: new Date(item.expiry_date),
             recevied_qty: parseInt(item.recevied_qty),
             item_price: parseFloat(item.item_price),
             item_mrp: parseFloat(item.item_mrp),
@@ -104,7 +104,6 @@ export const createGRN = async (req, res) => {
       },
     });
 
-   
    const updatePO =  await prisma.purchaseOrder.update({
       where: { order_number: purchase_order_number },
       data: { status: statusUpdate },
@@ -114,7 +113,7 @@ export const createGRN = async (req, res) => {
       return res.status(500).json({ error: "Failed to update Purchase Order status" });
     }
 
-    console.log("Frm backend",newGRN);
+    console.log("Fomrm backend",newGRN);
     
     res.status(201).json(newGRN);
   } catch (error) {
@@ -122,7 +121,6 @@ export const createGRN = async (req, res) => {
     res.status(500).json({ error: "Failed to create GRN" });
   }
 };
-
 
 
 export const getAllGRNs = async (req, res) => {
@@ -137,7 +135,6 @@ export const getAllGRNs = async (req, res) => {
         res.status(500).json({ error: "Failed to fetch GRNs" });
     }
 }
-
 
 
 export const deleteGRN = async (req, res) => {

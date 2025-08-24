@@ -41,6 +41,11 @@ function ProductForm() {
     }
   };
 
+  const handleRemoveCombination = (index) => {
+    const updated = formData.combination.filter((_, i) => i !== index);
+    setFormData({ ...formData, combination: updated });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -71,30 +76,43 @@ function ProductForm() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-md rounded p-6">
-      <h2 className="text-xl font-bold mb-4">
+    <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-xl p-8 border border-gray-200">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
         {id ? "Edit Product" : "Add Product"}
       </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.name}
-          onChange={handleChange}
-        />
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Product Name */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Product Name
+          </label>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter product name"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
 
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.category}
-          onChange={handleChange}
-        />
+        {/* Category */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Category
+          </label>
+          <input
+            type="text"
+            name="category"
+            value={formData.category}
+            onChange={handleChange}
+            placeholder="Enter category"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
 
+        {/* Combination */}
         <div>
           <div className="flex space-x-2">
             <input
@@ -116,85 +134,144 @@ function ProductForm() {
             {formData.combination.map((c, idx) => (
               <span
                 key={idx}
-                className="bg-gray-200 px-2 py-1 rounded-md text-sm"
+                className="bg-gray-200 px-2 py-1 rounded-md text-sm flex items-center gap-1"
               >
                 {c}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveCombination(idx)}
+                  className="ml-1 text-red-500 hover:text-red-700 font-bold"
+                >
+                  ×
+                </button>
               </span>
             ))}
           </div>
         </div>
 
-        <div className="flex gap-4">
-
-        <input
-          type="number"
-          name="product_mrp"
-          placeholder="Product MRP"
-          className="w-full border  px-3 py-2 rounded"
-          value={formData.product_mrp}
-          onChange={handleChange}
-        />
-        <input
-          type="number"
-          name="product_price"
-          placeholder="Product Price"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.product_price}
-          onChange={handleChange}
-        />
+        {/* Product MRP */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Product MRP
+          </label>
+          <input
+            type="number"
+            name="product_mrp"
+            value={formData.product_mrp}
+            onChange={handleChange}
+            placeholder="Enter MRP"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
         </div>
-        <input
-          type="number"
-          name="last_purchase_price"
-          placeholder="Last Purchase Price"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.last_purchase_price}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="unit_of_measure"
-          placeholder="Unit of Measure"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.unit_of_measure}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="hsn_code"
-          placeholder="HSN Code"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.hsn_code}
-          onChange={handleChange}
-        />
-        <textarea
-          name="description"
-          placeholder="Description"
-          className="w-full border px-3 py-2 rounded"
-          value={formData.description}
-          onChange={handleChange}
-        ></textarea>
 
-        <select
-          name="status"
-          value={formData.status}
-          onChange={handleChange}
-          className="w-full border px-3 py-2 rounded"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-            <div className="flex justify-between">
-            <button type="button" onClick={() => navigate("/product")} className="px-4 py-2 bg-gray-500 text-white rounded">Cancel</button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
-        >
-          {id ? "Update" : "Submit"}
-        </button>
+        {/* Product Price */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Product Price
+          </label>
+          <input
+            type="number"
+            name="product_price"
+            value={formData.product_price}
+            onChange={handleChange}
+            placeholder="Enter selling price"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        {/* Last Purchase Price */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Last Purchase Price
+          </label>
+          <input
+            type="number"
+            name="last_purchase_price"
+            value={formData.last_purchase_price}
+            onChange={handleChange}
+            placeholder="Enter last purchase price"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        {/* Unit of Measure */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Unit of Measure
+          </label>
+          <input
+            type="text"
+            name="unit_of_measure"
+            value={formData.unit_of_measure}
+            onChange={handleChange}
+            placeholder="e.g., kg, liter, pcs"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        {/* HSN Code */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            HSN Code
+          </label>
+          <input
+            type="text"
+            name="hsn_code"
+            value={formData.hsn_code}
+            onChange={handleChange}
+            placeholder="Enter HSN code"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        {/* Description (full width) */}
+        <div className="md:col-span-2">
+          <label className="block text-gray-700 font-medium mb-1">
+            Description
+          </label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Enter product description"
+            rows="3"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        {/* Status */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            Status
+          </label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        
+        <div className="md:col-span-2 flex justify-between mt-6">
+          <button
+            type="button"
+            onClick={() => navigate("/product")}
+            className="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow"
+          >
+            {id ? "Update Product" : "Add Product"}
+          </button>
         </div>
       </form>
-      
     </div>
   );
 }

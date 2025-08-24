@@ -47,8 +47,8 @@ function GRNList() {
       <div className="bg-white shadow-md p-4 rounded-md">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left">
-              <th className="border px-4 py-2">#</th>
+            <tr className="bg-gray-100">
+              <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">GRN Number</th>
               <th className="border px-4 py-2">Order Number</th>
               <th className="border px-4 py-2">Received Date</th>
