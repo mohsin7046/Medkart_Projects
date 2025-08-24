@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+//npx prisma db push
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vendor{
+  id        Int      @id @default(autoincrement())
+  vendor_code String   @unique
+  name      String
+  email     String   @unique
+  contact_person String
+  contact_number String?
+  gst_number String
+  address   String
+  status    String   @default("active") // active, inactive, blocked
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchaseOrders PurchaseOrder[]
+
+  @@map("vendors")
+}
+
+model Product{
+  id          Int      @id @default(autoincrement())
+  product_code String   @unique
+  name        String
+  category    String
+  combination String[]
+  product_mrp        Float
+  product_price       Float
+  last_purchase_price Float
+  unit_of_measure String
+  description String
+  hsn_code   Int
+  status      String   @default("active") // active, inactive, discontinued
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@map("products")
+  GoodReceiptNoteItem GoodReceiptNoteItem[]
+}
+
+model PurchaseOrder{
+  id          Int      @id @default(autoincrement())
+  order_number String   @unique
+  vendor_code   String
+  vendor      Vendor   @relation(fields: [vendor_code], references: [vendor_code])
+  order_date  DateTime
+  total_amount Float
+  expected_delivery_date DateTime
+  status      String   @default("pending") // pending, partially received, completed, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchaseOrderItems PurchaseOrderItem[]
+
+  @@map("purchase_orders")
+  GoodReceiptNote GoodReceiptNote[]
+}
+
+
+model PurchaseOrderItem{
+  id          Int      @id @default(autoincrement())
+  order_number String
+  purchaseOrder PurchaseOrder @relation(fields: [order_number], references: [order_number])
+  product_code  String
+  product     Product   @relation(fields: [product_code], references: [product_code])
+  quantity    Int
+  item_price       Float
+  item_mrp        Float
+  totalAmount       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("purchase_order_items")
+}
+
+model GoodReceiptNote{
+  id          Int      @id @default(autoincrement())
+  grn_number   String   @unique
+  order_number String
+  purchaseOrder PurchaseOrder @relation(fields: [order_number], references: [order_number])
+  received_date DateTime
+  total_amount Float
+  damaged_qty Int?
+  shortage_qty Int?
+  status      String   @default("pending") // pending, completed, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  goodReceiptNoteItems GoodReceiptNoteItem[]
+
+  @@map("good_receipt_notes")
+}
+
+model GoodReceiptNoteItem{
+  id          Int      @id @default(autoincrement())
+  grn_id      Int
+  goodReceiptNote GoodReceiptNote @relation(fields: [grn_id], references: [id])
+  product_code  String
+  product     Product   @relation(fields: [product_code], references: [product_code])
+  batch_number String
+  expiry_date DateTime
+  recevied_qty    Int
+  item_price       Float
+  item_mrp        Float
+  totalAmount       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("good_receipt_note_items")
+}
