@@ -24,6 +24,12 @@ export const createGRN = async (req, res) => {
     return res.status(400).json({ error: "Please fill all required fields" });
   }
 
+  items.map((item)=>{
+      if(parseFloat(item.item_mrp) < parseFloat(item.item_price) ){
+        return res.status(400).json({error:`MRP is not less than price in product ${item.product_code}`})
+      }
+    })
+
   try {
     
     const existingPO = await prisma.purchaseOrder.findUnique({

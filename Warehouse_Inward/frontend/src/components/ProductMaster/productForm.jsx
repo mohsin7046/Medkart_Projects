@@ -16,6 +16,7 @@ function ProductForm() {
     last_purchase_price: "",
     unit_of_measure: "",
     hsn_code: "",
+    gst_percentage:"",
     description: "",
     product_code: "",
     status: "active",
@@ -66,7 +67,11 @@ function ProductForm() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Failed to save product");
+      if (!response.ok){
+          const Error =  await response.json();
+          alert("Error: " + Error.error);
+          return;
+        }
 
       await response.json();
       navigate("/product");
@@ -220,6 +225,20 @@ function ProductForm() {
             value={formData.hsn_code}
             onChange={handleChange}
             placeholder="Enter HSN code"
+            className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
+
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">
+            GST Percentage
+          </label>
+          <input
+            type="text"
+            name="gst_percentage"
+            value={formData.gst_percentage}
+            onChange={handleChange}
+            placeholder="Enter GST %"
             className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
           />
         </div>

@@ -146,7 +146,11 @@ useEffect(() => {
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) throw new Error("Failed to save GRN");
+      if (!response.ok){
+        const Error = await response.json();
+        alert("Error: " + Error.error);
+        return;
+      }
 
       alert(id ? "GRN updated successfully!" : "GRN created successfully!");
       if(isEdit){

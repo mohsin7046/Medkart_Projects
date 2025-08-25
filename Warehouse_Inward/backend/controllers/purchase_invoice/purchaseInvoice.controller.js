@@ -5,9 +5,21 @@ export const createPurchaseInvoice = async (req, res) => {
   try {
     const { grn_number, invoice_date, total_amount, items } = req.body;
 
+    console.log(req.body);
+
     if (!grn_number || !invoice_date || !total_amount) {
       return res.status(400).json({ error: "Please fill all required fields" });
     }
+
+    items.map((item) => {
+      if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
+        return res
+          .status(400)
+          .json({
+            error: `MRP is not less than price in product ${item.product_code}`,
+          });
+      }
+    });
 
     const existingGRN = await prisma.goodReceiptNote.findUnique({
       where: { grn_number },
@@ -23,6 +35,18 @@ export const createPurchaseInvoice = async (req, res) => {
         .json({ error: "Purchase Invoice already created for this GRN" });
     }
 
+    let total = 0;
+    for (let item of items) {
+      const product = await prisma.product.findUnique({
+        where: { product_code: item.product_code },
+        select: { gst_percentage: true },
+      });
+
+      const gst = product?.gst_percentage || 0;
+      const sum = item.totalAmount + (item.totalAmount * gst) / 100;
+      total += sum;
+    }
+
     const invoice_number = `INV-${Date.now()}`;
 
     const invoice = await prisma.purchaseInvoice.create({
@@ -30,7 +54,7 @@ export const createPurchaseInvoice = async (req, res) => {
         grn_number,
         invoice_number,
         invoice_date: new Date(invoice_date),
-        total_amount: Number(total_amount),
+        total_amount: parseInt(total),
         PurchaseInvoiceItem: {
           create: items.map((item) => ({
             product_code: item.product_code,
@@ -38,7 +62,6 @@ export const createPurchaseInvoice = async (req, res) => {
             item_price: parseFloat(item.item_price),
             item_mrp: parseFloat(item.item_mrp),
             totalAmount: parseFloat(item.totalAmount),
-            gst_percentage: parseFloat(item.gst_percentage) || 0,
           })),
         },
       },

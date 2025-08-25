@@ -4,10 +4,14 @@ import crypto from "crypto";
 const prisma = new PrismaClient();
 
 export const addProduct = async (req, res) => {
-    const { name,category,combination, product_mrp,product_price,last_purchase_price,unit_of_measure,hsn_code,description,status} = req.body;
+    const { name,category,combination, product_mrp,product_price,last_purchase_price,unit_of_measure,hsn_code,gst_percentage,description,status} = req.body;
 
-    if(!name || !category || !product_mrp || !product_price || !last_purchase_price || !unit_of_measure || !hsn_code){
+    if(!name || !category || !product_mrp || !product_price || !last_purchase_price || !unit_of_measure || !hsn_code || !gst_percentage){
         return res.status(400).json({ error: "Please fill all required fields" });
+    }
+
+    if(parseFloat(product_mrp) < parseFloat(product_price)){
+      return res.status(400).json({error:"Product MRP is equal or greater than price"});
     }
 
     const randomStr = crypto.randomBytes(3).toString("hex").toUpperCase(); 
@@ -24,6 +28,7 @@ export const addProduct = async (req, res) => {
                 last_purchase_price:parseFloat(last_purchase_price),
                 unit_of_measure,
                 hsn_code:parseInt(hsn_code),
+                gst_percentage:parseFloat(gst_percentage),
                 description,
                 status
             },
@@ -33,7 +38,6 @@ export const addProduct = async (req, res) => {
         console.error("Error creating product:", error);
         res.status(500).json({ error: "Failed to create product" });
     }
-    
 }
 
 export const getAllProducts = async (req, res) => {
@@ -86,6 +90,10 @@ export const updateProduct = async (req, res) => {
     return res.status(400).json({ error: "Product ID is required for update" });
   }
 
+  if(parseFloat(formData?.product_mrp) < parseFloat(formData?.product_price)){
+      return res.status(400).json({error:"Product MRP is equal or greater than price"});
+    }
+
   try {
     const updatedProduct = await prisma.product.update({
       where: { product_code:formData.product_code },
@@ -99,6 +107,7 @@ export const updateProduct = async (req, res) => {
         unit_of_measure: formData.unit_of_measure,
         hsn_code: parseInt(formData.hsn_code),
         description: formData.description,
+        gst_percentage:parseFloat(formData.gst_percentage),
         status: formData.status
       },
     });

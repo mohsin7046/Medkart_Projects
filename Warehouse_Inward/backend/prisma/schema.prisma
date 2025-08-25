@@ -45,6 +45,7 @@ model Product{
   unit_of_measure String
   description String
   hsn_code   Int
+  gst_percentage Float
   status      String   @default("active") // active, inactive, discontinued
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -132,7 +133,7 @@ model GoodReceiptNoteItem{
 model PurchaseInvoice{
   id          Int      @id @default(autoincrement())
   invoice_number String   @unique
-  grn_number      String
+  grn_number      String  
   goodReceiptNote GoodReceiptNote @relation(fields: [grn_number], references: [grn_number])
   invoice_date DateTime
   total_amount Float
@@ -146,7 +147,7 @@ model PurchaseInvoice{
 
 model PurchaseInvoiceItem{
   id         Int      @id @default(autoincrement())
-  invoice_number  String
+  invoice_number  String  
   purchaseInvoice PurchaseInvoice @relation(fields: [invoice_number], references: [invoice_number])
   product_code  String
   product     Product   @relation(fields: [product_code], references: [product_code])
@@ -154,7 +155,6 @@ model PurchaseInvoiceItem{
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  gst_percentage Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

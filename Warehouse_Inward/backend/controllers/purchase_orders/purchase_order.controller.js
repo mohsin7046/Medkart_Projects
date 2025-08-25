@@ -8,6 +8,13 @@ export const createPurchaseOrder = async (req, res) => {
     const { vendor_code, order_date, expected_delivery_date, total_amount, items } = req.body;
     console.log("From fronetnd",req.body);
 
+
+    items.map((item)=>{
+      if(parseFloat(item.item_mrp) < parseFloat(item.item_price) ){
+        return res.status(400).json({error:`MRP is not less than price in product ${item.product_code}`})
+      }
+    })
+
     const order_number = "ORD-" + uuidv4().replace(/-/g, "").substring(0, 8).toUpperCase();
 
     const newPurchaseOrder = await prisma.purchaseOrder.create({

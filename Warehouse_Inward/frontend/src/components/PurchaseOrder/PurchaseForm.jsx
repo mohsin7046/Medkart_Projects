@@ -139,10 +139,17 @@ function PurchaseOrderForm() {
           order_number: passedOrderData?.order_number,
         }),
       });
+      let data;
 
-      if (!res.ok) throw new Error("Failed to save purchase order");
+      if (!res.ok){
+          data = await res.json();
+          alert("Error: " + data.error);
+          return;
+      }
 
-      await res.json();
+       data = await res.json();
+      console.log(data);
+      
       navigate("/purchase-order");
     } catch (error) {
       console.error("Error submitting purchase order:", error);

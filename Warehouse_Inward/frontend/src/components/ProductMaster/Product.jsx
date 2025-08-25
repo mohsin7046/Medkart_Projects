@@ -49,7 +49,11 @@ function Product() {
             body: JSON.stringify({ product_code }),
           }
         );
-        if (!response.ok) throw new Error("Network response was not ok");
+        if (!response.ok){
+          const Error = response.json();
+          alert("Error",Error.error);
+          return;
+        }
 
         setProducts(products.filter((p) => p.product_code !== product_code));
         alert("Product deleted successfully");
@@ -94,7 +98,7 @@ function Product() {
       <div className="bg-white shadow-md p-4 rounded-md">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-100 text-left">
+            <tr className="bg-gray-100">
               <th className="border px-4 py-2">ID</th>
               <th className="border px-4 py-2">Product Code</th>
               <th className="border px-4 py-2">Name</th>
@@ -103,6 +107,7 @@ function Product() {
               <th className="border px-4 py-2">MRP</th>
               <th className="border px-4 py-2">Unit</th>
               <th className="border px-4 py-2">HSN</th>
+              <th className="border px-4 py-2">GST %</th>
               <th className="border px-4 py-2">Status</th>
               <th className="border px-4 py-2">Action</th>
             </tr>
@@ -119,6 +124,7 @@ function Product() {
                   <td className="border px-4 py-2">₹{p.product_mrp}</td>
                   <td className="border px-4 py-2">{p.unit_of_measure}</td>
                   <td className="border px-4 py-2">{p.hsn_code}</td>
+                  <td className="border px-4 py-2">{p.gst_percentage}%</td>
                   <td className="border px-4 py-2">{p.status}</td>
                   <td className="border px-4 py-2">
                     <button

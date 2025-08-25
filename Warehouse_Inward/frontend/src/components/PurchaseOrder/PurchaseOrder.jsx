@@ -66,6 +66,7 @@ function PurchaseOrder() {
           return;
         }
         setOrders((prev) => prev.filter((o) => o.id !== id));
+        
       } catch (error) {
         console.error("Error deleting purchase order:", error);
       }

@@ -19,7 +19,6 @@ function PurchaseInvoiceForm() {
         item_price: item.item_price,
         item_mrp: item.item_mrp,
         totalAmount: item.totalAmount,
-        gst_percentage: item.gst_percentage || 0,
       })) || [],
   });
 
@@ -38,37 +37,18 @@ function PurchaseInvoiceForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const itemsWithGST = formData.items.map((item) => {
-    const baseTotal = item.quantity * item.item_price;
-    const gstAmount = (baseTotal * (item.gst_percentage || 0)) / 100;
-    return {
-      ...item,
-      totalAmount: baseTotal + gstAmount,
-    };
-  });
-
-
-  const totalAmount = itemsWithGST.reduce(
-    (sum, item) => sum + item.totalAmount,
-    0
-  );
-
-  const finalData = {
-    ...formData,
-    items: itemsWithGST,
-    total_amount: totalAmount,
-  };
-    
     try {
       const url = "http://localhost:3000/purchase-invoice/createPI";
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(finalData),
+        body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Failed to save invoice");
+      if (!response.ok) {
+      const Error = await response.json();
+      alert("Error: " + Error.error);
+      }
 
       navigate("/purchase-invoice");
     } catch (err) {
@@ -115,14 +95,12 @@ function PurchaseInvoiceForm() {
           />
         </div>
 
-        
-
         <div>
           <h3 className="font-semibold mb-2">Items</h3>
           {formData.items.map((item, index) => (
             <div
               key={index}
-              className="grid grid-cols-6 gap-2 mb-3 border p-2 rounded"
+              className="grid grid-cols-5 gap-2 mb-3 border p-2 rounded"
             >
               <input
                 type="text"
@@ -170,15 +148,7 @@ function PurchaseInvoiceForm() {
                 className="border rounded px-2 py-1"
                 placeholder="Total"
               />
-              <input
-                type="number"
-                value={item.gst_percentage}
-                onChange={(e) =>
-                  handleItemChange(index, "gst_percentage", e.target.value)
-                }
-                className="border rounded px-2 py-1"
-                placeholder="GST %"
-              />
+              
             </div>
           ))}
         </div>
