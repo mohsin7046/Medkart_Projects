@@ -50,7 +50,8 @@ export const getVendoreSearch = async (req, res) => {
         name: {
           contains: q,
           mode: "insensitive"
-        }
+        },
+        status:"active"
       },
       select: {
         vendor_code: true,

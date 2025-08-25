@@ -1,48 +1,94 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function GrnForm() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { order } = location.state || {};
+  const { id } = useParams();
+
+
+   const isEdit = id ? true : false;
+  let passedGrn = {};
+
+  if (isEdit) {
+    passedGrn = location.state?.grn || {};
+     console.log("Edit",passedGrn);
+  } else {
+    passedGrn = location.state?.order || {};
+    console.log("Add",passedGrn);
+  }
 
   const [formData, setFormData] = useState({
-    purchase_order_number: order?.order_number || "",
+    grn_number: "",
+    purchase_order_number: "",
     received_date: new Date().toISOString().split("T")[0],
     damaged_qty: 0,
     shortage_qty: 0,
     status: "pending",
-    items:
-      order?.purchaseOrderItems?.map((item) => ({
-        product_code: item.product_code,
-        batch_number: "",
-        expiry_date: item.expiry_date
-          ? new Date(item.expiry_date).toISOString().split("T")[0]
-          : "",
-        ordered_qty: item.quantity,
-        received_qty: item.quantity,
-        damaged_qty: 0,
-        shortage_qty: 0,
-        item_price: item.item_price,
-        item_mrp: item.item_mrp,
-        totalAmount: item.quantity * item.item_price,
-      })) || [],
+    items: [],
   });
+
+
+useEffect(() => {
+    if (passedGrn) {
+      setFormData({
+        grn_number: passedGrn.grn_number || `GRN-${Date.now()}`,
+        purchase_order_number: passedGrn.order_number || "",
+        received_date: passedGrn.received_date
+          ? passedGrn.received_date.split("T")[0]
+          : new Date().toISOString().split("T")[0],
+        damaged_qty: passedGrn.damaged_qty || 0,
+        shortage_qty: passedGrn.shortage_qty || 0,
+        status: passedGrn.status || "pending",
+        items: isEdit
+          ? 
+            passedGrn.goodReceiptNoteItems?.map((i) => ({
+              id: i.id,
+              product_code: i.product_code,
+              batch_number: i.batch_number || "",
+              expiry_date: i.expiry_date
+                ? i.expiry_date.split("T")[0]
+                : "",
+              ordered_qty: i.ordered_qty || 0,
+              recevied_qty: i.recevied_qty || 0,
+              damaged_qty: i.damaged_qty || 0,
+              shortage_qty: i.shortage_qty || 0,
+              item_price: i.item_price,
+              item_mrp: i.item_mrp,
+              totalAmount: i.totalAmount,
+            })) || []
+          : 
+            passedGrn.purchaseOrderItems?.map((i) => ({
+              id: i.id,
+              product_code: i.product_code,
+              batch_number: "",
+              expiry_date: "",
+              ordered_qty: i.quantity || 0,
+              recevied_qty: 0,
+              damaged_qty: 0,
+              shortage_qty: 0,
+              item_price: i.item_price,
+              item_mrp: i.item_mrp,
+              totalAmount: i.totalAmount,
+            })) || [],
+      });
+    }
+  }, [id, passedGrn, isEdit]);
 
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
     updatedItems[index][field] = value;
 
-    if (field === "received_qty" || field === "item_price") {
+    if (field === "recevied_qty" || field === "item_price") {
       updatedItems[index].totalAmount =
-        (parseInt(updatedItems[index].received_qty) || 0) *
+        (parseInt(updatedItems[index].recevied_qty) || 0) *
         (parseFloat(updatedItems[index].item_price) || 0);
     }
 
-    if (field === "received_qty") {
+    if (field === "recevied_qty") {
       updatedItems[index].shortage_qty =
         (parseInt(updatedItems[index].ordered_qty) || 0) -
-        (parseInt(updatedItems[index].received_qty) || 0);
+        (parseInt(updatedItems[index].recevied_qty) || 0);
     }
 
     setFormData({ ...formData, items: updatedItems });
@@ -70,12 +116,12 @@ function GrnForm() {
       damaged_qty: totalDamaged,
       shortage_qty: totalShortage,
       items: formData.items.map((i) => ({
+        id: i.id,
         product_code: i.product_code,
         batch_number: i.batch_number,
-        expiry_date: i.expiry_date
-          ? new Date(i.expiry_date).toISOString()
-          : null,
-        recevied_qty: i.received_qty,
+        ordered_qty:i.ordered_qty,
+        expiry_date: i.expiry_date,
+        recevied_qty: i.recevied_qty,
         item_price: i.item_price,
         item_mrp: i.item_mrp,
         totalAmount: i.totalAmount,
@@ -84,39 +130,42 @@ function GrnForm() {
 
     console.log("Submitting GRN:", payload);
 
-    if (!payload.items[0].batch_number || !payload.items[0].expiry_date) {
-      alert("Please fill all batch numbers and expiry dates.");
-    }
-
     try {
-      const response = await fetch("http://localhost:3000/grn/create-grn", {
-        method: "POST",
+      let url = "http://localhost:3000/grn/create-grn";
+      let method = "POST";
+
+      if (id) {
+        url = `http://localhost:3000/grn/update-grn`;
+        method = "PUT";
+      }
+
+      console.log(url, method, payload);
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        alert(errorData.error || "Failed to create GRN");
-        return;
-      }
+      if (!response.ok) throw new Error("Failed to save GRN");
 
-      alert("GRN created successfully!");
+      alert(id ? "GRN updated successfully!" : "GRN created successfully!");
+      if(isEdit){
+        navigate('/grn')
+      }
       navigate("/purchase-order");
     } catch (error) {
-      console.error("Error creating GRN:", error);
+      console.error("Error saving GRN:", error);
     }
   };
 
   return (
     <div className="bg-white shadow-lg p-6 rounded-xl max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        Create Good Receipt Note
+        {id ? "Edit Good Receipt Note" : "Create Good Receipt Note"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-          
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">
               Received Date
@@ -130,8 +179,6 @@ function GrnForm() {
               className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
             />
           </div>
-
-          
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">
               Purchase Order Number
@@ -169,7 +216,6 @@ function GrnForm() {
                   <td className="border px-2 py-1">
                     <input
                       type="text"
-                      placeholder="Batch No"
                       value={item.batch_number}
                       onChange={(e) =>
                         handleItemChange(idx, "batch_number", e.target.value)
@@ -191,9 +237,9 @@ function GrnForm() {
                   <td className="border px-2 py-1">
                     <input
                       type="number"
-                      value={item.received_qty}
+                      value={item.recevied_qty}
                       onChange={(e) =>
-                        handleItemChange(idx, "received_qty", e.target.value)
+                        handleItemChange(idx, "recevied_qty", e.target.value)
                       }
                       className="border px-2 py-1 rounded w-full"
                     />
@@ -250,7 +296,7 @@ function GrnForm() {
             type="submit"
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow"
           >
-            Save GRN
+            {id ? "Update GRN" : "Save GRN"}
           </button>
         </div>
       </form>

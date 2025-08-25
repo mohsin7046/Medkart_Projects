@@ -13,7 +13,6 @@ export const createGRN = async (req, res) => {
     status,
   } = req.body;
 
-  console.log("From Frontend",req.body);
   
   if (
     !purchase_order_number ||
@@ -21,7 +20,7 @@ export const createGRN = async (req, res) => {
     !items ||
     items.length === 0 ||
     !total_amount
-  ) {
+  ){
     return res.status(400).json({ error: "Please fill all required fields" });
   }
 
@@ -31,6 +30,9 @@ export const createGRN = async (req, res) => {
       where: { order_number: purchase_order_number },
       include:{purchaseOrderItems:true}
     });
+
+    console.log(existingPO.status);
+    
 
     if (!existingPO) {
       return res.status(404).json({ error: "Purchase order not found" });
@@ -73,6 +75,8 @@ export const createGRN = async (req, res) => {
         where: { order_number: purchase_order_number },
         data: { status: "cancelled" },
       });
+
+      
       return res.status(400).json({ error: "Received quantity or MRP is not valid" });
     }
 
@@ -95,6 +99,7 @@ export const createGRN = async (req, res) => {
             expiry_date: new Date(item.expiry_date),
             recevied_qty: parseInt(item.recevied_qty),
             item_price: parseFloat(item.item_price),
+            ordered_qty : parseInt(item.ordered_qty),
             item_mrp: parseFloat(item.item_mrp),
             totalAmount: parseFloat(item.totalAmount),
           })),
@@ -127,8 +132,9 @@ export const getAllGRNs = async (req, res) => {
     try {
         const grns = await prisma.goodReceiptNote.findMany({
         include: { goodReceiptNoteItems: true },
-        orderBy: { received_date: "desc" },
+        orderBy: { createdAt: "desc" },
         });
+
         res.status(200).json(grns);
     } catch (error) {
         console.error("Error fetching GRNs:", error);
@@ -136,6 +142,137 @@ export const getAllGRNs = async (req, res) => {
     }
 }
 
+
+export const updateGRN = async (req, res) => {
+  try {
+    const {
+      purchase_order_number,
+      grn_number,
+      received_date,
+      items,
+      total_amount,
+      damaged_qty,
+      shortage_qty,
+      status,
+    } = req.body;
+
+    console.log(req.body);
+    
+
+    if (
+      !purchase_order_number ||
+      !grn_number ||
+      !received_date ||
+      !items ||
+      items.length === 0 ||
+      !total_amount
+    ) {
+      return res.status(400).json({ error: "Please fill all required fields" });
+    }
+
+    const existingGRN = await prisma.goodReceiptNote.findUnique({
+      where: { grn_number: grn_number },
+    });
+
+    if (!existingGRN) {
+      return res.status(404).json({ error: "GRN not found" });
+    }
+
+    if(["completed","cancelled"].includes(existingGRN.status)) {
+      return res.status(400).json({ error: "Cannot update a completed or cancelled GRN" });
+    }
+
+    const existingPO = await prisma.purchaseOrder.findUnique({
+      where: { order_number: purchase_order_number },
+      include:{purchaseOrderItems:true}
+    });
+
+    if (!existingPO) {
+      return res.status(404).json({ error: "Purchase order not found" });
+    }
+
+    let statusUpdate = "";
+    
+    for(const poItem of existingPO.purchaseOrderItems){
+      const receivedItem = items.find((i) => i.product_code === poItem.product_code);
+      if(!receivedItem){
+        return res.status(400).json({ error: `Received item with product code ${poItem.product_code} not found in PO items` });
+      }
+
+      if(receivedItem.recevied_qty > poItem.quantity || shortage_qty < 0){
+        statusUpdate = "cancelled";
+        break;
+      }else if(receivedItem.recevied_qty < poItem.quantity || shortage_qty > 0){
+        statusUpdate = "partial received";
+      }
+
+      const lastGRNItem = await prisma.goodReceiptNoteItem.findFirst({
+        where: { product_code: poItem.product_code },
+        orderBy: { id: 'desc' },
+      });
+
+      if(lastGRNItem){
+        const allowedMRP = lastGRNItem.item_mrp * 1.2;
+        if(parseFloat(receivedItem.item_mrp) > allowedMRP){
+          statusUpdate = "cancelled";
+          break;
+        }
+      }
+    }
+
+    console.log(statusUpdate);
+    
+    if(statusUpdate === "cancelled"){
+      const updatePO =  await prisma.purchaseOrder.update({
+        where: { order_number: purchase_order_number },
+        data: { status: "cancelled" },
+      });
+
+     const updateGRNStatus = await prisma.goodReceiptNote.update({
+      where:{grn_number:grn_number},
+      data:{status:"cancelled"}
+     })
+
+      if(!updateGRNStatus){
+        return res.status(400).json({error:"Grn not updated for cancelled"})
+      }
+
+      console.log(updateGRNStatus);
+      
+
+      return res.status(400).json({ error: "Received quantity or MRP is not valid" });
+    }
+
+    if(statusUpdate === "" || statusUpdate !== "partial received"){
+      statusUpdate = "completed";
+    }
+
+    const updatedGRN = await prisma.goodReceiptNote.update({
+      where: { grn_number: grn_number },
+      data: {
+        order_number: purchase_order_number,
+        received_date: new Date(received_date),
+        damaged_qty: parseInt(damaged_qty) || 0,
+        shortage_qty: parseInt(shortage_qty) || 0,
+        total_amount: parseFloat(total_amount),
+        status,
+      },
+    });
+
+    const updatePO =  await prisma.purchaseOrder.update({
+      where: { order_number: purchase_order_number },
+      data: { status: statusUpdate },
+    });
+
+    if(!updatePO){
+      return res.status(500).json({ error: "Failed to update Purchase Order status" });
+    }
+
+    res.status(200).json(updatedGRN);
+  } catch (error) {
+    
+  }
+}
 
 export const deleteGRN = async (req, res) => {
   try {

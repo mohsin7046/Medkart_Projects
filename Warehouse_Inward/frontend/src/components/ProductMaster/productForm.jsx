@@ -82,7 +82,7 @@ function ProductForm() {
       </h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Product Name */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Product Name
@@ -97,7 +97,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Category */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Category
@@ -112,7 +112,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Combination */}
+       
         <div>
           <div className="flex space-x-2">
             <input
@@ -149,7 +149,7 @@ function ProductForm() {
           </div>
         </div>
 
-        {/* Product MRP */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Product MRP
@@ -164,7 +164,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Product Price */}
+       
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Product Price
@@ -179,7 +179,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Last Purchase Price */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Last Purchase Price
@@ -194,7 +194,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Unit of Measure */}
+       
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Unit of Measure
@@ -209,7 +209,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* HSN Code */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             HSN Code
@@ -224,7 +224,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Description (full width) */}
+        
         <div className="md:col-span-2">
           <label className="block text-gray-700 font-medium mb-1">
             Description
@@ -239,7 +239,7 @@ function ProductForm() {
           />
         </div>
 
-        {/* Status */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">
             Status

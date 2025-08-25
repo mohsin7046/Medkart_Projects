@@ -10,6 +10,9 @@ import VendorForm from "./components/VendorMaster/vendorForm";
 import GrnForm from "./components/GoodReceiptNote/grnForm";
 import GRN from "./components/GoodReceiptNote/grn"; 
 import GRNView from "./components/GoodReceiptNote/grnView";
+import PurchaseInvoice from "./components/PurchaseInvoice/PurchaseInvoice";
+import PurchaseInvoiceForm from "./components/PurchaseInvoice/PurchaseInvoiceForm";
+import PurchaseInvoiceView from "./components/PurchaseInvoice/PurchaseInvoiceView";
 
 function App() {
   return (
@@ -30,6 +33,10 @@ function App() {
           <Route path="/grn/add" element={<GrnForm />} />
           <Route path="/grn" element={<GRN />} />
           <Route path="/grn/view/:id" element={<GRNView />} />
+          <Route path="/grn/edit/:id" element={<GrnForm />} />
+          <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
+          <Route path="/purchase-invoice/add" element={<PurchaseInvoiceForm />} />
+          <Route path="/purchase-invoice/view/:id" element={<PurchaseInvoiceView />} />
         </Routes>
       </div>
     </Router>

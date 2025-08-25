@@ -63,7 +63,7 @@ function VendorForm() {
       </h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Name */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">Vendor Name</label>
           <input
@@ -76,7 +76,7 @@ function VendorForm() {
           />
         </div>
 
-        {/* Email */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">Email</label>
           <input
@@ -89,7 +89,7 @@ function VendorForm() {
           />
         </div>
 
-        {/* Contact Person */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">Contact Person</label>
           <input
@@ -102,7 +102,7 @@ function VendorForm() {
           />
         </div>
 
-        {/* Contact Number */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">Contact Number</label>
           <input
@@ -115,7 +115,7 @@ function VendorForm() {
           />
         </div>
 
-        {/* GST Number */}
+       
         <div>
           <label className="block text-gray-700 font-medium mb-1">GST Number</label>
           <input
@@ -128,7 +128,7 @@ function VendorForm() {
           />
         </div>
 
-        {/* Status */}
+        
         <div>
           <label className="block text-gray-700 font-medium mb-1">Status</label>
           <select
@@ -142,7 +142,7 @@ function VendorForm() {
           </select>
         </div>
 
-        {/* Address (full width row) */}
+        
         <div className="md:col-span-2">
           <label className="block text-gray-700 font-medium mb-1">Address</label>
           <textarea
@@ -155,7 +155,7 @@ function VendorForm() {
           ></textarea>
         </div>
 
-        {/* Buttons (full width row) */}
+       
         <div className="md:col-span-2 flex justify-between mt-6">
           <button
             type="button"

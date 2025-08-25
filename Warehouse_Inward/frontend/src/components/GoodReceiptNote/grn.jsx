@@ -5,6 +5,8 @@ import { FiEdit, FiTrash2,FiEye } from "react-icons/fi";
 function GRNList() {
   const [grns, setGrns] = useState([]);
   const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,9 +42,43 @@ function GRNList() {
     }
   };
 
+  const filteredGrns = grns.filter((g) => {
+    const matchesSearch =
+      g.grn_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      g.order_number?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all"
+        ? true
+        : g.status?.toLowerCase() === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus;
+  });
+
+
   return (
     <div>
-      <h2 className="text-xl font-bold mb-4">Goods Receipt Notes</h2>
+      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            placeholder="Search by GRN No. or Order No..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border px-3 py-1 rounded-md w-64"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
 
       <div className="bg-white shadow-md p-4 rounded-md">
         <table className="w-full border-collapse">
@@ -55,11 +91,12 @@ function GRNList() {
               <th className="border px-4 py-2">Total Amount</th>
               <th className="border px-4 py-2">Status</th>
               <th className="border px-4 py-2">Action</th>
+              <th className="border px-4 py-2">Create Invoice</th>
             </tr>
           </thead>
           <tbody>
-            {grns.length > 0 ? (
-              grns.map((grn, idx) => (
+            {filteredGrns.length > 0 ? (
+              filteredGrns.map((grn, idx) => (
                 <tr key={grn.id} className="text-center">
                   <td className="border px-4 py-2">{idx + 1}</td>
                   <td className="border px-4 py-2">{grn.grn_number}</td>
@@ -72,7 +109,7 @@ function GRNList() {
                   <td className="border px-4 py-2">
                     <button
                       onClick={() =>
-                        navigate(`/grn/edit/${grn.id}`, { state: { grn: g } })
+                        navigate(`/grn/edit/${grn.id}`, { state: { grn: grn } })
                       }
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
@@ -92,6 +129,16 @@ function GRNList() {
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       <FiEye className="text-blue-600" size={18} />
+                    </button>
+                  </td>
+                  <td className="border px-4 py-2">
+                    <button
+                      onClick={() =>
+                        navigate(`/purchase-invoice/add`, { state: { grn } })
+                      }
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
+                    >
+                      Create Invoice
                     </button>
                   </td>
                 </tr>

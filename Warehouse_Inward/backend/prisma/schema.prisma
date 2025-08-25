@@ -53,6 +53,7 @@ model Product{
 
   @@map("products")
   GoodReceiptNoteItem GoodReceiptNoteItem[]
+  PurchaseInvoiceItem PurchaseInvoiceItem[]
 }
 
 model PurchaseOrder{
@@ -106,6 +107,7 @@ model GoodReceiptNote{
   goodReceiptNoteItems GoodReceiptNoteItem[]
 
   @@map("good_receipt_notes")
+  PurchaseInvoice PurchaseInvoice[]
 }
 
 model GoodReceiptNoteItem{
@@ -117,6 +119,7 @@ model GoodReceiptNoteItem{
   batch_number String
   expiry_date DateTime
   recevied_qty    Int
+  ordered_qty  Int
   item_price       Float
   item_mrp        Float
   totalAmount       Float
@@ -124,4 +127,36 @@ model GoodReceiptNoteItem{
   updatedAt   DateTime @updatedAt
 
   @@map("good_receipt_note_items")
+}
+
+model PurchaseInvoice{
+  id          Int      @id @default(autoincrement())
+  invoice_number String   @unique
+  grn_number      String
+  goodReceiptNote GoodReceiptNote @relation(fields: [grn_number], references: [grn_number])
+  invoice_date DateTime
+  total_amount Float
+  status      String   @default("pending") // pending, paid, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("purchase_invoices")
+  PurchaseInvoiceItem PurchaseInvoiceItem[]
+}
+
+model PurchaseInvoiceItem{
+  id         Int      @id @default(autoincrement())
+  invoice_number  String
+  purchaseInvoice PurchaseInvoice @relation(fields: [invoice_number], references: [invoice_number])
+  product_code  String
+  product     Product   @relation(fields: [product_code], references: [product_code])
+  quantity    Int
+  item_price       Float
+  item_mrp        Float
+  totalAmount       Float
+  gst_percentage Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("purchase_invoice_items")
 }

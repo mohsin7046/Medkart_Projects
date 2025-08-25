@@ -63,7 +63,7 @@ export const getProductSearch = async (req, res) => {
           contains: q,
           mode:"insensitive"
         },
-      
+        status:'active'
       },
       select: {
         product_code: true,

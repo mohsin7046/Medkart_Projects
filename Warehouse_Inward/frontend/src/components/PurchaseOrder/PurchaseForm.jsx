@@ -156,7 +156,7 @@ function PurchaseOrderForm() {
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Vendor */}
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Vendor
@@ -168,7 +168,6 @@ function PurchaseOrderForm() {
           />
         </div>
 
-        {/* Order Dates */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -199,7 +198,6 @@ function PurchaseOrderForm() {
           </div>
         </div>
 
-        {/* Items */}
         <div className="space-y-4">
           <h3 className="font-semibold text-lg">Items</h3>
           {formData.items.map((item, index) => (
@@ -283,12 +281,12 @@ function PurchaseOrderForm() {
           </button>
         </div>
 
-        {/* Grand Total */}
+
         <div className="font-bold text-right text-lg">
           Grand Total: ₹{formData.total_amount}
         </div>
 
-        {/* Actions */}
+        
         <div className="flex justify-between">
           <button
             type="button"

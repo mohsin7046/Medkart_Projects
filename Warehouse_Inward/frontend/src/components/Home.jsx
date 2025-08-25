@@ -10,6 +10,7 @@ function Home() {
     else if (location.pathname.includes("vendor")) setSelected("vendor")
     else if (location.pathname.includes("purchase-order")) setSelected("purchase-order")
     else if (location.pathname.includes("grn")) setSelected("grn")
+    else if (location.pathname.includes("purchase-invoice")) setSelected("purchase-invoice")
   }, [location.pathname])
 
   return (
@@ -57,6 +58,16 @@ function Home() {
               }`}
             >
               GRN
+            </Link>
+
+            <Link
+              to="/purchase-invoice"
+              onClick={() => setSelected("purchase-invoice")}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                selected === "purchase-invoice" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Purchase Invoice
             </Link>
 
           </div>
