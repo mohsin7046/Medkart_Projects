@@ -11,7 +11,6 @@ export const createPurchaseOrder = async (req, res) => {
       total_amount,
       items
     } = req.body
-    console.log('From fronetnd', req.body)
 
     items.map((item) => {
       if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
@@ -52,6 +51,7 @@ export const createPurchaseOrder = async (req, res) => {
     res.status(500).json({ error: 'Failed to create purchase order' })
   }
 }
+
 
 export const getAllPurchaseOrders = async (req, res) => {
   try {

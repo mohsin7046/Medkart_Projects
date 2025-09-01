@@ -1,7 +1,6 @@
 import { prisma } from '../../utilities/import.config.js'
 import crypto from 'crypto'
 
-
 export const addProduct = async (req, res) => {
   const {
     name,
@@ -15,52 +14,42 @@ export const addProduct = async (req, res) => {
     gst_percentage,
     description,
     status
-  } = req.body
+  } = req.body;
 
-  if (
-    !name ||
-    !category ||
-    !product_mrp ||
-    !product_price ||
-    !last_purchase_price ||
-    !unit_of_measure ||
-    !hsn_code ||
-    !gst_percentage
-  ) {
-    return res.status(400).json({ error: 'Please fill all required fields' })
-  }
-
-  if (parseFloat(product_mrp) < parseFloat(product_price)) {
+  if (product_mrp < product_price) {
     return res
       .status(400)
-      .json({ error: 'Product MRP is equal or greater than price' })
+      .json({ error: "Product MRP must be equal or greater than price" });
   }
 
-  const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase()
-  const product_code = `pc-${randomStr}`
+  const randomStr = crypto.randomBytes(3).toString("hex").toUpperCase();
+  const product_code = `pc-${randomStr}`;
+
   try {
     const newProduct = await prisma.product.create({
       data: {
+        product_code,
         name,
         category,
-        product_code,
         combination,
-        product_mrp: parseFloat(product_mrp),
-        product_price: parseFloat(product_price),
-        last_purchase_price: parseFloat(last_purchase_price),
+        product_mrp,
+        product_price,
+        last_purchase_price,
         unit_of_measure,
-        hsn_code: parseInt(hsn_code),
-        gst_percentage: parseFloat(gst_percentage),
+        hsn_code,
+        gst_percentage,
         description,
         status
       }
-    })
-    res.status(201).json(newProduct)
+    });
+    res.status(201).json(newProduct);
   } catch (error) {
-    console.error('Error creating product:', error)
-    res.status(500).json({ error: 'Failed to create product' })
+    console.error("Error creating product:", error);
+    res.status(500).json({ error: "Failed to create product" });
   }
-}
+};
+
+
 
 export const getAllProducts = async (req, res) => {
   try {
@@ -103,8 +92,8 @@ export const getProductSearch = async (req, res) => {
 }
 
 export const updateProduct = async (req, res) => {
-  const formData = req.body
-  console.log(formData)
+  const formData = req.body;
+  console.log(formData);
 
   if (!formData.product_code) {
     return res.status(400).json({ error: 'Product ID is required for update' })

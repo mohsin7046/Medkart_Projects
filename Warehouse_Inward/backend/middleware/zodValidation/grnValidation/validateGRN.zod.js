@@ -1,4 +1,4 @@
-export const purchaseOrderValidate = (schema) => (req, res, next) => {
+export const goodReceiptNoteValidate = (schema) => (req, res, next) => {
   try {
     req.body = schema.parse(req.body); 
     next();

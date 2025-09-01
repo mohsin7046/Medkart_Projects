@@ -4,14 +4,8 @@ export const createPurchaseInvoice = async (req, res) => {
   try {
     const { grn_number, invoice_date, total_amount, items } = req.body
 
-    console.log(req.body)
-
-    if (!grn_number || !invoice_date || !total_amount) {
-      return res.status(400).json({ error: 'Please fill all required fields' })
-    }
-
     items.map((item) => {
-      if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
+      if (item.item_mrp < item.item_price) {
         return res.status(400).json({
           error: `MRP is not less than price in product ${item.product_code}`
         })
@@ -51,14 +45,14 @@ export const createPurchaseInvoice = async (req, res) => {
         grn_number,
         invoice_number,
         invoice_date: new Date(invoice_date),
-        total_amount: parseInt(total),
+        total_amount: total_amount,
         PurchaseInvoiceItem: {
           create: items.map((item) => ({
             product_code: item.product_code,
-            quantity: parseInt(item.quantity),
-            item_price: parseFloat(item.item_price),
-            item_mrp: parseFloat(item.item_mrp),
-            totalAmount: parseFloat(item.totalAmount)
+            quantity: item.quantity,
+            item_price: item.item_price,
+            item_mrp: item.item_mrp,
+            totalAmount: item.totalAmount
           }))
         }
       }
@@ -86,6 +80,9 @@ export const createPurchaseInvoice = async (req, res) => {
     return res.status(500).json({ error: 'Failed to create purchase invoice' })
   }
 }
+
+
+
 
 export const getAllPurchaseInvoices = async (req, res) => {
   try {
