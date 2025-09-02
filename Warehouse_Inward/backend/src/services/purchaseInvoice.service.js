@@ -111,23 +111,5 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   return deletedInvoice
 }
 
-export const searchFilterPurchaseInvoiceService = async (
-  query,
-  page,
-  limit
-) => {
-  const skip = (page - 1) * limit
-  const purchaseInvoices = await prisma.purchaseInvoice.findMany({
-    where: { deleted_at: null, query },
-    skip: skip,
-    take: Number(limit)
-  })
-
-  const totalItems = await prisma.purchaseInvoice.count({
-    where: { deleted_at: null, query }
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-
-  return { purchaseInvoices, metadata: { page, limit, totalPages, totalItems } }
-}
+export const searchFilterPurchaseInvoiceService = (query, page, limit) =>
+  searchAndFilter(prisma.purchaseInvoice, query, page, limit);

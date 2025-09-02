@@ -106,19 +106,5 @@ export const updatePurchaseOrderService = async (formData) => {
   return updatedPO
 }
 
-export const searchFilterPurchaseOrderService = async (query, page, limit) => {
-  const skip = (page - 1) * limit
-  const purchaseOrders = await prisma.purchaseOrder.findMany({
-    where: { deleted_at: null, query },
-    skip: skip,
-    take: Number(limit)
-  })
-
-  const totalItems = await prisma.purchaseOrder.count({
-    where: { deleted_at: null, query }
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-
-  return { purchaseOrders, metadata: { page, limit, totalPages, totalItems } }
-}
+export const searchFilterPurchaseOrderService = (query, page, limit) =>
+  searchAndFilter(prisma.purchaseOrder, query, page, limit);

@@ -1,6 +1,7 @@
 import { prisma } from '../../utilities/import.config.js'
 import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
+import { searchAndFilter } from './searchFilter.service.js';
 
 export const createVendorService = async (data) => {
   const vendor_code = generateRandom("VENDOR");
@@ -77,19 +78,5 @@ export const deleteVendorService = async (vendor_code) => {
   return softdeleteVendor
 }
 
-export const searchFilterVendorService = async (query, page, limit) => {
-  const skip = (page - 1) * limit
-  const vendors = await prisma.vendor.findMany({
-    where: { deleted_at: null, query },
-    skip: skip,
-    take: Number(limit)
-  })
-
-  const totalItems = await prisma.vendor.count({
-    where: { deleted_at: null, query }
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-
-  return { vendors, metadata: { page, limit, totalPages, totalItems } }
-}
+export const searchFilterVendorService = (query, page, limit) =>
+  searchAndFilter(prisma.vendor, query, page, limit);

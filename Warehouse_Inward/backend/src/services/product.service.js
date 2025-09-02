@@ -107,19 +107,5 @@ export const deleteProductService = async (product_code) => {
   return softdeleteProduct
 }
 
-export const searchFilterProductService = async (query, page, limit) => {
-  const skip = (page - 1) * limit
-  const products = await prisma.product.findMany({
-    where: { deleted_at: null, query },
-    skip: skip,
-    take: Number(limit)
-  })
-
-  const totalItems = await prisma.product.count({
-    where: { deleted_at: null, query }
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-
-  return { products, metadata: { page, limit, totalPages, totalItems } }
-}
+export const searchFilterProductService = (query, page, limit) =>
+  searchAndFilter(prisma.product, query, page, limit);

@@ -253,19 +253,5 @@ export const deleteGRNItemsById = async (grn_id) => {
   return deleteAllItem
 }
 
-export const searchFilterGRNService = async (query, page, limit) => {
-  const skip = (page - 1) * limit
-  const grns = await prisma.goodReceiptNote.findMany({
-    where: { deleted_at: null, query },
-    skip: skip,
-    take: Number(limit)
-  })
-
-  const totalItems = await prisma.goodReceiptNote.count({
-    where: { deleted_at: null, query }
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-
-  return { grns, metadata: { page, limit, totalPages, totalItems } }
-}
+export const searchFilterGRNService = (query, page, limit) =>
+  searchAndFilter(prisma.goodReceiptNote, query, page, limit);
