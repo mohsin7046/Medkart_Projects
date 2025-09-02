@@ -1,55 +1,62 @@
-import { decimalConversion } from "../../../utilities/decimal.conversion";
+import { decimalConversion } from '../../../utilities/decimal.conversion'
+import {z} from 'zod';
 
 export const updateProductSchema = z.object({
-  name: z.string()
-    .min(3, "Name must be at least 3 characters long")
-    .max(100, "Name must not exceed 100 characters")
-    .optional(),
-  
-  category: z.string()
-    .min(2, "Category must be at least 2 characters long")
+  name: z
+    .string()
+    .min(3, 'Name must be at least 3 characters long')
+    .max(100, 'Name must not exceed 100 characters')
     .optional(),
 
-  combination: z.union([
-    z.string().min(1, "Combination must not be empty"),
-    z.array(z.string().min(1, "Each combination must not be empty"))
-  ])
-  .optional(),
+  category: z
+    .string()
+    .min(2, 'Category must be at least 2 characters long')
+    .optional(),
 
-  product_mrp: z.number()
-    .positive("MRP must be a positive number")
+  combination: z
+    .union([
+      z.string().min(1, 'Combination must not be empty'),
+      z.array(z.string().min(1, 'Each combination must not be empty'))
+    ])
+    .optional(),
+
+  product_mrp: z
+    .number()
+    .positive('MRP must be a positive number')
     .transform(decimalConversion)
     .optional(),
 
-  product_price: z.number()
-    .positive("Price must be a positive number")
+  product_price: z
+    .number()
+    .positive('Price must be a positive number')
     .transform(decimalConversion)
     .optional(),
 
-  last_purchase_price: z.number()
-    .nonnegative("Last purchase price cannot be negative")
+  last_purchase_price: z
+    .number()
+    .nonnegative('Last purchase price cannot be negative')
     .transform(decimalConversion)
     .optional(),
 
-  unit_of_measure: z.string()
-    .min(1, "Unit of measure is required")
+  unit_of_measure: z.string().min(1, 'Unit of measure is required').optional(),
+
+  hsn_code: z
+    .number()
+    .int('HSN code must be an integer')
+    .gte(1000, 'HSN code must be at least 4 digits')
     .optional(),
 
-  hsn_code: z.number()
-    .int("HSN code must be an integer")
-    .gte(1000, "HSN code must be at least 4 digits")
-    .optional(),
-
-  gst_percentage: z.number()
-    .min(0, "GST % must be at least 0")
-    .max(100, "GST % cannot exceed 100")
+  gst_percentage: z
+    .number()
+    .min(0, 'GST % must be at least 0')
+    .max(100, 'GST % cannot exceed 100')
     .transform(decimalConversion)
     .optional(),
 
-  description: z.string()
-    .max(10, "Description should not exceed 10 characters")
+  description: z
+    .string()
+    .max(10, 'Description should not exceed 10 characters')
     .optional(),
 
-  status: z.string()
-  .optional(),
-});
+  status: z.string().optional()
+})

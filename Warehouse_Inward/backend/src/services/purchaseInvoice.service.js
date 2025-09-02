@@ -1,9 +1,15 @@
 import { prisma } from '../utilities/import.config.js'
 import { STATUS, PREFIX } from '../utilities/constant.js'
 
-export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total_amount, items }) => {
-
-  const existingGRN = await prisma.goodReceiptNote.findUnique({ where: { id: grn_id } })
+export const createPurchaseInvoiceService = async ({
+  grn_id,
+  invoice_date,
+  total_amount,
+  items
+}) => {
+  const existingGRN = await prisma.goodReceiptNote.findUnique({
+    where: { id: grn_id }
+  })
   if (!existingGRN) {
     throw new Error('GRN is not exist')
   }
@@ -12,23 +18,23 @@ export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total
     throw new Error('Purchase Invoice already created for this GRN')
   }
 
-  const productIds = items.map(item => item.product_id);
+  const productIds = items.map((item) => item.product_id)
 
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds },deleted_at:null },
+    where: { id: { in: productIds }, deleted_at: null },
     select: { product_code: true, gst_percentage: true }
-  });
+  })
 
   const productMap = products.reduce((obj, p) => {
-    obj[p.product_code] = p.gst_percentage || 0;
-    return obj;
-  }, {});
+    obj[p.product_code] = p.gst_percentage || 0
+    return obj
+  }, {})
 
-  let total = 0;
+  let total = 0
   for (let item of items) {
-    const gst = productMap[item.product_code] || 0;
-    const sum = item.totalAmount + (item.totalAmount * gst) / 100;
-    total += sum;
+    const gst = productMap[item.product_code] || 0
+    const sum = item.totalAmount + (item.totalAmount * gst) / 100
+    total += sum
   }
 
   const invoice_number = PREFIX.INVOICE + Date.now()
@@ -59,26 +65,27 @@ export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total
   return invoice
 }
 
-
 export const getAllPurchaseInvoicesService = async (page, limit, orderBy) => {
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit
 
-  const totalItems = await prisma.product.count();
+  const totalItems = await prisma.product.count()
   const allPurchaseInvoices = await prisma.purchaseInvoice.findMany({
     where: { deleted_at: null },
     include: { PurchaseInvoiceItem: true },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy },
-  });
+    orderBy: { createdAt: orderBy }
+  })
 
-  const totalPages = Math.ceil(totalItems / limit);
-  const hasNextPage = page < totalPages;
-  const hasPrevPage = page > 1;
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPrevPage = page > 1
 
-  return { allPurchaseInvoices, metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage } };
+  return {
+    allPurchaseInvoices,
+    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
+  }
 }
-
 
 export const deletePurchaseInvoiceService = async (invoice_id) => {
   await prisma.purchaseInvoiceItem.updateMany({
@@ -98,19 +105,23 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   return deletedInvoice
 }
 
-export const searchFilterPurchaseInvoiceService = async (query, page, limit) => {
-  const skip = (page - 1) * limit;
+export const searchFilterPurchaseInvoiceService = async (
+  query,
+  page,
+  limit
+) => {
+  const skip = (page - 1) * limit
   const purchaseInvoices = await prisma.purchaseInvoice.findMany({
     where: { deleted_at: null, query },
     skip: skip,
-    take: Number(limit),
-  });
-
-  const totalItems = await prisma.purchaseInvoice.count({
-    where: { deleted_at: null, query },
+    take: Number(limit)
   })
 
-  const totalPages = Math.ceil(totalItems / limit);
+  const totalItems = await prisma.purchaseInvoice.count({
+    where: { deleted_at: null, query }
+  })
+
+  const totalPages = Math.ceil(totalItems / limit)
 
   return { purchaseInvoices, metadata: { page, limit, totalPages, totalItems } }
 }

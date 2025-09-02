@@ -12,9 +12,9 @@ const router = Router()
 
 router.get('/getProducts?page&limit&orderBy', getAllProducts)
 router.get('/searchfilter?search&page&limit', searchFilterProduct)
-router.post('/add-product',addProduct)
+router.post('/add-product', addProduct)
 router.get('/search/:q', getProductSearch)
-router.put('/update',updateProduct)
+router.put('/update', updateProduct)
 router.delete('/deleteProduct', deleteProduct)
 
 export default router

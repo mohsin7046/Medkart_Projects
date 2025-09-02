@@ -2,12 +2,12 @@ import { prisma } from '../utilities/import.config.js'
 import { v4 as uuidv4 } from 'uuid'
 import { STATUS, PREFIX } from '../utilities/constant.js'
 
-
 export const createPurchaseOrderService = async (data) => {
-  const { vendor_id, order_date, expected_delivery_date, total_amount, items } = data
+  const { vendor_id, order_date, expected_delivery_date, total_amount, items } =
+    data
 
-
-  const order_number = PREFIX.ORDER + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
+  const order_number =
+    PREFIX.ORDER + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
 
   return await prisma.purchaseOrder.create({
     data: {
@@ -23,38 +23,38 @@ export const createPurchaseOrderService = async (data) => {
           quantity: item.quantity,
           item_price: item.item_price,
           item_mrp: item.item_mrp,
-          totalAmount: item.totalAmount,
-        })),
-      },
-    },
+          totalAmount: item.totalAmount
+        }))
+      }
+    }
   })
 }
 
-
 export const getAllPurchaseOrdersService = async (page, limit, orderBy) => {
+  const skip = (page - 1) * limit
 
-  const skip = (page - 1) * limit;
-
-  const totalItems = await prisma.product.count();
+  const totalItems = await prisma.product.count()
   const allProductOrders = await prisma.product.findMany({
-    where:{deleted_at:null},
+    where: { deleted_at: null },
     skip,
     take: limit,
     include: { purchaseOrderItems: true },
-    orderBy: { createdAt: orderBy },
-  });
+    orderBy: { createdAt: orderBy }
+  })
 
-  const totalPages = Math.ceil(totalItems / limit);
-  const hasNextPage = page < totalPages;
-  const hasPrevPage = page > 1;
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPrevPage = page > 1
 
-  return { allProductOrders, metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage } };
+  return {
+    allProductOrders,
+    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
+  }
 }
-
 
 export const deletePurchaseOrderService = async (purchase_order_id) => {
   const existingPO = await prisma.goodReceiptNote.findFirst({
-    where: { order_id: purchase_order_id,deleted_at:null },
+    where: { order_id: purchase_order_id, deleted_at: null }
   })
 
   if (existingPO && existingPO.status === STATUS.COMPLETED) {
@@ -64,24 +64,23 @@ export const deletePurchaseOrderService = async (purchase_order_id) => {
   await prisma.purchaseOrderItem.updateMany({
     where: { order_id: purchase_order_id },
     data: {
-      deleted_at:new Date()
+      deleted_at: new Date()
     }
   })
 
   const deletePO = await prisma.purchaseOrder.update({
     where: { id: purchase_order_id },
     data: {
-      deleted_at:new Date()
+      deleted_at: new Date()
     }
   })
 
   if (!deletePO) {
-    throw new Error("Purchase Order not deleted")
+    throw new Error('Purchase Order not deleted')
   }
 
-  return deletePO;
+  return deletePO
 }
-
 
 export const updatePurchaseOrderService = async (formData) => {
   const updatedPO = await prisma.purchaseOrder.update({
@@ -98,29 +97,29 @@ export const updatePurchaseOrderService = async (formData) => {
           quantity: parseInt(item.quantity),
           item_price: parseInt(item.item_price),
           item_mrp: parseInt(item.item_mrp),
-          totalAmount: parseInt(item.totalAmount),
-        })),
-      },
+          totalAmount: parseInt(item.totalAmount)
+        }))
+      }
     },
-    include: { purchaseOrderItems: true },
+    include: { purchaseOrderItems: true }
   })
 
-  return updatedPO;
+  return updatedPO
 }
 
 export const searchFilterPurchaseOrderService = async (query, page, limit) => {
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit
   const purchaseOrders = await prisma.purchaseOrder.findMany({
     where: { deleted_at: null, query },
     skip: skip,
-    take: Number(limit),
-  });
-
-  const totalItems = await prisma.purchaseOrder.count({
-    where: { deleted_at: null, query },
+    take: Number(limit)
   })
 
-  const totalPages = Math.ceil(totalItems / limit);
+  const totalItems = await prisma.purchaseOrder.count({
+    where: { deleted_at: null, query }
+  })
+
+  const totalPages = Math.ceil(totalItems / limit)
 
   return { purchaseOrders, metadata: { page, limit, totalPages, totalItems } }
 }

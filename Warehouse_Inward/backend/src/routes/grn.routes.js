@@ -7,7 +7,6 @@ import {
   searchFilterGRN
 } from '../controllers/grn/grn.controller.js'
 
-
 const router = Router()
 
 router.post('/create-grn', createGRN)

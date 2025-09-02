@@ -1,9 +1,7 @@
 import { prisma } from '../../utilities/import.config.js'
-import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js';
-
+import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js'
 
 export const createVendorService = async (data) => {
-
   const vendor_code = `${PREFIX.VENDOR + Date.now()}`
 
   const createVendor = await prisma.vendor.create({
@@ -11,29 +9,30 @@ export const createVendorService = async (data) => {
       ...data,
       vendor_code
     }
-  });
-  return createVendor;
+  })
+  return createVendor
 }
 
-
 export const getAllVendorsService = async (page, limit, orderBy) => {
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit
 
-  const totalItems = await prisma.vendor.count();
+  const totalItems = await prisma.vendor.count()
   const allVendors = await prisma.vendor.findMany({
     where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy },
-  });
+    orderBy: { createdAt: orderBy }
+  })
 
-  const totalPages = Math.ceil(totalItems / limit);
-  const hasNextPage = page < totalPages;
-  const hasPrevPage = page > 1;
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPrevPage = page > 1
 
-  return { allVendors, metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage } };
+  return {
+    allVendors,
+    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
+  }
 }
-
 
 export const searchVendorsService = async (q) => {
   const searchVendor = await prisma.vendor.findMany({
@@ -49,9 +48,8 @@ export const searchVendorsService = async (q) => {
     take: LIMIT.VENDOR_LIMIT
   })
 
-  return searchVendor;
+  return searchVendor
 }
-
 
 export const updateVendorService = async (data) => {
   const updatedVendor = await prisma.vendor.update({
@@ -72,26 +70,25 @@ export const deleteVendorService = async (vendor_code) => {
     }
   })
   if (!softdeleteVendor) {
-    throw new Error("Product is not deleted")
+    throw new Error('Product is not deleted')
   }
 
-  return softdeleteVendor;
+  return softdeleteVendor
 }
 
-
 export const searchFilterVendorService = async (query, page, limit) => {
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit
   const vendors = await prisma.vendor.findMany({
     where: { deleted_at: null, query },
     skip: skip,
-    take: Number(limit),
-  });
-
-  const totalItems = await prisma.vendor.count({
-    where: { deleted_at: null, query },
+    take: Number(limit)
   })
 
-  const totalPages = Math.ceil(totalItems / limit);
+  const totalItems = await prisma.vendor.count({
+    where: { deleted_at: null, query }
+  })
+
+  const totalPages = Math.ceil(totalItems / limit)
 
   return { vendors, metadata: { page, limit, totalPages, totalItems } }
 }

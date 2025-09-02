@@ -1,74 +1,73 @@
-import { prisma } from '../utilities/import.config.js';
-import { STATUS, PREFIX, LIMIT } from '../utilities/constant.js';
+import { prisma } from '../utilities/import.config.js'
+import { STATUS, PREFIX, LIMIT } from '../utilities/constant.js'
 import crypto from 'crypto'
 
 export const addProductService = async (data) => {
   if (data.product_mrp < data.product_price) {
-    throw new Error("Product MRP must be equal or greater than price");
+    throw new Error('Product MRP must be equal or greater than price')
   }
 
-  const randomStr = crypto.randomBytes(3).toString("hex").toUpperCase();
-  const product_code = `${PREFIX.PRODUCT + randomStr}`;
+  const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase()
+  const product_code = `${PREFIX.PRODUCT + randomStr}`
 
   const products = await prisma.product.create({
     data: {
       ...data,
-      product_code,
-    },
-  });
+      product_code
+    }
+  })
 
   return products
-};
-
+}
 
 export const getAllProductsService = async (page, limit, orderBy) => {
-  const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit
 
-  const totalItems = await prisma.product.count();
+  const totalItems = await prisma.product.count()
   const allProducts = await prisma.product.findMany({
-    where:{deleted_at:null},
+    where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy },
-  });
+    orderBy: { createdAt: orderBy }
+  })
 
-  const totalPages = Math.ceil(totalItems / limit);
-  const hasNextPage = page < totalPages;
-  const hasPrevPage = page > 1;
+  const totalPages = Math.ceil(totalItems / limit)
+  const hasNextPage = page < totalPages
+  const hasPrevPage = page > 1
 
-  return { allProducts, metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage } };
-};
-
-
+  return {
+    allProducts,
+    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
+  }
+}
 
 export const searchProductService = async (q) => {
   const searchProduct = await prisma.product.findMany({
     where: {
-      deleted_at:null,
+      deleted_at: null,
       name: {
         contains: q,
-        mode: "insensitive",
+        mode: 'insensitive'
       },
-      status: STATUS.ACTIVE,
+      status: STATUS.ACTIVE
     },
     select: {
       product_code: true,
-      name: true,
+      name: true
     },
-    take: LIMIT.PRODUCT_LIMIT,
-  });
+    take: LIMIT.PRODUCT_LIMIT
+  })
 
-  return searchProduct;
-};
-
+  return searchProduct
+}
 
 export const updateProductService = async (formData) => {
   if (!formData.product_code) {
-    throw new Error("Product code is required for update");
+    throw new Error('Product code is required for update')
   }
 
   if (formData.product_mrp < formData.product_price) {
-    throw new Error("Product MRP must be equal or greater than price");
+    throw new Error('Product MRP must be equal or greater than price')
   }
 
   const updateProduct = await prisma.product.update({
@@ -84,43 +83,42 @@ export const updateProductService = async (formData) => {
       hsn_code: formData.hsn_code,
       description: formData.description,
       gst_percentage: formData.gst_percentage,
-      status: formData.status,
-    },
-  });
+      status: formData.status
+    }
+  })
 
-  return updateProduct;
-};
-
+  return updateProduct
+}
 
 export const deleteProductService = async (product_code) => {
   if (!product_code) {
-    throw new Error("Product code is required for deletion");
+    throw new Error('Product code is required for deletion')
   }
   const softdeleteProduct = await prisma.product.update({
     where: { product_code },
     data: {
-      deleted_at:new Date()
+      deleted_at: new Date()
     }
   })
   if (!softdeleteProduct) {
-    throw new Error("Product is not deleted")
+    throw new Error('Product is not deleted')
   }
-  return softdeleteProduct;
-};
+  return softdeleteProduct
+}
 
-export const searchFilterProductService = async(query,page,limit)=>{
-   const skip = (page - 1) * limit;
-    const products = await prisma.product.findMany({
-      where:{ deleted_at:null,query},
-      skip: skip,
-      take: Number(limit),
-    });
+export const searchFilterProductService = async (query, page, limit) => {
+  const skip = (page - 1) * limit
+  const products = await prisma.product.findMany({
+    where: { deleted_at: null, query },
+    skip: skip,
+    take: Number(limit)
+  })
 
-    const totalItems = await prisma.product.count({
-       where:{ deleted_at:null,query},
-    })
+  const totalItems = await prisma.product.count({
+    where: { deleted_at: null, query }
+  })
 
-    const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = Math.ceil(totalItems / limit)
 
-    return {products,metadata:{page,limit,totalPages,totalItems}}
+  return { products, metadata: { page, limit, totalPages, totalItems } }
 }
