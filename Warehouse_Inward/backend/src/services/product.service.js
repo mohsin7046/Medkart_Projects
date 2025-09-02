@@ -26,6 +26,7 @@ export const getAllProductsService = async (page, limit, orderBy) => {
 
   const totalItems = await prisma.product.count();
   const allProducts = await prisma.product.findMany({
+    where:{deleted_at:null},
     skip,
     take: limit,
     orderBy: { createdAt: orderBy },
@@ -43,6 +44,7 @@ export const getAllProductsService = async (page, limit, orderBy) => {
 export const searchProductService = async (q) => {
   const searchProduct = await prisma.product.findMany({
     where: {
+      deleted_at:null,
       name: {
         contains: q,
         mode: "insensitive",
@@ -97,7 +99,7 @@ export const deleteProductService = async (product_code) => {
   const softdeleteProduct = await prisma.product.update({
     where: { product_code },
     data: {
-      deletedAt: Date.now()
+      deleted_at:new Date()
     }
   })
   if (!softdeleteProduct) {
@@ -109,13 +111,13 @@ export const deleteProductService = async (product_code) => {
 export const searchFilterProductService = async(query,page,limit)=>{
    const skip = (page - 1) * limit;
     const products = await prisma.product.findMany({
-      where: query,
+      where:{ deleted_at:null,query},
       skip: skip,
       take: Number(limit),
     });
 
     const totalItems = await prisma.product.count({
-      where: query, 
+       where:{ deleted_at:null,query},
     })
 
     const totalPages = Math.ceil(totalItems / limit);

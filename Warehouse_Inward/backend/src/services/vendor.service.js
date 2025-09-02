@@ -1,5 +1,5 @@
 import { prisma } from '../../utilities/import.config.js'
-import { STATUS, PREFIX,LIMIT } from '../src/utilities/constant.js';
+import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js';
 
 
 export const createVendorService = async (data) => {
@@ -21,6 +21,7 @@ export const getAllVendorsService = async (page, limit, orderBy) => {
 
   const totalItems = await prisma.vendor.count();
   const allVendors = await prisma.vendor.findMany({
+    where: { deleted_at: null },
     skip,
     take: limit,
     orderBy: { createdAt: orderBy },
@@ -37,6 +38,7 @@ export const getAllVendorsService = async (page, limit, orderBy) => {
 export const searchVendorsService = async (q) => {
   const searchVendor = await prisma.vendor.findMany({
     where: {
+      deleted_at: null,
       name: { contains: q, mode: 'insensitive' },
       status: STATUS.ACTIVE
     },
@@ -66,7 +68,7 @@ export const deleteVendorService = async (vendor_code) => {
   const softdeleteVendor = await prisma.vendor.update({
     where: { vendor_code },
     data: {
-      deletedAt: Date.now()
+      deleted_at: new Date()
     }
   })
   if (!softdeleteVendor) {
@@ -77,19 +79,19 @@ export const deleteVendorService = async (vendor_code) => {
 }
 
 
-export const searchFilterVendorService = async(query,page,limit)=>{
-   const skip = (page - 1) * limit;
-    const vendors = await prisma.vendor.findMany({
-      where: query,
-      skip: skip,
-      take: Number(limit),
-    });
+export const searchFilterVendorService = async (query, page, limit) => {
+  const skip = (page - 1) * limit;
+  const vendors = await prisma.vendor.findMany({
+    where: { deleted_at: null, query },
+    skip: skip,
+    take: Number(limit),
+  });
 
-    const totalItems = await prisma.vendor.count({
-      where: query,
-    })
+  const totalItems = await prisma.vendor.count({
+    where: { deleted_at: null, query },
+  })
 
-    const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = Math.ceil(totalItems / limit);
 
-    return {vendors,metadata:{page,limit,totalPages,totalItems}}
+  return { vendors, metadata: { page, limit, totalPages, totalItems } }
 }

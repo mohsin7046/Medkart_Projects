@@ -3,7 +3,7 @@ import { STATUS, PREFIX } from '../utilities/constant.js'
 
 export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total_amount, items }) => {
 
-  const existingGRN = await prisma.goodReceiptNote.findUnique({ where: { id:grn_id } })
+  const existingGRN = await prisma.goodReceiptNote.findUnique({ where: { id: grn_id } })
   if (!existingGRN) {
     throw new Error('GRN is not exist')
   }
@@ -15,7 +15,7 @@ export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total
   const productIds = items.map(item => item.product_id);
 
   const products = await prisma.product.findMany({
-    where: { id: { in: productIds } },
+    where: { id: { in: productIds },deleted_at:null },
     select: { product_code: true, gst_percentage: true }
   });
 
@@ -51,7 +51,6 @@ export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total
     }
   })
 
-
   await prisma.goodReceiptNote.update({
     where: { grn_id },
     data: { status: STATUS.COMPLETED }
@@ -61,11 +60,12 @@ export const createPurchaseInvoiceService = async ({ grn_id, invoice_date, total
 }
 
 
-export const getAllPurchaseInvoicesService = async (page,limit,orderBy) => {
+export const getAllPurchaseInvoicesService = async (page, limit, orderBy) => {
   const skip = (page - 1) * limit;
 
   const totalItems = await prisma.product.count();
-  const allPurchaseInvoices = await prisma.product.findMany({
+  const allPurchaseInvoices = await prisma.purchaseInvoice.findMany({
+    where: { deleted_at: null },
     include: { PurchaseInvoiceItem: true },
     skip,
     take: limit,
@@ -83,34 +83,34 @@ export const getAllPurchaseInvoicesService = async (page,limit,orderBy) => {
 export const deletePurchaseInvoiceService = async (invoice_id) => {
   await prisma.purchaseInvoiceItem.updateMany({
     where: { invoice_id },
-     data:{
-      deletedAt:Date.now()
+    data: {
+      deletedAt: Date.now()
     }
   })
 
   const deletedInvoice = await prisma.purchaseInvoice.update({
-    where: { id:invoice_id },
-     data:{
-      deletedAt:Date.now()
+    where: { id: invoice_id },
+    data: {
+      deleted_at: new Date()
     }
   })
 
   return deletedInvoice
 }
 
-export const searchFilterPurchaseInvoiceService = async(query,page,limit)=>{
-   const skip = (page - 1) * limit;
-    const purchaseInvoices = await prisma.purchaseInvoice.findMany({
-      where: query,
-      skip: skip,
-      take: Number(limit),
-    });
+export const searchFilterPurchaseInvoiceService = async (query, page, limit) => {
+  const skip = (page - 1) * limit;
+  const purchaseInvoices = await prisma.purchaseInvoice.findMany({
+    where: { deleted_at: null, query },
+    skip: skip,
+    take: Number(limit),
+  });
 
-    const totalItems = await prisma.purchaseInvoice.count({
-      where: query, 
-    })
+  const totalItems = await prisma.purchaseInvoice.count({
+    where: { deleted_at: null, query },
+  })
 
-    const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = Math.ceil(totalItems / limit);
 
-    return {purchaseInvoices,metadata:{page,limit,totalPages,totalItems}}
+  return { purchaseInvoices, metadata: { page, limit, totalPages, totalItems } }
 }

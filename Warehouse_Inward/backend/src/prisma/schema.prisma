@@ -25,9 +25,9 @@ model Vendor{
   gst_number String
   address   String
   status    String   @default("active") // active, inactive, blocked
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
 
   purchaseOrders PurchaseOrder[]
 
@@ -48,9 +48,9 @@ model Product{
   hsn_code   Int
   gst_percentage Float
   status      String   @default("active") // active, inactive, discontinued
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   purchaseOrderItems PurchaseOrderItem[]
 
@@ -68,9 +68,9 @@ model PurchaseOrder{
   total_amount Float
   expected_delivery_date DateTime
   status      String   @default("pending") // pending, partially received, completed, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   purchaseOrderItems PurchaseOrderItem[]
 
@@ -89,9 +89,9 @@ model PurchaseOrderItem{
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("purchase_order_items")
 }
@@ -106,9 +106,9 @@ model GoodReceiptNote{
   damaged_qty Int?
   shortage_qty Int?
   status      String   @default("pending") // pending, completed, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   goodReceiptNoteItems GoodReceiptNoteItem[]
 
@@ -129,9 +129,9 @@ model GoodReceiptNoteItem{
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("good_receipt_note_items")
 }
@@ -144,9 +144,9 @@ model PurchaseInvoice{
   invoice_date DateTime
   total_amount Float
   status      String   @default("pending") // pending, paid, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at   DateTime?
 
   @@map("purchase_invoices")
   PurchaseInvoiceItem PurchaseInvoiceItem[]
@@ -162,9 +162,9 @@ model PurchaseInvoiceItem{
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt DateTime?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("purchase_invoice_items")
 }

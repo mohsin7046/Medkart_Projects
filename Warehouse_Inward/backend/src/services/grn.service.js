@@ -2,16 +2,16 @@ import { prisma } from "../utilities/import.config.js";
 import { STATUS, PREFIX } from "../utilities/constant.js";
 
 export const findPOByOrderNumber = async (order_id) => {
-  const POOrderNumber = await prisma.purchaseOrder.findUnique({
-    where: { id: order_id },
+  const POOrderNumber = await prisma.purchaseOrder.findFirst({
+    where: { id: order_id, deleted_at: null },
     include: { purchaseOrderItems: true },
   });
   return POOrderNumber
 };
 
 export const findGRNByNumber = async (grn_id) => {
-  const grnfind = await prisma.goodReceiptNote.findUnique({
-    where: { id: grn_id },
+  const grnfind = await prisma.goodReceiptNote.findFirst({
+    where: { id: grn_id, deleted_at: null },
     include: { goodReceiptNoteItems: true },
   });
   return grnfind;
@@ -47,7 +47,7 @@ export const createGRNRecord = async (existingPO, data) => {
     }
 
     const lastGRNItem = await prisma.goodReceiptNoteItem.findFirst({
-      where: { product_id: poItem.id },
+      where: { product_id: poItem.id, deleted_at: null },
       orderBy: { id: 'desc' }
     });
 
@@ -111,7 +111,6 @@ export const createGRNRecord = async (existingPO, data) => {
   }
 
   return newGRN;
-
 };
 
 
@@ -125,8 +124,8 @@ export const updateGRNRecord = async (existingGRN, data) => {
   const purchase_order_id = data.purchase_order_id;
   const grn_id = data.id;
 
-  const existingPO = await prisma.purchaseOrder.findUnique({
-    where: { id: purchase_order_id },
+  const existingPO = await prisma.purchaseOrder.findFirst({
+    where: { id: purchase_order_id, deleted_at: null },
     include: { purchaseOrderItems: true }
   });
 
@@ -160,7 +159,7 @@ export const updateGRNRecord = async (existingGRN, data) => {
     }
 
     const lastGRNItem = await prisma.goodReceiptNoteItem.findFirst({
-      where: { product_id: poItem.id },
+      where: { product_id: poItem.id, deleted_at: null },
       orderBy: { id: 'desc' }
     });
 
@@ -221,8 +220,11 @@ export const updateGRNRecord = async (existingGRN, data) => {
 export const getALLGRNService = async (page, limit, orderBy) => {
   const skip = (page - 1) * limit;
 
-  const totalItems = await prisma.product.count();
+  const totalItems = await prisma.product.count({
+    where: { deleted_at: null }
+  });
   const allGRNs = await prisma.product.findMany({
+    where: { deleted_at: null },
     include: { goodReceiptNoteItems: true },
     skip,
     take: limit,
@@ -240,7 +242,7 @@ export const deleteGRNRecord = async (grn_number) => {
   const deleteGRN = await prisma.goodReceiptNote.update({
     where: { grn_number },
     data: {
-      deletedAt: Date.now()
+      deleted_at:new Date()
     }
   });
   return deleteGRN
@@ -250,25 +252,25 @@ export const deleteGRNItemsById = async (grn_id) => {
   const deleteAllItem = await prisma.goodReceiptNoteItem.updateMany({
     where: { grn_id },
     data: {
-      deletedAt: Date.now()
+      deleted_at:new Date()
     }
   });
   return deleteAllItem
 };
 
-export const searchFilterGRNService = async(query,page,limit)=>{
-   const skip = (page - 1) * limit;
-    const grns = await prisma.goodReceiptNote.findMany({
-      where: query,
-      skip: skip,
-      take: Number(limit),
-    });
+export const searchFilterGRNService = async (query, page, limit) => {
+  const skip = (page - 1) * limit;
+  const grns = await prisma.goodReceiptNote.findMany({
+    where:{deleted_at:null,query},
+    skip: skip,
+    take: Number(limit),
+  });
 
-    const totalItems = await prisma.goodReceiptNote.count({
-      where: query, 
-    })
+  const totalItems = await prisma.goodReceiptNote.count({
+    where:{deleted_at:null,query},
+  })
 
-    const totalPages = Math.ceil(totalItems / limit);
+  const totalPages = Math.ceil(totalItems / limit);
 
-    return {grns,metadata:{page,limit,totalPages,totalItems}}
+  return { grns, metadata: { page, limit, totalPages, totalItems } }
 }
