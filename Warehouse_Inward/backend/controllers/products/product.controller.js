@@ -1,51 +1,20 @@
-import { prisma } from '../../utilities/import.config.js'
-import crypto from 'crypto'
+
+import { addProductService, getAllProductsService, searchProductService, updateProductService, deleteProductService } from '../../services/product.service.js';
+import { successResponse, errorResponse } from '../../utilities/response.js';
+
 
 export const addProduct = async (req, res) => {
-  const {
-    name,
-    category,
-    combination,
-    product_mrp,
-    product_price,
-    last_purchase_price,
-    unit_of_measure,
-    hsn_code,
-    gst_percentage,
-    description,
-    status
-  } = req.body;
-
-  if (product_mrp < product_price) {
-    return res
-      .status(400)
-      .json({ error: "Product MRP must be equal or greater than price" });
-  }
-
-  const randomStr = crypto.randomBytes(3).toString("hex").toUpperCase();
-  const product_code = `pc-${randomStr}`;
+  const data = req.body;
 
   try {
-    const newProduct = await prisma.product.create({
-      data: {
-        product_code,
-        name,
-        category,
-        combination,
-        product_mrp,
-        product_price,
-        last_purchase_price,
-        unit_of_measure,
-        hsn_code,
-        gst_percentage,
-        description,
-        status
-      }
-    });
-    res.status(201).json(newProduct);
+    const newProduct = await addProductService(data)
+    if (!newProduct) {
+      return errorResponse(res, "Product not created", 400);
+    }
+    return successResponse(res, newProduct, "Product created Successfully", 200)
   } catch (error) {
     console.error("Error creating product:", error);
-    res.status(500).json({ error: "Failed to create product" });
+    return errorResponse(res, "Failed to create product", 500)
   }
 };
 
@@ -53,99 +22,62 @@ export const addProduct = async (req, res) => {
 
 export const getAllProducts = async (req, res) => {
   try {
-    const products = await prisma.product.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-    res.status(200).json(products)
+    //TODO: getALLProducts through pagination 
+    const products = await getAllProductsService();
+    if (!products) {
+      return errorResponse(res, "Product not fetched!!", 400)
+    }
+    return successResponse(res, products, "Product fetch succesfully", 200)
   } catch (error) {
     console.error('Error fetching products:', error)
-    res.status(500).json({ error: 'Failed to fetch products' })
+    return errorResponse(res, 'Failed to fetch products', 500)
   }
 }
 
 export const getProductSearch = async (req, res) => {
   try {
     const { q } = req.params
-    console.log(q)
 
-    const products = await prisma.product.findMany({
-      where: {
-        name: {
-          contains: q,
-          mode: 'insensitive'
-        },
-        status: 'active'
-      },
-      select: {
-        product_code: true,
-        name: true
-      },
-      take: 2
-    })
-    res.json(products)
+    const products = await searchProductService(q);
+    if (!products) {
+      return errorResponse(res, "Product not fetched for the query!!", 400)
+    }
+    return successResponse(res, products, "Product fetch succesfully for query", 200)
   } catch (err) {
     console.error('Products search error:', err)
-    res.status(500).json({ error: 'Failed to fetch products' })
+    return errorResponse(res, 'Failed to fetch products for query', 500)
   }
 }
 
+
 export const updateProduct = async (req, res) => {
   const formData = req.body;
-  console.log(formData);
-
-  if (!formData.product_code) {
-    return res.status(400).json({ error: 'Product ID is required for update' })
-  }
-
-  if (parseFloat(formData?.product_mrp) < parseFloat(formData?.product_price)) {
-    return res
-      .status(400)
-      .json({ error: 'Product MRP is equal or greater than price' })
-  }
 
   try {
-    const updatedProduct = await prisma.product.update({
-      where: { product_code: formData.product_code },
-      data: {
-        name: formData.name,
-        category: formData.category,
-        combination: formData.combination,
-        product_mrp: parseFloat(formData.product_mrp),
-        product_price: parseFloat(formData.product_price),
-        last_purchase_price: parseFloat(formData.last_purchase_price),
-        unit_of_measure: formData.unit_of_measure,
-        hsn_code: parseInt(formData.hsn_code),
-        description: formData.description,
-        gst_percentage: parseFloat(formData.gst_percentage),
-        status: formData.status
-      }
-    })
-    res.status(200).json(updatedProduct)
+    const updatedProduct = await updateProductService(formData);
+    if (!updatedProduct) {
+      return errorResponse(res, "Product not updated!!", 400)
+    }
+    return successResponse(res, updatedProduct, "Product update succesfully", 200)
   } catch (error) {
     console.error('Error updating product:', error)
-    res.status(500).json({ error: 'Failed to update product' })
+    return errorResponse(res, 'Failed to update products', 500)
   }
 }
 
 export const deleteProduct = async (req, res) => {
   const { product_code } = req.body
-  if (!product_code) {
-    return res
-      .status(400)
-      .json({ error: 'Product code is required for deletion' })
-  }
 
   try {
-    const deletedProduct = await prisma.product.delete({
-      where: { product_code: product_code }
-    })
-    res
-      .status(200)
-      .json({ message: 'Product deleted successfully', deletedProduct })
+    const deletedProduct = await deleteProductService(product_code);
+
+    if (!deletedProduct) {
+      return errorResponse(res, "Product not deleted!!", 400)
+    }
+    return successResponse(res, deletedProduct, "Product delete succesfully", 200)
+
   } catch (error) {
     console.error('Error deleting product:', error)
-    res.status(500).json({ error: 'Failed to delete product' })
+    return errorResponse(res, 'Failed to delete products', 500)
   }
 }

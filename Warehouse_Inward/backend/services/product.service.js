@@ -1,37 +1,44 @@
 import { prisma } from '../utilities/import.config.js';
-
+import { STATUS,PREFIX } from '../utilities/constant.js';
+import crypto from 'crypto'
 
 export const addProductService = async (data) => {
   if (data.product_mrp < data.product_price) {
     throw new Error("Product MRP must be equal or greater than price");
   }
 
-  const product_code = generateProductCode();
+  const randomStr = crypto.randomBytes(3).toString("hex").toUpperCase();
+  const product_code = `${PREFIX.PRODUCT + randomStr}`;
 
-  return prisma.product.create({
+  const products =  await prisma.product.create({
     data: {
       ...data,
       product_code,
     },
   });
+
+  return products
 };
 
 
+//TODO: getALLProducts through pagination 
 export const getAllProductsService = async () => {
-  return prisma.product.findMany({
+  const allProducts = await prisma.product.findMany({
     orderBy: { createdAt: "desc" },
   });
+
+  return allProducts
 };
 
 
 export const searchProductService = async (q) => {
-  return prisma.product.findMany({
+  const searchProduct = await prisma.product.findMany({
     where: {
       name: {
         contains: q,
         mode: "insensitive",
       },
-      status: "active",
+      status: STATUS.ACTIVE,
     },
     select: {
       product_code: true,
@@ -39,6 +46,8 @@ export const searchProductService = async (q) => {
     },
     take: 2,
   });
+
+  return searchProduct;
 };
 
 
@@ -47,26 +56,28 @@ export const updateProductService = async (formData) => {
     throw new Error("Product code is required for update");
   }
 
-  if (parseFloat(formData.product_mrp) < parseFloat(formData.product_price)) {
+  if (formData.product_mrp < formData.product_price) {
     throw new Error("Product MRP must be equal or greater than price");
   }
 
-  return prisma.product.update({
+  const updateProduct = await prisma.product.update({
     where: { product_code: formData.product_code },
     data: {
       name: formData.name,
       category: formData.category,
       combination: formData.combination,
-      product_mrp: parseFloat(formData.product_mrp),
-      product_price: parseFloat(formData.product_price),
-      last_purchase_price: parseFloat(formData.last_purchase_price),
+      product_mrp: formData.product_mrp,
+      product_price: formData.product_price,
+      last_purchase_price: formData.last_purchase_price,
       unit_of_measure: formData.unit_of_measure,
-      hsn_code: parseInt(formData.hsn_code),
+      hsn_code: formData.hsn_code,
       description: formData.description,
-      gst_percentage: parseFloat(formData.gst_percentage),
+      gst_percentage: formData.gst_percentage,
       status: formData.status,
     },
   });
+
+  return updateProduct;
 };
 
 
@@ -74,8 +85,14 @@ export const deleteProductService = async (product_code) => {
   if (!product_code) {
     throw new Error("Product code is required for deletion");
   }
-
-  return prisma.product.delete({
-    where: { product_code },
-  });
+  const softdeleteProduct = await prisma.product.update({
+    where:{product_code},
+    data:{
+      deletedAt:Date.now()
+    }
+  })
+  if(!softdeleteProduct){
+    throw new Error("Product is not deleted")
+  }
+  return softdeleteProduct;
 };

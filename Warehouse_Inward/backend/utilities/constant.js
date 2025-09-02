@@ -3,6 +3,9 @@ export const STATUS = Object.freeze({
   ACCEPTED: "accepted",
   COMPLETED: "completed",
   CANCELLED: "cancelled",
+  ACTIVE: "active",
+  INACTIVE: "inactive",
+  PARTIAL_RECEVIED: 'partial received'
 });
 
 export const PREFIX = Object.freeze({
@@ -10,4 +13,5 @@ export const PREFIX = Object.freeze({
   PRODUCT: "PC-",
   INVOICE: "INV-",
   GRN: "GRN-",
+  VENDOR: "VC-"
 });

@@ -1,19 +1,15 @@
 import { prisma } from '../../utilities/import.config.js'
 import { v4 as uuidv4 } from 'uuid'
+import { createPurchaseOrderService, getAllPurchaseOrdersService, deletePurchaseOrderService, updatePurchaseOrderService } from '../../services/purchaseOrder.service.js'
+import { errorResponse, successResponse } from '../../utilities/response.js'
 
 
 export const createPurchaseOrder = async (req, res) => {
   try {
-    const {
-      vendor_code,
-      order_date,
-      expected_delivery_date,
-      total_amount,
-      items
-    } = req.body
+    const data = req.body
 
-    items.map((item) => {
-      if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
+    data.items.map((item) => {
+      if (item.item_mrp < item.item_price) {
         return res
           .status(400)
           .json({
@@ -22,88 +18,49 @@ export const createPurchaseOrder = async (req, res) => {
       }
     })
 
-    const order_number =
-      'ORD-' + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
+    const newPurchaseOrder = await createPurchaseOrderService(data);
 
-    const newPurchaseOrder = await prisma.purchaseOrder.create({
-      data: {
-        vendor_code: vendor_code,
-        order_date: new Date(order_date),
-        order_number,
-        expected_delivery_date: new Date(expected_delivery_date),
-        total_amount,
-        status: 'pending',
-        purchaseOrderItems: {
-          create: items.map((item) => ({
-            product_code: item.product_code,
-            quantity: parseInt(item.quantity),
-            item_price: parseInt(item.item_price),
-            item_mrp: parseInt(item.item_mrp),
-            totalAmount: parseInt(item.totalAmount)
-          }))
-        }
-      }
-    })
+    if (!newPurchaseOrder) {
+      return errorResponse(res, "Purchase Order not created", 400)
+    }
 
-    res.status(201).json(newPurchaseOrder)
+    return successResponse(res, newPurchaseOrder, "Successfully created purchase Order", 200)
   } catch (error) {
     console.error('Error creating purchase order:', error)
-    res.status(500).json({ error: 'Failed to create purchase order' })
+    return errorResponse(res, "Failed to created Purchase Order", 500)
   }
 }
 
 
 export const getAllPurchaseOrders = async (req, res) => {
   try {
-    const orders = await prisma.purchaseOrder.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      },
-      include: {
-        purchaseOrderItems: true
-      }
-    })
+    const orders = await getAllPurchaseOrdersService();
 
-    res.status(200).json(orders)
+    if (!orders) {
+      return errorResponse(res, "Purchase Order not fetch", 400)
+    }
+
+    return successResponse(res, orders, "Successfully getALL purchase Order", 200)
   } catch (error) {
     console.error('Error fetching purchase orders:', error)
-    res.status(500).json({ error: 'Failed to fetch purchase orders' })
+    return errorResponse(res, "Failed to fetch purchase orders", 500)
   }
 }
 
 export const deletePurchaseOrder = async (req, res) => {
   try {
     const { purchase_order_number } = req.body
-    console.log(purchase_order_number)
 
-    const existingPO = await prisma.goodReceiptNote.findFirst({
-      where: { order_number: purchase_order_number }
-    })
+    const deletePurchaseOrder = await deletePurchaseOrderService(purchase_order_number);
 
-    if (existingPO && existingPO.status === 'completed') {
-      return res
-        .status(400)
-        .json({ error: 'Cannot delete purchase order with completed GRN' })
+    if (!deletePurchaseOrder) {
+      return errorResponse(res, "Purchase Order not deleted", 400)
     }
 
-    const deleteOrderItem = await prisma.purchaseOrderItem.deleteMany({
-      where: { order_number: purchase_order_number }
-    })
-
-    const deletedOrder = await prisma.purchaseOrder.delete({
-      where: { order_number: purchase_order_number }
-    })
-
-    if (!deletedOrder) {
-      return res.status(404).json({ error: 'Purchase order not found' })
-    }
-
-    res
-      .status(200)
-      .json({ message: 'Purchase order deleted successfully', deletedOrder })
+    return successResponse(res, deletePurchaseOrder, "Successfully deleted purchase Order", 200)
   } catch (error) {
     console.error('Error deleting purchase order:', error)
-    res.status(500).json({ error: 'Failed to delete purchase order' })
+    return errorResponse(res, "Failed to delete purchase orders", 500)
   }
 }
 
@@ -111,36 +68,16 @@ export const updatePurchaseOrder = async (req, res) => {
   const formData = req.body
 
   try {
-    if (!formData.id) {
-      return res
-        .status(400)
-        .json({ error: 'Purchase Order ID is required for update' })
+
+    const updatedOrder = await updatePurchaseOrderService(formData)
+
+    if (!updatedOrder) {
+      return errorResponse(res, "Purchase Order not updated", 400)
     }
 
-    const updatedOrder = await prisma.purchaseOrder.update({
-      where: { order_number: formData.order_number },
-      data: {
-        vendor_code: formData.vendor_code,
-        order_date: new Date(formData.order_date),
-        expected_delivery_date: new Date(formData.expected_delivery_date),
-        total_amount: formData.total_amount,
-        purchaseOrderItems: {
-          deleteMany: { order_number: formData.order_number },
-          create: formData.items.map((item) => ({
-            product_code: item.product_code,
-            quantity: parseInt(item.quantity),
-            item_price: parseInt(item.item_price),
-            item_mrp: parseInt(item.item_mrp),
-            totalAmount: parseInt(item.totalAmount)
-          }))
-        }
-      },
-      include: { purchaseOrderItems: true }
-    })
-
-    return res.json(updatedOrder)
+    return successResponse(res, updatedOrder, "Successfully updated purchase Order", 200)
   } catch (error) {
     console.error('Error updating Purchase Order:', error)
-    return res.status(500).json({ error: 'Failed to update purchase order' })
+    return errorResponse(res, "Failed to update purchase order", 500)
   }
 }

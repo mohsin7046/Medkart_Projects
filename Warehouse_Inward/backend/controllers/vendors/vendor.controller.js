@@ -1,49 +1,31 @@
-import { prisma } from '../../utilities/import.config.js'
+import {createVendorService,getAllVendorsService,searchVendorsService,updateVendorService,deleteVendorService} from '../../services/vendor.service.js'
+import { errorResponse, successResponse } from '../../utilities/response.js';
 
 export const createVendor = async (req, res) => {
-  const {
-    name,
-    email,
-    contact_person,
-    contact_number,
-    gst_number,
-    address,
-    status
-  } = req.body
-  console.log(req.body)
+  const data = req.body
 
-  const vendor_code = `vc${Date.now()}`
   try {
-    const newVendor = await prisma.vendor.create({
-      data: {
-        name,
-        vendor_code,
-        email,
-        address,
-        contact_number: contact_number,
-        contact_person,
-        gst_number,
-        status: status.toLowerCase()
-      }
-    })
-    res.status(201).json(newVendor)
+    const newVendor = await createVendorService(data);
+    if(!newVendor){
+      return errorResponse(res,"Vendor not created",400)
+    }
+    return successResponse(res,newVendor,"Successfully created vendor",200)
   } catch (error) {
     console.error('Error creating vendor:', error)
-    res.status(500).json({ error: 'Failed to create vendor' })
+    return errorResponse(res,'Failed to create vendor',500)
   }
 }
 
 export const getAllVendors = async (req, res) => {
   try {
-    const vendors = await prisma.vendor.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-    res.status(200).json(vendors)
+    const vendors = await getAllVendorsService();
+    if(vendors){
+      return errorResponse(res,"ALL Vendor are not fetch")
+    }
+    return successResponse(res,vendors,"Successfully getallVendors",200)
   } catch (error) {
     console.error('Error fetching vendors:', error)
-    res.status(500).json({ error: 'Failed to fetch vendors' })
+    return errorResponse(res,"Failed to fetch the vendors",500)
   }
 }
 
@@ -51,65 +33,45 @@ export const getVendoreSearch = async (req, res) => {
   try {
     const { q } = req.params
 
-    const vendors = await prisma.vendor.findMany({
-      where: {
-        name: {
-          contains: q,
-          mode: 'insensitive'
-        },
-        status: 'active'
-      },
-      select: {
-        vendor_code: true,
-        name: true
-      },
-      take: 10
-    })
-    console.log(vendors)
-
-    res.json(vendors)
+    const vendors = await searchVendorsService(q);
+    if(!vendors){
+      return errorResponse(res,"Vendor not present for the query",400)
+    }
+    return successResponse(res,vendors,"Successfully get Vendor for query",200)
   } catch (err) {
     console.error('Vendor search error:', err)
-    res.status(500).json({ error: 'Failed to fetch vendors' })
+    return errorResponse(res,'Failed to fetch vendors',500)
   }
 }
 
+
 export const updateVendor = async (req, res) => {
-  const formData = req.body
-
-  console.log(formData.status)
-
+  const formData = req.body;
+  
   try {
-    const updatedVendor = await prisma.vendor.update({
-      where: { vendor_code: formData.vendor_code },
-      data: {
-        name: formData.name,
-        email: formData.email,
-        contact_person: formData.contact_person,
-        contact_number: formData.contact_number,
-        gst_number: formData.gst_number,
-        address: formData.address,
-        status: formData.status
-      }
-    })
-    console.log(updatedVendor)
+    const updatedVendor = await updateVendorService(formData)
+    
+    if(!updatedVendor){
+      return errorResponse(res,"Vendor not present for the query",400)
+    }
 
-    res.status(200).json(updatedVendor)
+    return successResponse(res,updatedVendor,"Successfully update Vendor",200)
   } catch (error) {
     console.error('Error updating vendor status:', error)
-    res.status(500).json({ error: 'Failed to update vendor status' })
+   return errorResponse(res,'Failed to update vendor status',500)
   }
 }
 
 export const deleteVendor = async (req, res) => {
   const { vendor_code } = req.body
   try {
-    await prisma.vendor.delete({
-      where: { vendor_code }
-    })
-    res.status(200).json({ message: 'Vendor deleted successfully' })
+    const vendordelete = await deleteVendorService(vendor_code);
+    if(!vendordelete){
+      return errorResponse(res,"Vendor not deleted",400)
+    }
+   return successResponse(res,vendordelete,"Successfully delete Vendor",200)
   } catch (error) {
     console.error('Error deleting vendor:', error)
-    res.status(500).json({ error: 'Failed to delete vendor' })
+    return errorResponse(res,'Failed to delete vendor',500)
   }
 }

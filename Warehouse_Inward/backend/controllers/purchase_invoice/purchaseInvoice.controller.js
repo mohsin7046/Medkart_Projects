@@ -1,131 +1,63 @@
 import { prisma } from '../../utilities/import.config.js'
+import { createPurchaseInvoiceService, getAllPurchaseInvoicesService,deletePurchaseInvoiceService} from '../../services/purchaseInvoice.service.js'
+import { errorResponse, successResponse } from '../../utilities/response.js'
 
 export const createPurchaseInvoice = async (req, res) => {
   try {
-    const { grn_number, invoice_date, total_amount, items } = req.body
+    const data = req.body
 
-    items.map((item) => {
+    data.items.map((item) => {
       if (item.item_mrp < item.item_price) {
-        return res.status(400).json({
-          error: `MRP is not less than price in product ${item.product_code}`
-        })
+        return errorResponse(res,`MRP is not less than price in product ${item.product_code}`,400)
       }
     })
 
-    const existingGRN = await prisma.goodReceiptNote.findUnique({
-      where: { grn_number }
-    })
+    const invoice = await createPurchaseInvoiceService(data);
 
-    if (!existingGRN) {
-      return res.status(400).json({ error: 'GRN is not exist' })
+    if(!invoice){
+      return errorResponse(res,"purchase invoice isnot created",400)
     }
 
-    if (['completed,cancelled'].includes(existingGRN.status)) {
-      return res
-        .status(400)
-        .json({ error: 'Purchase Invoice already created for this GRN' })
-    }
-
-    let total = 0
-    for (let item of items) {
-      const product = await prisma.product.findUnique({
-        where: { product_code: item.product_code },
-        select: { gst_percentage: true }
-      })
-
-      const gst = product?.gst_percentage || 0
-      const sum = item.totalAmount + (item.totalAmount * gst) / 100
-      total += sum
-    }
-
-    const invoice_number = `INV-${Date.now()}`
-
-    const invoice = await prisma.purchaseInvoice.create({
-      data: {
-        grn_number,
-        invoice_number,
-        invoice_date: new Date(invoice_date),
-        total_amount: total_amount,
-        PurchaseInvoiceItem: {
-          create: items.map((item) => ({
-            product_code: item.product_code,
-            quantity: item.quantity,
-            item_price: item.item_price,
-            item_mrp: item.item_mrp,
-            totalAmount: item.totalAmount
-          }))
-        }
-      }
-    })
-    if (!invoice) {
-      return res
-        .status(500)
-        .json({ error: 'Failed to create purchase invoice' })
-    }
-
-    const updateGRN = await prisma.goodReceiptNote.update({
-      where: { grn_number },
-      data: {
-        status: 'completed'
-      }
-    })
-
-    if (!updateGRN) {
-      return res.status(400).json({ error: 'GRN status is not updated' })
-    }
-
-    res.status(201).json(invoice)
+    return successResponse(res,invoice,"Purchase invoice successfully created",200)
   } catch (error) {
     console.log(error)
-    return res.status(500).json({ error: 'Failed to create purchase invoice' })
+    return errorResponse(res,'Failed to create purchase invoice',500)
   }
 }
 
 
 
-
 export const getAllPurchaseInvoices = async (req, res) => {
   try {
-    const invoices = await prisma.purchaseInvoice.findMany({
-      include: {
-        PurchaseInvoiceItem: true
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    })
-    console.log(invoices)
+    const invoices = await getAllPurchaseInvoicesService();
 
-    res.status(200).json(invoices)
+    if(!invoices){
+      return errorResponse(res,"purchase invoice not fetched",400)
+    }
+
+    return successResponse(res,invoices,"Purchase invoice successfully fetched",200)
   } catch (error) {
     console.error('Error fetching purchase invoices:', error)
-    res.status(500).json({ error: 'Failed to fetch purchase invoices' })
+    return errorResponse(res,'Failed to fetch purchase invoices',500)
   }
 }
 
 export const deletePurchaseInvoice = async (req, res) => {
   try {
     const { invoice_number } = req.body
-    console.log(invoice_number)
-
+  
     if (!invoice_number) {
-      return res.status(400).json({ error: 'All feilds are required' })
+      return errorResponse(res,'All feilds are required',400)
     }
 
-    await prisma.purchaseInvoiceItem.deleteMany({
-      where: { invoice_number: invoice_number }
-    })
-
-    const deletedInvoice = await prisma.purchaseInvoice.delete({
-      where: { invoice_number }
-    })
+    const deletedInvoice = await deletePurchaseInvoiceService(invoice_number)
 
     if (!deletedInvoice) {
-      return res.status(404).json({ error: 'Purchase invoice is not deleted' })
+      return errorResponse(res,'Purchase invoice is not deleted',400)
     }
-    res.status(200).json(deletedInvoice)
+   return successResponse(res,deletedInvoice,"Purchase invoice successfully deleted",200)
   } catch (error) {
     console.error('Error deleting purchase invoices:', error)
-    res.status(500).json({ error: 'Failed to deleting purchase invoices' })
+   return errorResponse(res,'Failed to delete purchase invoices',500)
   }
 }

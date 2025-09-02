@@ -1,28 +1,29 @@
 import { prisma } from '../utilities/import.config.js'
 import { v4 as uuidv4 } from 'uuid'
+import { STATUS,PREFIX } from '../utilities/constant.js'
 
 
 export const createPurchaseOrderService = async (data) => {
-  const { vendor_code, order_date, expected_delivery_date, total_amount, items } = data
+  const { vendor_id, order_date, expected_delivery_date, total_amount, items } = data
 
 
-  const order_number = 'ORD-' + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
+  const order_number = PREFIX.ORDER + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
 
   return await prisma.purchaseOrder.create({
     data: {
-      vendor_code,
+      vendor_id,
       order_date: new Date(order_date),
       order_number,
       expected_delivery_date: new Date(expected_delivery_date),
       total_amount,
-      status: 'pending',
+      status: STATUS.PENDING,
       purchaseOrderItems: {
         create: items.map((item) => ({
-          product_code: item.product_code,
-          quantity: parseInt(item.quantity),
-          item_price: parseInt(item.item_price),
-          item_mrp: parseInt(item.item_mrp),
-          totalAmount: parseInt(item.totalAmount),
+          product_id: item.product_id,
+          quantity: item.quantity,
+          item_price: item.item_price,
+          item_mrp: item.item_mrp,
+          totalAmount: item.totalAmount,
         })),
       },
     },
@@ -31,44 +32,58 @@ export const createPurchaseOrderService = async (data) => {
 
 
 export const getAllPurchaseOrdersService = async () => {
-  return await prisma.purchaseOrder.findMany({
+  const getPO =  await prisma.purchaseOrder.findMany({
     orderBy: { createdAt: 'desc' },
     include: { purchaseOrderItems: true },
-  })
+  }) 
+
+  return getPO
 }
 
 
-export const deletePurchaseOrderService = async (purchase_order_number) => {
+export const deletePurchaseOrderService = async (purchase_order_id) => {
   const existingPO = await prisma.goodReceiptNote.findFirst({
-    where: { order_number: purchase_order_number },
+    where: { order_id: purchase_order_id },
   })
 
-  if (existingPO && existingPO.status === 'completed') {
+  if (existingPO && existingPO.status === STATUS.COMPLETED) {
     throw new Error('Cannot delete purchase order with completed GRN')
   }
 
-  await prisma.purchaseOrderItem.deleteMany({
-    where: { order_number: purchase_order_number },
+  await prisma.purchaseOrderItem.updateMany({
+    where: { order_id: purchase_order_id },
+    data:{
+      deletedAt:Date.now()
+    }
   })
 
-  return await prisma.purchaseOrder.delete({
-    where: { order_number: purchase_order_number },
+  const deletePO =  await prisma.purchaseOrder.update({
+    where: { id: purchase_order_id },
+     data:{
+      deletedAt:Date.now()
+    }
   })
+
+  if(!deletePO){
+    throw new Error("Purchase Order not deleted")
+  }
+
+  return deletePO;
 }
 
 
 export const updatePurchaseOrderService = async (formData) => {
-  return await prisma.purchaseOrder.update({
+  const updatedPO =  await prisma.purchaseOrder.update({
     where: { order_number: formData.order_number },
     data: {
-      vendor_code: formData.vendor_code,
+      vendor_id: formData.vendor_id,
       order_date: new Date(formData.order_date),
       expected_delivery_date: new Date(formData.expected_delivery_date),
       total_amount: formData.total_amount,
       purchaseOrderItems: {
         deleteMany: { order_number: formData.order_number },
         create: formData.items.map((item) => ({
-          product_code: item.product_code,
+          product_id: item.product_id,
           quantity: parseInt(item.quantity),
           item_price: parseInt(item.item_price),
           item_mrp: parseInt(item.item_mrp),
@@ -78,4 +93,6 @@ export const updatePurchaseOrderService = async (formData) => {
     },
     include: { purchaseOrderItems: true },
   })
+
+  return updatedPO;
 }
