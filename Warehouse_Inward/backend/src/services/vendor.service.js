@@ -1,8 +1,9 @@
 import { prisma } from '../../utilities/import.config.js'
 import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js'
+import { generateRandom } from '../utilities/generateRandom.js'
 
 export const createVendorService = async (data) => {
-  const vendor_code = `${PREFIX.VENDOR + Date.now()}`
+  const vendor_code = generateRandom("VENDOR");
 
   const createVendor = await prisma.vendor.create({
     data: {

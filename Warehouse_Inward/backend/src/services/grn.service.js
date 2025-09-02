@@ -1,5 +1,6 @@
 import { prisma } from '../utilities/import.config.js'
 import { STATUS, PREFIX } from '../utilities/constant.js'
+import { generateRandom } from '../utilities/generateRandom.js'
 
 export const findPOByOrderNumber = async (order_id) => {
   const POOrderNumber = await prisma.purchaseOrder.findFirst({
@@ -73,7 +74,8 @@ export const createGRNRecord = async (existingPO, data) => {
     statusUpdate = STATUS.COMPLETED
   }
 
-  const grn_number = PREFIX.GRN + Date.now()
+  const grn_number = generateRandom("GRN");
+
   const newGRN = await prisma.goodReceiptNote.create({
     data: {
       grn_number,

@@ -1,6 +1,7 @@
 import { prisma } from '../utilities/import.config.js'
 import { STATUS, PREFIX, LIMIT } from '../utilities/constant.js'
 import crypto from 'crypto'
+import { generateRandom } from '../utilities/generateRandom.js'
 
 export const addProductService = async (data) => {
   if (data.product_mrp < data.product_price) {
@@ -8,7 +9,7 @@ export const addProductService = async (data) => {
   }
 
   const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase()
-  const product_code = `${PREFIX.PRODUCT + randomStr}`
+  const product_code = generateRandom("PRODUCT");
 
   const products = await prisma.product.create({
     data: {

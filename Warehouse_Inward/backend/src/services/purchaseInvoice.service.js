@@ -1,5 +1,6 @@
 import { prisma } from '../utilities/import.config.js'
 import { STATUS, PREFIX } from '../utilities/constant.js'
+import { generateRandom } from '../utilities/generateRandom.js'
 
 export const createPurchaseInvoiceService = async ({
   grn_id,
@@ -37,7 +38,7 @@ export const createPurchaseInvoiceService = async ({
     total += sum
   }
 
-  const invoice_number = PREFIX.INVOICE + Date.now()
+  const invoice_number = generateRandom("INVOICE")
 
   const invoice = await prisma.purchaseInvoice.create({
     data: {

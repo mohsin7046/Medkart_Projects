@@ -1,13 +1,12 @@
 import { prisma } from '../utilities/import.config.js'
-import { v4 as uuidv4 } from 'uuid'
 import { STATUS, PREFIX } from '../utilities/constant.js'
+import { generateRandom } from '../utilities/generateRandom.js'
 
 export const createPurchaseOrderService = async (data) => {
   const { vendor_id, order_date, expected_delivery_date, total_amount, items } =
     data
 
-  const order_number =
-    PREFIX.ORDER + uuidv4().replace(/-/g, '').substring(0, 8).toUpperCase()
+  const order_number = generateRandom("ORDER");
 
   return await prisma.purchaseOrder.create({
     data: {
