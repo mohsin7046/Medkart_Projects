@@ -8,7 +8,7 @@ export const createVendorSchema = z.object({
 
   email: z.email('Invalid email format'),
 
-  contact_person: z
+  contact_person: z 
     .string()
     .min(3, 'Contact person name must be at least 3 characters long'),
 

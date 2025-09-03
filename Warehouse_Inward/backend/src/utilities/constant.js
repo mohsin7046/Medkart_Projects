@@ -1,4 +1,5 @@
 import {prisma} from '../utilities/import.config.js'
+
 export const STATUS = Object.freeze({
   PENDING: 'pending',
   ACCEPTED: 'accepted',
@@ -8,6 +9,15 @@ export const STATUS = Object.freeze({
   INACTIVE: 'inactive',
   PARTIAL_RECEVIED: 'partial received'
 })
+
+// TODO::
+// export const GENERATOR_TYPES = Object.freeze({
+//   ORDER: 'ORDER',
+//   PRODUCT: ',
+//   INVOICE: 'INV-',
+//   GRN: 'GRN-',
+//   VENDOR: 'VC-'
+// })
 
 export const PREFIX = Object.freeze({
   ORDER: 'ORD-',
@@ -29,11 +39,15 @@ export const FEILD = Object.freeze({
   grn: ['grn_number'],
   invoice: ['invoice_number']
 })
-
+ 
 export const SEARCHFILTERNAME = Object.freeze({
   order: prisma.purchaseOrder,
   product: prisma.product,
   invoice: prisma.purchaseInvoice,
-  grn: prisma.grn,
+  grn: prisma.goodReceiptNote,
   vendor: prisma.vendor
+})
+
+export const SETEXPIRY = Object.freeze({
+  expiryMonth:3
 })

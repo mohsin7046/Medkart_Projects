@@ -2,9 +2,9 @@ import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const purchaseOrderItemSchema = z.object({
-  product_code: z
-    .string()
-    .min(2, 'Product code must be at least 2 characters long'),
+  product_id: z
+    .number()
+    .min(1, 'Product id must be at least 2 characters long'),
 
   quantity: z
     .number()
@@ -20,15 +20,11 @@ const purchaseOrderItemSchema = z.object({
     .number()
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
-
-  totalAmount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion)
+ 
 })
 
 export const createPurchaseOrderSchema = z.object({
-  vendor_code: z.string().min(2, 'Vendor code is required'),
+  vendor_id: z.number().min(1, 'Vendor id is required'),
 
   order_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid order_date format'
@@ -37,15 +33,6 @@ export const createPurchaseOrderSchema = z.object({
   expected_delivery_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid expected_delivery_date format'
   }),
-
-  total_amount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion),
-
-  status: z
-    .enum(['pending', 'partially received', 'completed', 'cancelled'])
-    .default('pending'),
 
   items: z
     .array(purchaseOrderItemSchema)

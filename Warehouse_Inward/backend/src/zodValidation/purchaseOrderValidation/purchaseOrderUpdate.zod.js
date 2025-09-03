@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
+import { STATUS } from '../../utilities/constant.js'
 
 const purchaseOrderItemSchema = z.object({
-  product_code: z
-    .string()
-    .min(2, 'Product code must be at least 2 characters long')
-    .optional(),
+  product_id: z
+    .number()
+    .min(1, 'Product id must be at least 2 characters long'),
 
   quantity: z
     .number()
@@ -25,15 +25,12 @@ const purchaseOrderItemSchema = z.object({
     .transform(decimalConversion)
     .optional(),
 
-  totalAmount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion)
-    .optional()
 })
 
 export const updatePurchaseOrderSchema = z.object({
-  vendor_code: z.string().min(2, 'Vendor code is required').optional(),
+  vendor_id: z.number().min(1, 'Vendor id is required'),
+
+  order_id: z.number().min(1, 'order id is required'),
 
   order_date: z
     .string()
@@ -49,13 +46,13 @@ export const updatePurchaseOrderSchema = z.object({
     })
     .optional(),
 
-  total_amount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion)
-    .optional(),
-
-  status: z.string().optional(),
+  status: z.string()
+    .refine(
+      (val) => !val || (val !== STATUS.CANCELLED && val !== STATUS.COMPLETED),
+      {
+        message: "Status cannot be 'cancelled' or 'completed'",
+      }
+    ),
 
   items: z
     .array(purchaseOrderItemSchema)

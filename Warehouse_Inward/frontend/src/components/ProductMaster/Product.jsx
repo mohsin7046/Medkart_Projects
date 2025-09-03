@@ -38,7 +38,7 @@ function Product() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = (product_code) => async () => {
+  const handleDelete = (product_id) => async () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         const response = await fetch(
@@ -46,7 +46,7 @@ function Product() {
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ product_code }),
+            body: JSON.stringify({ product_id }),
           }
         );
         if (!response.ok){
@@ -55,7 +55,7 @@ function Product() {
           return;
         }
 
-        setProducts(products.filter((p) => p.product_code !== product_code));
+        setProducts(products.filter((p) => p.product_id !== product_id));
         alert("Product deleted successfully");
       } catch (error) {
         console.error("Error deleting product:", error);
@@ -139,7 +139,7 @@ function Product() {
                     </button>
 
                     <button
-                      onClick={() => handleDelete(p.product_code)}
+                      onClick={() => handleDelete(p.id)}
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       <FiTrash2 className="text-red-500" size={18} />

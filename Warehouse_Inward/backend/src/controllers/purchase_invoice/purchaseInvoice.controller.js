@@ -8,9 +8,11 @@ import { errorResponse, successResponse } from '../../utilities/response.js'
 import { createPurchaseInvoiceSchema } from '../../zodValidation/PurchaseInvoiceValidation/purchaseInvoiceCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
+
+
 export const createPurchaseInvoice = catchAsync(async (req, res) => {
   const data = createPurchaseInvoiceSchema.parse(req.body)
-
+ 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
   }
@@ -19,7 +21,7 @@ export const createPurchaseInvoice = catchAsync(async (req, res) => {
     if (item.item_mrp < item.item_price) {
       return errorResponse(
         res,
-        `MRP is not less than price in product ${item.product_code}`,
+        `MRP is not less than price in product ${item.product_id}`,
         400
       )
     }
@@ -38,6 +40,8 @@ export const createPurchaseInvoice = catchAsync(async (req, res) => {
     200
   )
 })
+
+
 
 export const getAllPurchaseInvoices = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)

@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const goodReceiptNoteItemSchema = z.object({
-  product_code: z.string().min(2, 'Product code is required'),
+  product_id: z.number().min(1, 'Product id is required'),
 
   batch_number: z.string().min(1, 'Batch number is required'),
 
@@ -15,7 +15,7 @@ const goodReceiptNoteItemSchema = z.object({
     .int('Received quantity must be an integer')
     .nonnegative('Received quantity cannot be negative'),
 
-  ordered_qty: z
+  ordered_qty: z  
     .number()
     .int('Ordered quantity must be an integer')
     .positive('Ordered quantity must be greater than 0'),
@@ -30,23 +30,14 @@ const goodReceiptNoteItemSchema = z.object({
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
 
-  totalAmount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion)
 })
 
 export const createGoodReceiptNoteSchema = z.object({
-  purchase_order_number: z.string().min(3, 'Purchase order number is required'),
+  order_id: z.number().min(1, 'Purchase id number is required'),
 
   received_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid received_date format'
   }),
-
-  total_amount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion),
 
   damaged_qty: z
     .number()
@@ -59,8 +50,6 @@ export const createGoodReceiptNoteSchema = z.object({
     .int('Shortage quantity must be an integer')
     .nonnegative('Shortage quantity cannot be negative')
     .optional(),
-
-  status: z.string().default('pending'),
 
   items: z
     .array(goodReceiptNoteItemSchema)

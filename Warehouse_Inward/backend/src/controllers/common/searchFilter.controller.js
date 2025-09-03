@@ -9,13 +9,12 @@ export const searchFilterCommon = catchAsync(async (req, res) => {
 
    limit = Number(limit);
    page = Number(page);
-
+   console.log(name);
    
 
    if (!SEARCHFILTERNAME[name]) {
     return errorResponse(res,`Invalid name: ${name}`,400)
   }
-
 
   let query = {};
   if (search && FEILD[name]) {

@@ -59,12 +59,21 @@ function ProductForm() {
       }
 
       console.log(url, method, formData);
+
+      const payload = {
+      ...formData,
+      product_mrp: formData.product_mrp ? parseFloat(formData.product_mrp) : 0,
+      product_price: formData.product_price ? parseFloat(formData.product_price) : 0,
+      last_purchase_price: formData.last_purchase_price ? parseFloat(formData.last_purchase_price) : 0,
+      gst_percentage: formData.gst_percentage ? parseFloat(formData.gst_percentage) : 0,
+      hsn_code: formData.hsn_code ? parseInt(formData.hsn_code) : "",
+    };
       
 
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok){

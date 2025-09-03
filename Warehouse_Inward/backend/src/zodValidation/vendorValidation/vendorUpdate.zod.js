@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
 export const updateVendorSchema = z.object({
+  vendor_code: z.string()
+    .optional(),
+
   name: z
     .string()
     .min(3, 'Vendor name must be at least 3 characters long')

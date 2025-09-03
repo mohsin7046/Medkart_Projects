@@ -10,9 +10,10 @@ export const createVendorService = async (data) => {
       ...data,
       vendor_code
     }
-  })
+  }) 
   return createVendor
 }
+
 
 export const getAllVendorsService = async (page, limit, orderBy) => {
   const skip = (page - 1) * limit
@@ -22,7 +23,7 @@ export const getAllVendorsService = async (page, limit, orderBy) => {
     where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy }
+    orderBy: { created_at: orderBy }
   })
 
   const totalPages = Math.ceil(totalItems / limit)
@@ -34,6 +35,7 @@ export const getAllVendorsService = async (page, limit, orderBy) => {
     metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
   }
 }
+
 
 export const searchVendorsService = async (q) => {
   const searchVendor = await prisma.vendor.findMany({
@@ -52,6 +54,7 @@ export const searchVendorsService = async (q) => {
   return searchVendor
 }
 
+
 export const updateVendorService = async (data) => {
   const updatedVendor = await prisma.vendor.update({
     where: { vendor_code: data.vendor_code },
@@ -62,6 +65,7 @@ export const updateVendorService = async (data) => {
 
   return updatedVendor
 }
+
 
 export const deleteVendorService = async (vendor_code) => {
   const softdeleteVendor = await prisma.vendor.update({

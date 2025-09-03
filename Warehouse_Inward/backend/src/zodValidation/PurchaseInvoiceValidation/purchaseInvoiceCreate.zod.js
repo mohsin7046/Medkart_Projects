@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const purchaseInvoiceItemSchema = z.object({
-  product_code: z.string().min(2, 'Product code is required'),
+  product_id: z.number().min(1, 'Product id is required'),
 
   quantity: z
     .number()
@@ -18,26 +18,14 @@ const purchaseInvoiceItemSchema = z.object({
     .number()
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
-
-  totalAmount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion)
-})
+}) 
 
 export const createPurchaseInvoiceSchema = z.object({
-  grn_number: z.string().min(3, 'GRN number is required'),
+  grn_id: z.number().min(1, 'GRN id is required'),
 
   invoice_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid invoice_date format'
   }),
-
-  total_amount: z
-    .number()
-    .positive('Total amount must be greater than 0')
-    .transform(decimalConversion),
-
-  status: z.string().default('pending'),
 
   items: z
     .array(purchaseInvoiceItemSchema)

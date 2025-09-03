@@ -10,8 +10,9 @@ import { updateVendorSchema } from '../../zodValidation/vendorValidation/vendorU
 import { createVendorSchema } from '../../zodValidation/vendorValidation/vendorCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
+
 export const createVendor = catchAsync(async (req, res) => {
-  const data = createVendorSchema.parse(req.body)
+  const data = createVendorSchema.parse(req.body) 
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -23,6 +24,7 @@ export const createVendor = catchAsync(async (req, res) => {
   }
   return successResponse(res, newVendor, 'Successfully created vendor', 200)
 })
+
 
 export const getAllVendors = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
@@ -36,6 +38,8 @@ export const getAllVendors = catchAsync(async (req, res) => {
   return successResponse(res, vendors, 'Successfully getallVendors', 200)
 })
 
+
+
 export const getVendoreSearch = catchAsync(async (req, res) => {
   const { q } = req.params
 
@@ -45,6 +49,7 @@ export const getVendoreSearch = catchAsync(async (req, res) => {
   }
   return successResponse(res, vendors, 'Successfully get Vendor for query', 200)
 })
+
 
 export const updateVendor = catchAsync(async (req, res) => {
   const formData = updateVendorSchema.parse(req.body)
@@ -61,6 +66,7 @@ export const updateVendor = catchAsync(async (req, res) => {
 
   return successResponse(res, updatedVendor, 'Successfully update Vendor', 200)
 })
+
 
 export const deleteVendor = catchAsync(async (req, res) => {
   const { vendor_code } = req.body

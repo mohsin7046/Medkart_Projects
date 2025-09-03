@@ -5,7 +5,6 @@ import {
   updateProductService,
   deleteProductService,
 } from '../../services/product.service.js'
-import { FEILD } from '../../utilities/constant.js'
 import { successResponse, errorResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
 import { updateProductSchema } from '../../zodValidation/productValidation/productUpdate.zod.js'
@@ -14,6 +13,8 @@ import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
 export const addProduct = catchAsync(async (req, res) => {
 
+  console.log(req.body);
+  
   const data = createProductSchema.parse(req.body);
 
 
