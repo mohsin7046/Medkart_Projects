@@ -46,13 +46,7 @@ export const updatePurchaseOrderSchema = z.object({
     })
     .optional(),
 
-  status: z.string()
-    .refine(
-      (val) => !val || (val !== STATUS.CANCELLED && val !== STATUS.COMPLETED),
-      {
-        message: "Status cannot be 'cancelled' or 'completed'",
-      }
-    ),
+ status: statusSchema("po", [STATUS.CANCELLED, STATUS.COMPLETED]).optional(),
 
   items: z
     .array(purchaseOrderItemSchema)

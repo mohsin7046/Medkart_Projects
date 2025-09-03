@@ -1,5 +1,6 @@
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 import { z } from 'zod';
+import { statusSchema } from '../statusSchemaValidate.js'
 
 export const updateProductSchema = z.object({
   product_code: z.string()
@@ -61,5 +62,5 @@ export const updateProductSchema = z.object({
     .max(100, 'Description should not exceed 10 characters')
     .optional(),
 
-  status: z.string().optional()
+  status: statusSchema("product").optional(),
 }).strict()

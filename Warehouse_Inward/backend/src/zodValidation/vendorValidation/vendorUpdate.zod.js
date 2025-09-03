@@ -31,5 +31,5 @@ export const updateVendorSchema = z.object({
     .max(255, 'Address cannot exceed 255 characters')
     .optional(),
 
-  status: z.string().optional()
+  status: statusSchema("vendor").optional(),
 }).strict()
