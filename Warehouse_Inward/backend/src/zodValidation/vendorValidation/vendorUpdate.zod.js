@@ -32,4 +32,4 @@ export const updateVendorSchema = z.object({
     .optional(),
 
   status: z.string().optional()
-})
+}).strict()

@@ -47,4 +47,4 @@ export const createProductSchema = z.object({
     .max(100, 'Description should not exceed 10 characters'),
 
   status: z.string()
-})
+}).strict()

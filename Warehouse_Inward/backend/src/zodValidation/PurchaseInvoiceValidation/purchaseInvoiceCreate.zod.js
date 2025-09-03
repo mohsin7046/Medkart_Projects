@@ -18,7 +18,7 @@ const purchaseInvoiceItemSchema = z.object({
     .number()
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
-}) 
+}).strict()
 
 export const createPurchaseInvoiceSchema = z.object({
   grn_id: z.number().min(1, 'GRN id is required'),
@@ -30,4 +30,4 @@ export const createPurchaseInvoiceSchema = z.object({
   items: z
     .array(purchaseInvoiceItemSchema)
     .min(1, 'At least one invoice item is required')
-})
+}).strict()

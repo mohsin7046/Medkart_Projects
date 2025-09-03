@@ -38,7 +38,7 @@ const goodReceiptNoteItemSchema = z.object({
     .transform(decimalConversion)
     .optional(),
 
-})
+}).strict()
 
 export const updateGoodReceiptNoteSchema = z.object({
   grn_id: z.number()
@@ -80,4 +80,4 @@ export const updateGoodReceiptNoteSchema = z.object({
     .array(goodReceiptNoteItemSchema)
     .min(1, 'At least one GRN item is required')
     .optional()
-})
+}).strict()

@@ -30,7 +30,7 @@ const goodReceiptNoteItemSchema = z.object({
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
 
-})
+}).strict()
 
 export const createGoodReceiptNoteSchema = z.object({
   order_id: z.number().min(1, 'Purchase id number is required'),
@@ -54,4 +54,4 @@ export const createGoodReceiptNoteSchema = z.object({
   items: z
     .array(goodReceiptNoteItemSchema)
     .min(1, 'At least one GRN item is required')
-})
+}).strict()

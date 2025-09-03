@@ -25,7 +25,7 @@ const purchaseOrderItemSchema = z.object({
     .transform(decimalConversion)
     .optional(),
 
-})
+}).strict()
 
 export const updatePurchaseOrderSchema = z.object({
   vendor_id: z.number().min(1, 'Vendor id is required'),
@@ -58,4 +58,4 @@ export const updatePurchaseOrderSchema = z.object({
     .array(purchaseOrderItemSchema)
     .min(1, 'At least one order item is required')
     .optional()
-})
+}).strict()

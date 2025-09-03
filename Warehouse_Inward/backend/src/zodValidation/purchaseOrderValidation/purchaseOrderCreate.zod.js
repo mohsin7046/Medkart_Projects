@@ -21,7 +21,7 @@ const purchaseOrderItemSchema = z.object({
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
  
-})
+}).strict()
 
 export const createPurchaseOrderSchema = z.object({
   vendor_id: z.number().min(1, 'Vendor id is required'),
@@ -37,4 +37,4 @@ export const createPurchaseOrderSchema = z.object({
   items: z
     .array(purchaseOrderItemSchema)
     .min(1, 'At least one order item is required')
-})
+}).strict()

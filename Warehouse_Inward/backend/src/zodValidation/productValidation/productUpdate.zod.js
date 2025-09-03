@@ -62,4 +62,4 @@ export const updateProductSchema = z.object({
     .optional(),
 
   status: z.string().optional()
-})
+}).strict()

@@ -25,4 +25,4 @@ export const createVendorSchema = z.object({
     .max(255, 'Address cannot exceed 255 characters'),
 
   status: z.string()
-})
+}).strict()
