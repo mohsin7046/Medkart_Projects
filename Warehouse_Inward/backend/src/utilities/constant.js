@@ -10,6 +10,14 @@ export const STATUS = Object.freeze({
   PARTIAL_RECEVIED: 'partial received'
 })
 
+export const EACHSTATUS = Object.freeze({
+  product:['active','inactive'],
+  vendor:['active','inactive'],
+  po:['pending','partial received','cancelled','completed'],
+  grn:['pending','cancelled','completed'],
+  pi:['pending','cancelled','completed']
+})
+
 // TODO::
 // export const GENERATOR_TYPES = Object.freeze({
 //   ORDER: 'ORDER',

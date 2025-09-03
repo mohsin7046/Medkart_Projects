@@ -9,17 +9,11 @@ import {
 
 const router = Router()
 
-router.get('/getProducts', getAllProducts)
-router.post('/add-product', addProduct)
-
-router.get('/home', (req, res) => {
-  console.log("Hiii"); 
-  res.send("Hello from /home route 🚀");
-});
-
-router.get('/search/:q', getProductSearch)
-router.put('/update', updateProduct)
-router.delete('/deleteProduct', deleteProduct)
+router.get('/products', getAllProducts)
+router.post('/products', addProduct);
+router.get('/products/:q', getProductSearch)
+router.put('/products', updateProduct)
+router.delete('/products', deleteProduct)
 
 export default router
 

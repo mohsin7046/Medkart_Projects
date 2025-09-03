@@ -6,9 +6,11 @@ import grnRoutes from './grn.routes.js'
 import purchaseInvoiceRoutes from './purchaseInvoice.routes.js'
 import commonRoutes from './common.routes.js'
 
-app.use('/vendors', vendorRoutes)
-app.use('/products', productRoutes)
-app.use('/purchase-orders', purchaseOrderRoutes)
-app.use('/grn', grnRoutes)
-app.use('/purchase-invoice', purchaseInvoiceRoutes)
-app.use('/common',commonRoutes)
+let str = '/api/v1'
+
+app.use(str, vendorRoutes)
+app.use(str, productRoutes)
+app.use(str, purchaseOrderRoutes)
+app.use(str, grnRoutes)
+app.use(str, purchaseInvoiceRoutes)
+app.use(str,commonRoutes)

@@ -10,10 +10,10 @@ import {
 
 const router = Router()
 
-router.post('/add-vendor', createVendor)
-router.get('/getAllvendor', getAllVendors)
-router.get('/search/:q', getVendoreSearch)
-router.put('/update', updateVendor)
-router.delete('/deleteVendor', deleteVendor)
+router.post('/vendors', createVendor)
+router.get('/vendors', getAllVendors)
+router.get('/vendors/:q', getVendoreSearch)
+router.put('/vendors', updateVendor)
+router.delete('/vendors', deleteVendor)
 
 export default router

@@ -8,9 +8,9 @@ import {
 
 const router = Router()
 
-router.post('/create-grn', createGRN)
-router.get('/get-grn', getAllGRNs)
-router.delete('/delete-grn', deleteGRN)
-router.put('/update-grn', updateGRN)
+router.post('/grn', createGRN)
+router.get('/grn', getAllGRNs)
+router.delete('/grn', deleteGRN)
+router.put('/grn', updateGRN)
 
 export default router

@@ -9,9 +9,9 @@ import {
 
 const router = Router()
 
-router.post('/add-purchase-order', createPurchaseOrder)
-router.get('/getAllPurchaseOrders', getAllPurchaseOrders)
-router.delete('/deletePurchaseOrder', deletePurchaseOrder)
-router.put('/updatePurchaseOrder', updatePurchaseOrder)
+router.post('/purchase-order', createPurchaseOrder)
+router.get('/purchase-order', getAllPurchaseOrders)
+router.delete('/purchase-order', deletePurchaseOrder)
+router.put('/purchase-order', updatePurchaseOrder)
 
 export default router
