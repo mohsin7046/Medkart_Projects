@@ -45,9 +45,9 @@ export const createPurchaseOrder = catchAsync(async (req, res) => {
 export const getAllPurchaseOrders = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const orderBy = req.query.orderBy
+  const sortby = req.query.sortby;
 
-  const orders = await getAllPurchaseOrdersService(page, limit, orderBy)
+  const orders = await getAllPurchaseOrdersService(page, limit, sortby)
 
   if (!orders) {
     return errorResponse(res, 'Purchase Order not fetch', 400)

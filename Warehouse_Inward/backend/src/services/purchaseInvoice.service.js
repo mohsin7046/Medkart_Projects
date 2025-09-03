@@ -61,7 +61,7 @@ export const createPurchaseInvoiceService = async ({
         invoice_number,
         invoice_date: new Date(invoice_date),
         total_amount: total_amount,
-        status:STATUS.PENDING,
+        status: STATUS.PENDING,
         PurchaseInvoiceItem: {
           create: items.map((item, idx) => ({
             product_id: item.product_id,
@@ -85,16 +85,24 @@ export const createPurchaseInvoiceService = async ({
 
 
 
-export const getAllPurchaseInvoicesService = async (page, limit, orderBy) => {
+export const getAllPurchaseInvoicesService = async (page, limit, sortby) => {
   const skip = (page - 1) * limit
 
-  const totalItems = await prisma.product.count()
+  let orderBy = {};
+  if (sortby) {
+    const [field, direction] = sortby.split(",");
+    orderBy = {
+      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
+    };
+  }
+
+  const totalItems = await prisma.purchaseInvoice.count()
   const allPurchaseInvoices = await prisma.purchaseInvoice.findMany({
     where: { deleted_at: null },
     include: { PurchaseInvoiceItem: true },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy }
+    orderBy
   })
 
   const totalPages = Math.ceil(totalItems / limit)

@@ -22,7 +22,7 @@ export const createPurchaseOrderService = async (data) => {
     0
   ));
 
-  const createdPO =  await prisma.purchaseOrder.create({
+  const createdPO = await prisma.purchaseOrder.create({
     data: {
       vendor_id,
       order_date: new Date(order_date),
@@ -31,7 +31,7 @@ export const createPurchaseOrderService = async (data) => {
       total_amount,
       status: STATUS.PENDING,
       purchaseOrderItems: {
-        create: items.map((item,idx) => ({
+        create: items.map((item, idx) => ({
           product_id: item.product_id,
           quantity: item.quantity,
           item_price: item.item_price,
@@ -46,16 +46,24 @@ export const createPurchaseOrderService = async (data) => {
 }
 
 
-export const getAllPurchaseOrdersService = async (page, limit, orderBy) => {
+export const getAllPurchaseOrdersService = async (page, limit, sortby) => {
   const skip = (page - 1) * limit
 
-  const totalItems = await prisma.product.count()
-  const allProductOrders = await prisma.product.findMany({
+  let orderBy = {};
+  if (sortby) {
+    const [field, direction] = sortby.split(",");
+    orderBy = {
+      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
+    };
+  }
+
+  const totalItems = await prisma.purchaseOrder.count()
+  const allProductOrders = await prisma.purchaseOrder.findMany({
     where: { deleted_at: null },
     skip,
     take: limit,
     include: { purchaseOrderItems: true },
-    orderBy: { created_at: orderBy }
+    orderBy
   })
 
   const totalPages = Math.ceil(totalItems / limit)
@@ -90,7 +98,7 @@ export const deletePurchaseOrderService = async (order_id) => {
     where: { id: order_id },
     data: {
       deleted_at: new Date(),
-      status:STATUS.CANCELLED
+      status: STATUS.CANCELLED
     }
   })
 
@@ -105,7 +113,7 @@ export const deletePurchaseOrderService = async (order_id) => {
 
 export const updatePurchaseOrderService = async (formData) => {
 
-   const itemsWithTotal = formData.items.map((item) => {
+  const itemsWithTotal = formData.items.map((item) => {
     const totalAmount = decimalConversion(item.quantity * item.item_price);
     return {
       ...item,
@@ -126,7 +134,7 @@ export const updatePurchaseOrderService = async (formData) => {
       total_amount,
       purchaseOrderItems: {
         deleteMany: { order_id: formData.order_id },
-        create: formData.items.map((item,idx) => ({
+        create: formData.items.map((item, idx) => ({
           product_id: item.product_id,
           quantity: item.quantity,
           item_price: item.item_price,
@@ -139,6 +147,5 @@ export const updatePurchaseOrderService = async (formData) => {
   })
 
   return updatedPO
-} 
+}
 
- 

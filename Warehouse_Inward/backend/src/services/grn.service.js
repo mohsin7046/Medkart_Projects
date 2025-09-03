@@ -10,7 +10,7 @@ export const findPOByOrderNumber = async (order_id) => {
   })
   return POOrderNumber
 }
- 
+
 export const findGRNByNumber = async (grn_id) => {
   const grnfind = await prisma.goodReceiptNote.findFirst({
     where: { id: grn_id, deleted_at: null },
@@ -22,7 +22,7 @@ export const findGRNByNumber = async (grn_id) => {
 
 export const createGRNRecord = async (existingPO, data) => {
 
- return await prisma.$transaction(async (tx) => {
+  return await prisma.$transaction(async (tx) => {
     const purchase_order_id = data.order_id
     let statusUpdate = ''
 
@@ -63,7 +63,7 @@ export const createGRNRecord = async (existingPO, data) => {
           break
         }
       }
-    }    
+    }
 
     if (statusUpdate === STATUS.CANCELLED) {
       await tx.purchaseOrder.update({
@@ -80,17 +80,17 @@ export const createGRNRecord = async (existingPO, data) => {
     const grn_number = generateRandom('GRN');
 
     const itemsWithTotal = data.items.map((item) => {
-    const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
-    return {
-      ...item,
-      totalAmount,
-    };
-  });
+      const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
+      return {
+        ...item,
+        totalAmount,
+      };
+    });
 
-  const total_amount = decimalConversion(itemsWithTotal.reduce(
-    (sum, item) => sum + item.totalAmount,
-    0
-  ));
+    const total_amount = decimalConversion(itemsWithTotal.reduce(
+      (sum, item) => sum + item.totalAmount,
+      0
+    ));
 
     const newGRN = await tx.goodReceiptNote.create({
       data: {
@@ -100,7 +100,7 @@ export const createGRNRecord = async (existingPO, data) => {
         damaged_qty: data.damaged_qty || 0,
         shortage_qty: data.shortage_qty || 0,
         goodReceiptNoteItems: {
-          create: data.items.map((item,idx) => ({
+          create: data.items.map((item, idx) => ({
             product_id: item.product_id,
             batch_number: item.batch_number,
             expiry_date: new Date(item.expiry_date),
@@ -143,7 +143,7 @@ export const updateGRNRecord = async (existingGRN, data) => {
     }
 
     console.log(existingPO);
-    
+
 
     let statusUpdate = ''
 
@@ -178,15 +178,15 @@ export const updateGRNRecord = async (existingGRN, data) => {
       // })
 
       // console.log(lastGRNItem);
-      
 
-    //   if (lastGRNItem) {
-    //     const allowedMRP = lastGRNItem.item_mrp * 1.2
-    //     if (Number(receivedItem.item_mrp) > allowedMRP) {
-    //       statusUpdate = STATUS.CANCELLED
-    //       break
-    //     }
-    //   }
+
+      //   if (lastGRNItem) {
+      //     const allowedMRP = lastGRNItem.item_mrp * 1.2
+      //     if (Number(receivedItem.item_mrp) > allowedMRP) {
+      //       statusUpdate = STATUS.CANCELLED
+      //       break
+      //     }
+      //   }
     }
 
     if (statusUpdate === STATUS.CANCELLED) {
@@ -208,17 +208,17 @@ export const updateGRNRecord = async (existingGRN, data) => {
     }
 
     const itemsWithTotal = data.items.map((item) => {
-    const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
-    return {
-      ...item,
-      totalAmount,
-    };
-  });
+      const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
+      return {
+        ...item,
+        totalAmount,
+      };
+    });
 
-  const total_amount = decimalConversion(itemsWithTotal.reduce(
-    (sum, item) => sum + item.totalAmount,
-    0
-  ));
+    const total_amount = decimalConversion(itemsWithTotal.reduce(
+      (sum, item) => sum + item.totalAmount,
+      0
+    ));
 
     const updatedGRN = await tx.goodReceiptNote.update({
       where: { id: grn_id },
@@ -230,7 +230,7 @@ export const updateGRNRecord = async (existingGRN, data) => {
         status: statusUpdate,
         goodReceiptNoteItems: {
           deleteMany: { grn_id: grn_id },
-          create: data.items.map((item,idx) => ({
+          create: data.items.map((item, idx) => ({
             product_id: item.product_id,
             batch_number: item.batch_number,
             expiry_date: new Date(item.expiry_date),
@@ -255,8 +255,16 @@ export const updateGRNRecord = async (existingGRN, data) => {
 
 
 
-export const getALLGRNService = async (page, limit, orderBy) => {
+export const getALLGRNService = async (page, limit, sortby) => {
   const skip = (page - 1) * limit
+
+  let orderBy = {};
+  if (sortby) {
+    const [field, direction] = sortby.split(",");
+    orderBy = {
+      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
+    };
+  }
 
   const totalItems = await prisma.goodReceiptNote.count({
     where: { deleted_at: null }
@@ -266,7 +274,7 @@ export const getALLGRNService = async (page, limit, orderBy) => {
     include: { goodReceiptNoteItems: true },
     skip,
     take: limit,
-    orderBy: { created_at: orderBy }
+    orderBy
   })
 
   const totalPages = Math.ceil(totalItems / limit)
@@ -281,10 +289,10 @@ export const getALLGRNService = async (page, limit, orderBy) => {
 
 export const deleteGRNRecord = async (grn_id) => {
   const deleteGRN = await prisma.goodReceiptNote.update({
-    where: { id:grn_id },
+    where: { id: grn_id },
     data: {
       deleted_at: new Date(),
-      status:STATUS.CANCELLED
+      status: STATUS.CANCELLED
     }
   })
   return deleteGRN

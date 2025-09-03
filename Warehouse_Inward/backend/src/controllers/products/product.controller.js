@@ -37,8 +37,8 @@ export const addProduct = catchAsync(async (req, res) => {
 export const getAllProducts = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const orderBy = req.query.orderBy
-  const products = await getAllProductsService(page, limit, orderBy)
+  const sortby = req.query.sortby;
+  const products = await getAllProductsService(page, limit, sortby)
   if (!products) {
     return errorResponse(res, 'Product not fetched!!', 400)
   }

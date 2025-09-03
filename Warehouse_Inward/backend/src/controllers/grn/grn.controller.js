@@ -2,13 +2,13 @@ import {
   findPOByOrderNumber,
   getALLGRNService,
   findGRNByNumber,
-  createGRNRecord,  
+  createGRNRecord,
   updateGRNRecord,
   deleteGRNRecord,
   deleteGRNItemsById,
 } from '../../services/grn.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import {SETEXPIRY, STATUS } from '../../utilities/constant.js'
+import { SETEXPIRY, STATUS } from '../../utilities/constant.js'
 import { updateGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnUpdate.zod.js'
 import { createGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
@@ -25,11 +25,11 @@ export const createGRN = catchAsync(async (req, res) => {
 
   data.items.map((item) => {
     if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
-      return errorResponse(res,`MRP is not less than price in product ${item.product_id}`,400)
+      return errorResponse(res, `MRP is not less than price in product ${item.product_id}`, 400)
     }
 
-    if(!checkExpiry(item.expiry_date)){
-      return errorResponse(res,`Expiry date is ${SETEXPIRY.expiryMonth} month always greater`,400)
+    if (!checkExpiry(item.expiry_date)) {
+      return errorResponse(res, `Expiry date is ${SETEXPIRY.expiryMonth} month always greater`, 400)
     }
   })
 
@@ -57,9 +57,9 @@ export const createGRN = catchAsync(async (req, res) => {
 export const getAllGRNs = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const orderBy = req.query.orderBy
+  const sortby = req.query.sortby;
 
-  const getGRNS = await getALLGRNService(page, limit, orderBy)
+  const getGRNS = await getALLGRNService(page, limit, sortby)
   if (!getGRNS) {
     return errorResponse(res, 'GRN not fetched', 400)
   }
@@ -102,14 +102,14 @@ export const deleteGRN = catchAsync(async (req, res) => {
     return errorResponse(res, 'GRN not found', 400)
   }
 
-  if([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)){
+  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) {
     return errorResponse(res, 'GRN is completed or cancelled', 400)
   }
 
   const deleteGRNItems = deleteGRNItemsById(grn_id);
 
-  if(!deleteGRNItems){
-     return errorResponse(res, 'GRNItems not found', 400)
+  if (!deleteGRNItems) {
+    return errorResponse(res, 'GRNItems not found', 400)
   }
 
   const deletedGRN = deleteGRNRecord(grn_id)

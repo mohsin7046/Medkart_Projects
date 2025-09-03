@@ -46,9 +46,9 @@ export const createPurchaseInvoice = catchAsync(async (req, res) => {
 export const getAllPurchaseInvoices = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const orderBy = req.query.orderBy
+  const sortby = req.query.sortby;
 
-  const invoices = await getAllPurchaseInvoicesService(page, limit, orderBy)
+  const invoices = await getAllPurchaseInvoicesService(page, limit, sortby)
 
   if (!invoices) {
     return errorResponse(res, 'purchase invoice not fetched', 400)

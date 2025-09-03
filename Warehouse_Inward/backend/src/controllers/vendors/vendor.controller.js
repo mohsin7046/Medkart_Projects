@@ -29,9 +29,9 @@ export const createVendor = catchAsync(async (req, res) => {
 export const getAllVendors = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
   const limit = parseInt(req.query.limit)
-  const orderBy = req.query.orderBy
+  const sortby = req.query.sortby;
 
-  const vendors = await getAllVendorsService(page, limit, orderBy)
+  const vendors = await getAllVendorsService(page, limit, sortby)
   if (!vendors) {
     return errorResponse(res, 'ALL Vendor are not fetch', 400)
   }

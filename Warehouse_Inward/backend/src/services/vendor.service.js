@@ -10,20 +10,28 @@ export const createVendorService = async (data) => {
       ...data,
       vendor_code
     }
-  }) 
+  })
   return createVendor
 }
 
 
-export const getAllVendorsService = async (page, limit, orderBy) => {
+export const getAllVendorsService = async (page, limit, sortby) => {
   const skip = (page - 1) * limit
+
+  let orderBy = {};
+  if (sortby) {
+    const [field, direction] = sortby.split(",");
+    orderBy = {
+      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
+    };
+  }
 
   const totalItems = await prisma.vendor.count()
   const allVendors = await prisma.vendor.findMany({
     where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { created_at: orderBy }
+    orderBy
   })
 
   const totalPages = Math.ceil(totalItems / limit)

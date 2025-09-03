@@ -9,7 +9,7 @@ export const addProductService = async (data) => {
 
   const product_code = generateRandom("PRODUCT");
   console.log(product_code);
-  
+
 
   const products = await prisma.product.create({
     data: {
@@ -21,16 +21,25 @@ export const addProductService = async (data) => {
   return products
 }
 
- 
-export const getAllProductsService = async (page, limit, orderBy) => {
+
+export const getAllProductsService = async (page, limit, sortby) => {
   const skip = (page - 1) * limit
+
+
+  let orderBy = {};
+  if (sortby) {
+    const [field, direction] = sortby.split(",");
+    orderBy = {
+      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
+    };
+  }
 
   const totalItems = await prisma.product.count()
   const allProducts = await prisma.product.findMany({
     where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { created_at: orderBy }
+    orderBy
   })
 
   const totalPages = Math.ceil(totalItems / limit)
@@ -61,7 +70,7 @@ export const searchProductService = async (q) => {
     take: LIMIT.PRODUCT_LIMIT
   })
 
-  
+
   return searchProduct
 }
 
@@ -93,7 +102,7 @@ export const updateProductService = async (formData) => {
 
   return updateProduct
 }
- 
+
 export const deleteProductService = async (product_code) => {
   if (!product_code) {
     throw new Error('Product code is required for deletion')

@@ -1,16 +1,28 @@
 import { catchAsync } from "../../utilities/tryCatchAsyncHandler.js";
 import { FEILD, SEARCHFILTERNAME } from "../../utilities/constant.js";
 import { errorResponse, successResponse } from "../../utilities/response.js";
+import { buildFilter } from "../../utilities/builderFilter.js";
 
 
 export const searchFilterCommon = catchAsync(async (req, res) => {
     
-  let { name,search, page = 1,status, limit = 10 } = req.query
+  const filters = req.query
 
-   limit = Number(limit);
-   page = Number(page);
-   console.log(name);
-   
+  const filterMapping = {
+    name: { field: "name", type: "string" },
+    search: { field: "search", type: "string" },
+    page: { field: "page", type: "number" },
+    limit: { field: "limit", type: "number" },
+    status:{field: "status", type: "string" }
+  };
+
+  const where = buildFilter(filters, filterMapping);
+
+  const name = where.name;
+  const limit = where.limit;
+  const search = where.search;
+  const page = where.page;
+  const status = where.status;
 
    if (!SEARCHFILTERNAME[name]) {
     return errorResponse(res,`Invalid name: ${name}`,400)
