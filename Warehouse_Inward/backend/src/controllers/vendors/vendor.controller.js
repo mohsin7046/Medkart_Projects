@@ -4,17 +4,14 @@ import {
   searchVendorsService,
   updateVendorService,
   deleteVendorService,
-  searchFilterVendorService
-} from '../../../services/vendor.service.js'
-import { FEILD } from '../../utilities/constant.js'
+} from '../../services/vendor.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import { Validate } from '../../zodValidation/validate.zod.js'
 import { updateVendorSchema } from '../../zodValidation/vendorValidation/vendorUpdate.zod.js'
 import { createVendorSchema } from '../../zodValidation/vendorValidation/vendorCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
 export const createVendor = catchAsync(async (req, res) => {
-  const data = Validate(createVendorSchema)
+  const data = createVendorSchema.parse(req.body)
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -50,7 +47,7 @@ export const getVendoreSearch = catchAsync(async (req, res) => {
 })
 
 export const updateVendor = catchAsync(async (req, res) => {
-  const formData = Validate(updateVendorSchema)
+  const formData = updateVendorSchema.parse(req.body)
 
   if (!formData) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -72,32 +69,4 @@ export const deleteVendor = catchAsync(async (req, res) => {
     return errorResponse(res, 'Vendor not deleted', 400)
   }
   return successResponse(res, vendordelete, 'Successfully delete Vendor', 200)
-})
-
-export const searchFilterVendor = catchAsync(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query
-
-  let query = {};
-  if (search) {
-    query.OR = FEILD.VENDOR_FEILD.map((item) => ({
-      [item]: { contains: search, mode: 'insensitive' }
-    }))
-  }
-
-  if (status) {
-    query.status = status
-  }
-
-  const getSearchFilter = await searchFilterVendorService(query, page, limit)
-
-  if (!getSearchFilter) {
-    return errorResponse(res, 'Product not searched or filtered', 400)
-  }
-
-  return successResponse(
-    res,
-    getSearchFilter,
-    'Successfully Search or filter the product',
-    200
-  )
 })

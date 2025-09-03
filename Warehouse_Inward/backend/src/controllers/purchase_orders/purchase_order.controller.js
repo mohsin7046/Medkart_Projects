@@ -3,17 +3,14 @@ import {
   getAllPurchaseOrdersService,
   deletePurchaseOrderService,
   updatePurchaseOrderService,
-  searchFilterPurchaseOrderService
 } from '../../services/purchaseOrder.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import { FEILD } from '../../utilities/constant.js'
-import { Validate } from '../../zodValidation/validate.zod.js'
 import { updatePurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderUpdate.zod.js'
 import { createPurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
 export const createPurchaseOrder = catchAsync(async (req, res) => {
-  const data = Validate(createPurchaseOrderSchema)
+  const data = createPurchaseOrderSchema.parse(req.body)
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
   }
@@ -74,7 +71,7 @@ export const deletePurchaseOrder = catchAsync(async (req, res) => {
 })
 
 export const updatePurchaseOrder = catchAsync(async (req, res) => {
-  const formData = Validate(updatePurchaseOrderSchema)
+  const formData = updatePurchaseOrderSchema.parse(req.body)
 
   if (!formData) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -90,38 +87,6 @@ export const updatePurchaseOrder = catchAsync(async (req, res) => {
     res,
     updatedOrder,
     'Successfully updated purchase Order',
-    200
-  )
-})
-
-export const searchFilterPurchaseOrder = catchAsync(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query
-
-  let query = {};
-  if (search) {
-    query.OR = FEILD.PURCHASE_ORDER_FEILD.map((item) => ({
-      [item]: { contains: search, mode: 'insensitive' }
-    }))
-  }
-
-  if (status) {
-    query.status = status
-  }
-
-  const getSearchFilter = await searchFilterPurchaseOrderService(
-    query,
-    page,
-    limit
-  )
-
-  if (!getSearchFilter) {
-    return errorResponse(res, 'Product not searched or filtered', 400)
-  }
-
-  return successResponse(
-    res,
-    getSearchFilter,
-    'Successfully Search or filter the product',
     200
   )
 })

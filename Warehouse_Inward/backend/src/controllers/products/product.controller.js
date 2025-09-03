@@ -4,28 +4,34 @@ import {
   searchProductService,
   updateProductService,
   deleteProductService,
-  searchFilterProductService
 } from '../../services/product.service.js'
 import { FEILD } from '../../utilities/constant.js'
 import { successResponse, errorResponse } from '../../utilities/response.js'
-import { Validate } from '../../zodValidation/validate.zod.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
 import { updateProductSchema } from '../../zodValidation/productValidation/productUpdate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
+ 
 
 export const addProduct = catchAsync(async (req, res) => {
-  const data = Validate(createProductSchema)
+
+  const data = createProductSchema.parse(req.body);
+
 
   if (!data) {
+    console.log(data.error);
+      
     return errorResponse(res, 'All feilds are required', 400)
   }
 
-  const newProduct = await addProductService(data)
+  const newProduct = await addProductService(data);
+
   if (!newProduct) {
-    return errorResponse(res, 'Product not created', 400)
+    return errorResponse(res, 'Product not created', 400);
   }
   return successResponse(res, newProduct, 'Product created Successfully', 200)
 })
+
+
 
 export const getAllProducts = catchAsync(async (req, res) => {
   const page = parseInt(req.query.page)
@@ -37,6 +43,7 @@ export const getAllProducts = catchAsync(async (req, res) => {
   }
   return successResponse(res, products, 'Product fetch succesfully', 200)
 })
+
 
 export const getProductSearch = catchAsync(async (req, res) => {
   const { q } = req.params
@@ -54,10 +61,16 @@ export const getProductSearch = catchAsync(async (req, res) => {
 })
 
 export const updateProduct = catchAsync(async (req, res) => {
-  const formData = Validate(updateProductSchema)
+  console.log(req.body);
+  
+  const formData = updateProductSchema.parse(req.body);
+
   if (!formData) {
     return errorResponse(res, 'All feilds are required', 400)
   }
+
+  console.log(formData);
+  
 
   const updatedProduct = await updateProductService(formData)
   if (!updatedProduct) {
@@ -76,31 +89,5 @@ export const deleteProduct = catchAsync(async (req, res) => {
   }
   return successResponse(res, deletedProduct, 'Product delete succesfully', 200)
 })
+ 
 
-export const searchFilterProduct = catchAsync(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query
-
-  let query = {};
-  if (search) {
-    query.OR = FEILD.PRODUCT_FEILD.map((item) => ({
-      [item]: { contains: search, mode: 'insensitive' }
-    }))
-  }
-
-  if (status) {
-    query.status = status
-  }
-
-  const getSearchFilter = await searchFilterProductService(query, page, limit)
-
-  if (!getSearchFilter) {
-    return errorResponse(res, 'Product not searched or filtered', 400)
-  }
-
-  return successResponse(
-    res,
-    getSearchFilter,
-    'Successfully Search or filter the product',
-    200
-  )
-})

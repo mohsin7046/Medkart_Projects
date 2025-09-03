@@ -6,17 +6,15 @@ import {
   updateGRNRecord,
   deleteGRNRecord,
   deleteGRNItemsById,
-  searchFilterGRNService
 } from '../../services/grn.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import { FEILD, STATUS } from '../../utilities/constant.js'
-import { Validate } from '../../zodValidation/validate.zod.js'
+import {STATUS } from '../../utilities/constant.js'
 import { updateGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnUpdate.zod.js'
 import { createGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
 export const createGRN = catchAsync(async (req, res) => {
-  const data = Validate(createGoodReceiptNoteSchema)
+  const data = createGoodReceiptNoteSchema.parse(req.body)
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -62,7 +60,7 @@ export const getAllGRNs = catchAsync(async (req, res) => {
 })
 
 export const updateGRN = catchAsync(async (req, res) => {
-  const data = Validate(updateGoodReceiptNoteSchema)
+  const data = updateGoodReceiptNoteSchema.parse(req.body)
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -107,30 +105,3 @@ export const deleteGRN = catchAsync(async (req, res) => {
   return successResponse(res, deleteGRN, 'GRN deleted succesfully', 200)
 })
 
-export const searchFilterGRN = catchAsync(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query
-  let query = {};
-
-  if (search) {
-    query.OR = FEILD.GRN_FEILD.map((item) => ({
-      [item]: { contains: search, mode: 'insensitive' }
-    }))
-  }
-
-  if (status) {
-    query.status = status
-  }
-
-  const getSearchFilter = await searchFilterGRNService(query, page, limit)
-
-  if (!getSearchFilter) {
-    return errorResponse(res, 'Product not searched or filtered', 400)
-  }
-
-  return successResponse(
-    res,
-    getSearchFilter,
-    'Successfully Search or filter the product',
-    200
-  )
-})

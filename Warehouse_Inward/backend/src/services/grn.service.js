@@ -1,5 +1,5 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS, PREFIX } from '../utilities/constant.js'
+import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 
 export const findPOByOrderNumber = async (order_id) => {
@@ -253,5 +253,3 @@ export const deleteGRNItemsById = async (grn_id) => {
   return deleteAllItem
 }
 
-export const searchFilterGRNService = (query, page, limit) =>
-  searchAndFilter(prisma.goodReceiptNote, query, page, limit);

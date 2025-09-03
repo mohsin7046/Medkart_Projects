@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { decimalConversion } from '../../../utilities/decimal.conversion'
+import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const purchaseInvoiceItemSchema = z.object({
   product_code: z.string().min(2, 'Product code is required'),

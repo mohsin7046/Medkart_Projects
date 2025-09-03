@@ -2,16 +2,14 @@ import {
   createPurchaseInvoiceService,
   getAllPurchaseInvoicesService,
   deletePurchaseInvoiceService,
-  searchFilterPurchaseInvoiceService
 } from '../../services/purchaseInvoice.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import { FEILD } from '../../utilities/constant.js'
-import { Validate } from '../../zodValidation/validate.zod.js'
+
 import { createPurchaseInvoiceSchema } from '../../zodValidation/PurchaseInvoiceValidation/purchaseInvoiceCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 
 export const createPurchaseInvoice = catchAsync(async (req, res) => {
-  const data = Validate(createPurchaseInvoiceSchema)
+  const data = createPurchaseInvoiceSchema.parse(req.body)
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
@@ -80,35 +78,4 @@ export const deletePurchaseInvoice = catchAsync(async (req, res) => {
   )
 })
 
-export const searchFilterPurchaseInvoice = catchAsync(async (req, res) => {
-  const { search, status, page = 1, limit = 10 } = req.query
 
-  let query ={};
-
-  if (search) {
-    query.OR = FEILD.PURCHASE_INVOICE_FEILD.map((item) => ({
-      [item]: { contains: search, mode: 'insensitive' }
-    }))
-  }
-
-  if (status) {
-    query.status = status
-  }
-
-  const getSearchFilter = await searchFilterPurchaseInvoiceService(
-    query,
-    page,
-    limit
-  )
-
-  if (!getSearchFilter) {
-    return errorResponse(res, 'Product not searched or filtered', 400)
-  }
-
-  return successResponse(
-    res,
-    getSearchFilter,
-    'Successfully Search or filter the product',
-    200
-  )
-})

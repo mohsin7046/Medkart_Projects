@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { decimalConversion } from '../../../utilities/decimal.conversion'
+import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const purchaseOrderItemSchema = z.object({
   product_code: z

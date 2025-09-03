@@ -1,6 +1,5 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS, PREFIX, LIMIT } from '../utilities/constant.js'
-import crypto from 'crypto'
+import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 
 export const addProductService = async (data) => {
@@ -8,8 +7,9 @@ export const addProductService = async (data) => {
     throw new Error('Product MRP must be equal or greater than price')
   }
 
-  const randomStr = crypto.randomBytes(3).toString('hex').toUpperCase()
   const product_code = generateRandom("PRODUCT");
+  console.log(product_code);
+  
 
   const products = await prisma.product.create({
     data: {
@@ -21,6 +21,7 @@ export const addProductService = async (data) => {
   return products
 }
 
+ 
 export const getAllProductsService = async (page, limit, orderBy) => {
   const skip = (page - 1) * limit
 
@@ -29,7 +30,7 @@ export const getAllProductsService = async (page, limit, orderBy) => {
     where: { deleted_at: null },
     skip,
     take: limit,
-    orderBy: { createdAt: orderBy }
+    orderBy: { created_at: orderBy }
   })
 
   const totalPages = Math.ceil(totalItems / limit)
@@ -41,6 +42,7 @@ export const getAllProductsService = async (page, limit, orderBy) => {
     metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
   }
 }
+
 
 export const searchProductService = async (q) => {
   const searchProduct = await prisma.product.findMany({
@@ -59,6 +61,7 @@ export const searchProductService = async (q) => {
     take: LIMIT.PRODUCT_LIMIT
   })
 
+  
   return searchProduct
 }
 
@@ -90,7 +93,7 @@ export const updateProductService = async (formData) => {
 
   return updateProduct
 }
-
+ 
 export const deleteProductService = async (product_code) => {
   if (!product_code) {
     throw new Error('Product code is required for deletion')
@@ -106,6 +109,3 @@ export const deleteProductService = async (product_code) => {
   }
   return softdeleteProduct
 }
-
-export const searchFilterProductService = (query, page, limit) =>
-  searchAndFilter(prisma.product, query, page, limit);

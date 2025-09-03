@@ -1,4 +1,4 @@
-import { decimalConversion } from '../../../utilities/decimal.conversion'
+import { decimalConversion } from '../../utilities/decimal.conversion.js'
 import {z} from 'zod'
 
 export const createProductSchema = z.object({
@@ -44,7 +44,7 @@ export const createProductSchema = z.object({
 
   description: z
     .string()
-    .max(10, 'Description should not exceed 10 characters'),
+    .max(100, 'Description should not exceed 10 characters'),
 
   status: z.string()
 })

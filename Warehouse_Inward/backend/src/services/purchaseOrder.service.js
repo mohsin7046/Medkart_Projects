@@ -1,6 +1,7 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS, PREFIX } from '../utilities/constant.js'
+import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
+
 
 export const createPurchaseOrderService = async (data) => {
   const { vendor_id, order_date, expected_delivery_date, total_amount, items } =
@@ -106,5 +107,3 @@ export const updatePurchaseOrderService = async (formData) => {
   return updatedPO
 }
 
-export const searchFilterPurchaseOrderService = (query, page, limit) =>
-  searchAndFilter(prisma.purchaseOrder, query, page, limit);

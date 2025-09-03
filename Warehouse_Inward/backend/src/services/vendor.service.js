@@ -1,7 +1,6 @@
-import { prisma } from '../../utilities/import.config.js'
-import { STATUS, PREFIX, LIMIT } from '../src/utilities/constant.js'
+import { prisma } from '../utilities/import.config.js'
+import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
-import { searchAndFilter } from './searchFilter.service.js';
 
 export const createVendorService = async (data) => {
   const vendor_code = generateRandom("VENDOR");
@@ -77,6 +76,3 @@ export const deleteVendorService = async (vendor_code) => {
 
   return softdeleteVendor
 }
-
-export const searchFilterVendorService = (query, page, limit) =>
-  searchAndFilter(prisma.vendor, query, page, limit);

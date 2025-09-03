@@ -1,5 +1,5 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS, PREFIX } from '../utilities/constant.js'
+import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 
 export const createPurchaseInvoiceService = async ({
@@ -111,5 +111,3 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   return deletedInvoice
 }
 
-export const searchFilterPurchaseInvoiceService = (query, page, limit) =>
-  searchAndFilter(prisma.purchaseInvoice, query, page, limit);

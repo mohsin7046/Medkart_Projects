@@ -1,3 +1,4 @@
+import {prisma} from '../utilities/import.config.js'
 export const STATUS = Object.freeze({
   PENDING: 'pending',
   ACCEPTED: 'accepted',
@@ -22,9 +23,17 @@ export const LIMIT = Object.freeze({
 })
 
 export const FEILD = Object.freeze({
-  PRODUCT_FEILD: ['name', 'category', 'product_code', 'description'],
-  VENDOR_FEILD: ['name', 'email', 'vendor_code', 'contact_person', 'address'],
-  PURCHASE_ORDER_FEILD: ['order_number'],
-  GRN_FEILD: ['grn_number'],
-  PURCHASE_INVOICE_FEILD: ['invoice_number']
+  product: ['name', 'category', 'product_code', 'description'],
+  vendor: ['name', 'email', 'vendor_code', 'contact_person', 'address'],
+  order: ['order_number'],
+  grn: ['grn_number'],
+  invoice: ['invoice_number']
+})
+
+export const SEARCHFILTERNAME = Object.freeze({
+  order: prisma.purchaseOrder,
+  product: prisma.product,
+  invoice: prisma.purchaseInvoice,
+  grn: prisma.grn,
+  vendor: prisma.vendor
 })
