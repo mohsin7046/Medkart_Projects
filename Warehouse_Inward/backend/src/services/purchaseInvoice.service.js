@@ -103,3 +103,13 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   return deletedInvoice
 }
 
+export const getInvoiceByIdService = async (id)=>{
+  const data = await prisma.purchaseInvoice.findUnique({
+    where:{id:parseInt(id)},
+    include:{PurchaseInvoiceItem:true}
+  });
+  console.log(data);
+  
+  return data;
+}
+

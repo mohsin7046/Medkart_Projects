@@ -21,8 +21,9 @@ export const findGRNByNumber = async (grn_id) => {
 
 
 export const createGRNRecord = async (existingPO, data) => {
-
+ 
   return await prisma.$transaction(async (tx) => {
+
     const purchase_order_id = data.order_id
     let statusUpdate = ''
 
@@ -33,6 +34,7 @@ export const createGRNRecord = async (existingPO, data) => {
 
     for (const poItem of existingPO.purchaseOrderItems) {
       const receivedItem = receivedItemMap[poItem.product_id]
+
       if (!receivedItem) {
         throw new Error(
           `Received item with product code ${poItem.product_id} not found in PO items`
@@ -41,23 +43,23 @@ export const createGRNRecord = async (existingPO, data) => {
 
       const shortage_qty = receivedItem.shortage_qty || 0
 
-      if (receivedItem.recevied_qty > receivedItem.ordered_qty || shortage_qty < 0) {
+      if (receivedItem.recevied_qty > receivedItem.ordered_qty && shortage_qty < 0) {
         statusUpdate = STATUS.CANCELLED
         break
       } else if (
-        receivedItem.recevied_qty < receivedItem.ordered_qty ||
+        receivedItem.recevied_qty < receivedItem.ordered_qty &&
         shortage_qty > 0
       ) {
         statusUpdate = STATUS.PARTIAL_RECEVIED
       }
 
-      const lastGRNItem = await tx.goodReceiptNoteItem.findFirst({
-        where: { product_id: poItem.product_id, deleted_at: null },
-        orderBy: { id: 'desc' }
+      const lastProductIteMRP = await tx.product.findFirst({
+        where: { id: poItem.product_id, deleted_at: null },
+        select:{last_purchase_price:true}
       })
 
-      if (lastGRNItem) {
-        const allowedMRP = lastGRNItem.item_mrp * 1.2
+      if (lastProductIteMRP) {
+        const allowedMRP = lastProductIteMRP * 1.2
         if (receivedItem.item_mrp > allowedMRP) {
           statusUpdate = STATUS.CANCELLED
           break
@@ -74,7 +76,7 @@ export const createGRNRecord = async (existingPO, data) => {
     }
 
     if (statusUpdate === '' || statusUpdate !== STATUS.PARTIAL_RECEVIED) {
-      statusUpdate = STATUS.PENDING
+      statusUpdate = STATUS.COMPLETED
     }
 
     const grn_number = generateRandom('GRN');
@@ -112,7 +114,7 @@ export const createGRNRecord = async (existingPO, data) => {
           }))
         },
         total_amount,
-        status: statusUpdate
+        status: statusUpdate === STATUS.COMPLETED ? STATUS.PENDING : statusUpdate
       }
     })
 
@@ -274,5 +276,14 @@ export const deleteGRNItemsById = async (grn_id) => {
     }
   })
   return deleteAllItem
+}
+
+export const getGRNByIdService = async(id)=>{
+   const data = await prisma.goodReceiptNote.findUnique({
+    where:{id:parseInt(id)},
+    include:{goodReceiptNoteItems:true}
+  });
+  console.log(data);
+  return data;
 }
 

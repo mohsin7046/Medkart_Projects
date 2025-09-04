@@ -77,10 +77,10 @@ function Product() {
 
   return (
     <div>
-      {/* --- Filters --- */}
+      
       <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
         <div className="flex items-center gap-2">
-          {/* Search term */}
+          
           <input
             type="text"
             placeholder="Search..."
@@ -89,7 +89,7 @@ function Product() {
             className="border px-3 py-1 rounded-md w-52"
           />
 
-          {/* Search field */}
+         
           <select
             value={searchField}
             onChange={(e) => setSearchField(e.target.value)}
@@ -103,7 +103,7 @@ function Product() {
             <option value="hsn_code">HSN</option>
           </select>
 
-          {/* Status */}
+       
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -114,7 +114,7 @@ function Product() {
             <option value="inactive">Inactive</option>
           </select>
 
-          {/* Sort field */}
+          
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value)}
@@ -124,7 +124,7 @@ function Product() {
             <option value="updated_at">Updated At</option>
           </select>
 
-          {/* Sort order */}
+          
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
@@ -143,7 +143,7 @@ function Product() {
         </button>
       </div>
 
-      {/* --- Table --- */}
+     
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
@@ -206,7 +206,7 @@ function Product() {
         </table>
       </div>
 
-      {/* --- Pagination --- */}
+      
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button
           onClick={() => setPage(page - 1)}

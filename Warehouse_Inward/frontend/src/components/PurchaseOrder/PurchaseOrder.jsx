@@ -130,7 +130,6 @@ function PurchaseOrder() {
             <option value="updated_at">Updated At</option>
           </select>
 
-       
           <select
             value={sortOrder}
             onChange={(e) => setSortOrder(e.target.value)}
@@ -213,7 +212,7 @@ function PurchaseOrder() {
                     <td className="border px-4 py-2">
                       <button
                         disabled={isDisabled}
-                        onClick={() => navigate(`/grn/add`, { state: { order: o } })}
+                        onClick={() => navigate(`/grn/add/${o.id}`, { state: { order: o } })}
                         className="relative group p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
                       >
                         <FiFilePlus className="text-orange-500" size={18} />

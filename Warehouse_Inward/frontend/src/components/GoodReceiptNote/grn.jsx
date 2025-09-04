@@ -1,72 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash2,FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 
 function GRNList() {
   const [grns, setGrns] = useState([]);
-  const navigate = useNavigate();
-    const [searchTerm, setSearchTerm] = useState("");
+  const [metadata, setMetadata] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("grn_number");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("d"); 
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/grn/get-grn");
+        const params = new URLSearchParams({
+          page,
+          limit,
+          sortby: `${sortField},${sortOrder}`,
+        });
+
+        if (searchTerm) params.append("search", searchTerm);
+        if (statusFilter !== "all") params.append("status", statusFilter);
+        params.append("name", "grn");
+        if (searchField) params.append("field", searchField);
+
+        const response = await fetch(
+          `http://localhost:3000/api/v1/grn?${params.toString()}`
+        );
+
         if (!response.ok) throw new Error("Network response was not ok");
         const data = await response.json();
-        setGrns(data);
+
+        setGrns(data.data.data || []);
+        setMetadata(data.data.metadata || {});
       } catch (error) {
-        console.error("Error fetching GRN:", error);
+        console.error("Error fetching GRNs:", error);
       }
     };
     fetchData();
-  }, []);
+  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
-  const handleDelete = async (grn_number) => {
+  const handleDelete = (grn_number) => async () => {
     if (window.confirm("Are you sure you want to delete this GRN?")) {
       try {
-        const response = await fetch(`http://localhost:3000/grn/delete-grn`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ grn_number:grn_number}),
-        });
-        if (!response.ok){
-          const errorData = await response.json();
-          alert(errorData.error || "Failed to delete GRN");
+        const response = await fetch(
+          `http://localhost:3000/api/v1/grn`,
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ grn_number }),
+          }
+        );
+        if (!response.ok) {
+          const Error = await response.json();
+          alert("Error: " + Error.error);
           return;
         }
-        setGrns((prev) => prev.filter((g) => g.grn_number !== grn_number));
+
+        setGrns(grns.filter((g) => g.grn_number !== grn_number));
+        alert("GRN deleted successfully");
       } catch (error) {
         console.error("Error deleting GRN:", error);
+        alert("Failed to delete GRN");
       }
     }
   };
 
-  const filteredGrns = grns.filter((g) => {
-    const matchesSearch =
-      g.grn_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.order_number?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all"
-        ? true
-        : g.status?.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
-
-
   return (
     <div>
-      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      
+      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
+        <div className="flex items-center gap-2">
+          
           <input
             type="text"
-            placeholder="Search by GRN No. or Order No..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-64"
+            className="border px-3 py-1 rounded-md w-52"
           />
+
+        
+          <select
+            value={searchField}
+            onChange={(e) => setSearchField(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="grn_number">GRN Number</option>
+          </select>
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -77,16 +104,35 @@ function GRNList() {
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
+
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="created_at">Created At</option>
+            <option value="updated_at">Updated At</option>
+          </select>
+
+          
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="a">Ascending</option>
+            <option value="d">Descending</option>
+          </select>
         </div>
       </div>
 
-      <div className="bg-white shadow-md p-4 rounded-md">
+      <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">IDX</th>
               <th className="border px-4 py-2">GRN Number</th>
-              <th className="border px-4 py-2">Order Number</th>
+              <th className="border px-4 py-2">Order ID</th>
               <th className="border px-4 py-2">Received Date</th>
               <th className="border px-4 py-2">Total Amount</th>
               <th className="border px-4 py-2">Status</th>
@@ -95,32 +141,33 @@ function GRNList() {
             </tr>
           </thead>
           <tbody>
-            {filteredGrns.length > 0 ? (
-              filteredGrns.map((grn, idx) => (
+            {grns.length > 0 ? (
+              grns.map((grn, idx) => (
                 <tr key={grn.id} className="text-center">
-                  <td className="border px-4 py-2">{idx + 1}</td>
+                  <td className="border px-4 py-2">
+                    {(page - 1) * limit + idx + 1}
+                  </td>
                   <td className="border px-4 py-2">{grn.grn_number}</td>
-                  <td className="border px-4 py-2">{grn.order_number}</td>
+                  <td className="border px-4 py-2">{grn.order_id}</td>
                   <td className="border px-4 py-2">
                     {new Date(grn.received_date).toLocaleDateString()}
                   </td>
                   <td className="border px-4 py-2">₹{grn.total_amount}</td>
                   <td className="border px-4 py-2">{grn.status}</td>
-                  <td className="border px-4 py-2">
+                  <td className="border px-4 py-2 flex justify-center gap-2">
                     <button
                       onClick={() =>
-                        navigate(`/grn/edit/${grn.id}`, { state: { grn: grn } })
+                        navigate(`/grn/edit/${grn.id}`)
                       }
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       <FiEdit className="text-green-600" size={18} />
                     </button>
-
                     <button
-                      onClick={() => handleDelete(grn.grn_number)}
+                      onClick={handleDelete(grn.grn_number)}
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
-                      <FiTrash2 className="text-red-700" size={18} />
+                      <FiTrash2 className="text-red-500" size={18} />
                     </button>
                     <button
                       onClick={() =>
@@ -134,7 +181,7 @@ function GRNList() {
                   <td className="border px-4 py-2">
                     <button
                       onClick={() =>
-                        navigate(`/purchase-invoice/add`, { state: { grn } })
+                        navigate(`/purchase-invoice/add/${grn.id}`)
                       }
                       className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
                     >
@@ -145,13 +192,34 @@ function GRNList() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="text-center py-4 text-gray-500">
+                <td colSpan="8" className="text-center py-4 text-gray-500">
                   No GRNs found
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+      </div>
+
+     
+      <div className="flex justify-center items-center mt-4 space-x-2">
+        <button
+          onClick={() => setPage(page - 1)}
+          disabled={!metadata.page || page <= 1}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {metadata.page || 1} of {metadata.totalPages || 1}
+        </span>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page >= (metadata.totalPages || 1)}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

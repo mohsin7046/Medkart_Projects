@@ -1,6 +1,7 @@
 import {
   createPurchaseInvoiceService,
   deletePurchaseInvoiceService,
+  getInvoiceByIdService
 } from '../../services/purchaseInvoice.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
 
@@ -60,6 +61,19 @@ export const deletePurchaseInvoice = catchAsync(async (req, res) => {
     'Purchase invoice successfully deleted',
     200
   )
+})
+
+export const getInvoiceById = catchAsync(async(req,res)=>{
+  const {id} = req.params;
+  console.log(id);
+  
+  const PIbyIddata = await getInvoiceByIdService(id);
+
+  if(!PIbyIddata){
+    errorResponse(res,"Purchase Invoice not fount for the id",400)
+  }
+
+  successResponse(res,PIbyIddata,"Purchase Invoice data fetch successfully by id",200)
 })
 
 

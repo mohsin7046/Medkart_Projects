@@ -32,12 +32,12 @@ function App() {
           <Route path="/purchase-order" element={<PurchaseOrder />} />
           <Route path="/purchase-order/add" element={<PurchaseOrderForm />} />
           <Route path="/purchase-order/edit/:id" element={<PurchaseOrderForm />} />
-          <Route path="/grn/add" element={<GrnForm />} />
+          <Route path="/grn/add/:id" element={<GrnForm />} />
           <Route path="/grn" element={<GRN />} />
           <Route path="/grn/view/:id" element={<GRNView />} />
           <Route path="/grn/edit/:id" element={<GrnForm />} />
           <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
-          <Route path="/purchase-invoice/add" element={<PurchaseInvoiceForm />} />
+          <Route path="/purchase-invoice/add/:id" element={<PurchaseInvoiceForm />} />
           <Route path="/purchase-invoice/view/:id" element={<PurchaseInvoiceView />} />
         </Routes>
       </div>

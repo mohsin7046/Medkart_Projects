@@ -2,21 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 function GrnForm() {
-  const location = useLocation();
-  const navigate = useNavigate();
   const { id } = useParams();
 
+  const navigate = useNavigate();
 
-   const isEdit = id ? true : false;
-  let passedGrn = {};
-
-  if (isEdit) {
-    passedGrn = location.state?.grn || {};
-     console.log("Edit",passedGrn);
-  } else {
-    passedGrn = location.state?.order || {};
-    console.log("Add",passedGrn);
-  }
+  const location = useLocation();
+  const [mode, setMode] = useState("create");
 
   const [formData, setFormData] = useState({
     grn_number: "",
@@ -29,51 +20,76 @@ function GrnForm() {
   });
 
 
-useEffect(() => {
-    if (passedGrn) {
-      setFormData({
-        grn_number: passedGrn.grn_number || `GRN-${Date.now()}`,
-        purchase_order_number: passedGrn.order_number || "",
-        received_date: passedGrn.received_date
-          ? passedGrn.received_date.split("T")[0]
-          : new Date().toISOString().split("T")[0],
-        damaged_qty: passedGrn.damaged_qty || 0,
-        shortage_qty: passedGrn.shortage_qty || 0,
-        status: passedGrn.status || "pending",
-        items: isEdit
-          ? 
-            passedGrn.goodReceiptNoteItems?.map((i) => ({
-              id: i.id,
-              product_code: i.product_code,
-              batch_number: i.batch_number || "",
-              expiry_date: i.expiry_date
-                ? i.expiry_date.split("T")[0]
-                : "",
-              ordered_qty: i.ordered_qty || 0,
-              recevied_qty: i.recevied_qty || 0,
-              damaged_qty: i.damaged_qty || 0,
-              shortage_qty: i.shortage_qty || 0,
-              item_price: i.item_price,
-              item_mrp: i.item_mrp,
-              totalAmount: i.totalAmount,
-            })) || []
-          : 
-            passedGrn.purchaseOrderItems?.map((i) => ({
-              id: i.id,
-              product_code: i.product_code,
-              batch_number: "",
-              expiry_date: "",
-              ordered_qty: i.quantity || 0,
-              recevied_qty: 0,
-              damaged_qty: 0,
-              shortage_qty: 0,
-              item_price: i.item_price,
-              item_mrp: i.item_mrp,
-              totalAmount: i.totalAmount,
-            })) || [],
-      });
+  useEffect(() => {
+    if (location.pathname.includes("/grn/edit")) {
+      setMode("edit");
+    } else if (location.pathname.includes("/grn/add")) {
+      setMode("create");
     }
-  }, [id, passedGrn, isEdit]);
+  }, [location]);
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let url = "";
+        if (mode === "edit") {
+          url = `http://localhost:3000/api/v1/grn/${id}`;
+        } else {
+          url = `http://localhost:3000/api/v1/purchase-order/${id}`;
+        }
+        
+        const res = await fetch(url);
+        const response = await res.json();
+        const data = response.data || response;
+        console.log(mode === "edit" ? "Editing GRN" : "Creating GRN from PO", data);
+
+        setFormData({
+          grn_number: mode === "edit" ? data.grn_number : "",
+          order_id:
+            mode === "edit"
+              ? data?.order_id
+              : data.id,
+          received_date:
+            mode === "edit"
+              ? data.received_date.split("T")[0]
+              : new Date().toISOString().split("T")[0],
+          items:
+            mode === "edit"
+              ? data.goodReceiptNoteItems.map((i) => ({
+                product_id: i.product_id || "",
+                batch_number: i.batch_number || "",
+                ordered_qty: i.ordered_qty,
+                recevied_qty: i.recevied_qty || 0,
+                batch_number: String(i.batch_number),
+                expiry_date: i.expiry_date.split("T")[0],
+                damaged_qty: i.damaged_qty || 0,
+                shortage_qty: i.shortage_qty || 0,
+                item_price: i.item_price,
+                item_mrp: i.item_mrp,
+                totalAmount: i.totalAmount,
+              }))
+              : data.purchaseOrderItems.map((i) => ({
+                id: i.id,
+                product_id: i.product_id || "",
+                batch_number: "",
+                ordered_qty: i.quantity || i.ordered_qty,
+                recevied_qty: 0,
+                damaged_qty: 0,
+                shortage_qty: 0,
+                item_price: i.item_price,
+                item_mrp: i.item_mrp,
+                totalAmount: i.totalAmount,
+              })),
+        });
+      } catch (err) {
+        console.error("Error fetching GRN/PO:", err);
+      }
+    };
+
+    if (id) fetchData();
+  }, [id, mode]);
+
 
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
@@ -94,6 +110,7 @@ useEffect(() => {
     setFormData({ ...formData, items: updatedItems });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -110,62 +127,90 @@ useEffect(() => {
       0
     );
 
-    const payload = {
-      ...formData,
-      total_amount: totalAmount,
-      damaged_qty: totalDamaged,
-      shortage_qty: totalShortage,
-      items: formData.items.map((i) => ({
-        id: i.id,
-        product_code: i.product_code,
-        batch_number: i.batch_number,
-        ordered_qty:i.ordered_qty,
-        expiry_date: i.expiry_date,
-        recevied_qty: i.recevied_qty,
-        item_price: i.item_price,
-        item_mrp: i.item_mrp,
-        totalAmount: i.totalAmount,
-      })),
-    };
+    let payload;
+
+    if (mode === "create") {
+      payload = {
+        order_id: Number(id),
+        received_date: formData.received_date,
+        damaged_qty: totalDamaged,
+        shortage_qty: totalShortage,
+        items: formData.items.map((i) => ({
+          product_id: Number(i.product_id),
+          batch_number: String(i.batch_number),
+          expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
+          recevied_qty: Number(i.recevied_qty),
+          ordered_qty: Number(i.ordered_qty),
+          item_price: Number(i.item_price),
+          item_mrp: Number(i.item_mrp),
+        })),
+      };
+    } else {
+      payload = {
+        grn_id: Number(id),
+        order_id: Number(formData.order_id) || undefined,
+        received_date: formData.received_date,
+        damaged_qty: totalDamaged,
+        shortage_qty: totalShortage,
+        status: formData.status || undefined,
+        items: formData.items.map((i) => ({
+          id: i.id,
+          product_id: Number(i.product_id),
+          batch_number: String(i.batch_number),
+          expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
+          recevied_qty: Number(i.recevied_qty),
+          ordered_qty: Number(i.ordered_qty),
+          item_price: Number(i.item_price),
+          item_mrp: Number(i.item_mrp),
+        })),
+      };
+    }
 
     console.log("Submitting GRN:", payload);
 
     try {
-      let url = "http://localhost:3000/grn/create-grn";
+
+      let url = "http://localhost:3000/api/v1/grn";
       let method = "POST";
 
-      if (id) {
-        url = `http://localhost:3000/grn/update-grn`;
+      if (mode === "edit") {
+        url = `http://localhost:3000/api/v1/grn`;
         method = "PUT";
       }
 
-      console.log(url, method, payload);
+      console.log(url, method);
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok){
+      if (!response.ok) {
         const Error = await response.json();
         alert("Error: " + Error.error);
         return;
       }
 
       alert(id ? "GRN updated successfully!" : "GRN created successfully!");
-      if(isEdit){
+
+      if (mode === "edit") {
         navigate('/grn')
+      }else{
+        navigate("/purchase-order");
       }
-      navigate("/purchase-order");
+
+    
     } catch (error) {
       console.error("Error saving GRN:", error);
     }
   };
 
+
   return (
     <div className="bg-white shadow-lg p-6 rounded-xl max-w-6xl mx-auto">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        {id ? "Edit Good Receipt Note" : "Create Good Receipt Note"}
+        {mode === "edit" ? "Edit Good Receipt Note" : "Create Good Receipt Note"}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -185,11 +230,11 @@ useEffect(() => {
           </div>
           <div className="flex flex-col">
             <label className="text-sm font-medium text-gray-700 mb-1">
-              Purchase Order Number
+              Purchase Order ID
             </label>
             <input
               type="text"
-              value={formData.purchase_order_number}
+              value={formData.order_id}
               readOnly
               className="border border-gray-300 px-3 py-2 rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
               placeholder="PO Number"
@@ -216,7 +261,7 @@ useEffect(() => {
             <tbody>
               {formData.items.map((item, idx) => (
                 <tr key={idx} className="text-center hover:bg-gray-50">
-                  <td className="border px-2 py-1">{item.product_code}</td>
+                  <td className="border px-2 py-1">{item.product_id}</td>
                   <td className="border px-2 py-1">
                     <input
                       type="text"
@@ -241,6 +286,7 @@ useEffect(() => {
                   <td className="border px-2 py-1">
                     <input
                       type="number"
+                      min="0"
                       value={item.recevied_qty}
                       onChange={(e) =>
                         handleItemChange(idx, "recevied_qty", e.target.value)
@@ -269,6 +315,8 @@ useEffect(() => {
                   <td className="border px-2 py-1">
                     <input
                       type="number"
+                      min="0"
+                      step="any"
                       value={item.item_price}
                       onChange={(e) =>
                         handleItemChange(idx, "item_price", e.target.value)
@@ -279,6 +327,8 @@ useEffect(() => {
                   <td className="border px-2 py-1">
                     <input
                       type="number"
+                      min="0"
+                      step="any"
                       value={item.item_mrp}
                       onChange={(e) =>
                         handleItemChange(idx, "item_mrp", e.target.value)
@@ -287,7 +337,7 @@ useEffect(() => {
                     />
                   </td>
                   <td className="border px-2 py-1 font-medium text-gray-700">
-                    ₹{item.totalAmount}
+                    ₹{item.totalAmount.toFixed(3)}
                   </td>
                 </tr>
               ))}

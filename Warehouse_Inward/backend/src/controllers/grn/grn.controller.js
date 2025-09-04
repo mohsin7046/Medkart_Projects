@@ -5,6 +5,7 @@ import {
   updateGRNRecord,
   deleteGRNRecord,
   deleteGRNItemsById,
+  getGRNByIdService
 } from '../../services/grn.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
 import { SETEXPIRY, STATUS } from '../../utilities/constant.js'
@@ -19,13 +20,12 @@ export const createGRN = catchAsync(async (req, res) => {
   const data = createGoodReceiptNoteSchema.parse(req.body)
 
   if (!data) {
-    logger.error(data.error)
+    logger.error(data.error) 
     return errorResponse(res, 'All feilds are required', 400)
   }
 
-
   data.items.map((item) => {
-    if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
+    if (item.item_mrp < item.item_price) {
       logger.error(`MRP is not less than price in product ${item.product_id}`)
       return errorResponse(res, `MRP is not less than price in product ${item.product_id}`, 400)
     }
@@ -111,5 +111,18 @@ export const deleteGRN = catchAsync(async (req, res) => {
   }
 
   return successResponse(res, deleteGRN, 'GRN deleted succesfully', 200)
+})
+
+export const getGRNByID = catchAsync(async(req,res)=>{
+   const {id} = req.params;
+  console.log(id);
+  
+  const grnbyIddata = await getGRNByIdService(id);
+
+  if(!grnbyIddata){
+    errorResponse(res,"GRN not fount for the id",400)
+  }
+
+  successResponse(res,grnbyIddata,"GRN data fetch successfully by id",200)
 })
 

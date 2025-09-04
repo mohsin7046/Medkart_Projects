@@ -177,7 +177,7 @@ function ProductForm() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* --- Product fields --- */}
+          
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Product Name <span className="text-red-500">*</span>
@@ -221,7 +221,7 @@ function ProductForm() {
             />
           </div>
 
-          {/* Numbers */}
+        
           <div>
             <label className="block text-gray-700 font-medium mb-1">Product MRP</label>
             <input
@@ -261,7 +261,7 @@ function ProductForm() {
             />
           </div>
 
-          {/* Dropdowns */}
+         
           <div>
             <label className="block text-gray-700 font-medium mb-1">Unit of Measure</label>
             <select
@@ -306,7 +306,7 @@ function ProductForm() {
             />
           </div>
 
-          {/* Textarea */}
+         
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">Description</label>
             <textarea
@@ -320,7 +320,7 @@ function ProductForm() {
             />
           </div>
 
-          {/* Status */}
+         
           <div>
             <label className="block text-gray-700 font-medium mb-1">Status</label>
             <select
@@ -335,7 +335,7 @@ function ProductForm() {
             </select>
           </div>
 
-          {/* Buttons */}
+          
           <div className="md:col-span-2 flex justify-between mt-8">
             <button
               type="button"
