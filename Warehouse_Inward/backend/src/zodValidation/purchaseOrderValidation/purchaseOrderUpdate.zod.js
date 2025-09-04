@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 import { STATUS } from '../../utilities/constant.js'
+import { statusSchema } from '../statusSchemaValidate.js'
 
 const purchaseOrderItemSchema = z.object({
   product_id: z

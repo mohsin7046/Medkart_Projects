@@ -1,9 +1,9 @@
 import {
   addProductService,
-  getAllProductsService,
   searchProductService,
   updateProductService,
   deleteProductService,
+  getProductByIdService
 } from '../../services/product.service.js'
 import { successResponse, errorResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
@@ -33,19 +33,6 @@ export const addProduct = catchAsync(async (req, res) => {
 })
 
 
-
-export const getAllProducts = catchAsync(async (req, res) => {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  const sortby = req.query.sortby;
-  const products = await getAllProductsService(page, limit, sortby)
-  if (!products) {
-    return errorResponse(res, 'Product not fetched!!', 400)
-  }
-  return successResponse(res, products, 'Product fetch succesfully', 200)
-})
-
-
 export const getProductSearch = catchAsync(async (req, res) => {
   const { q } = req.params
 
@@ -60,6 +47,7 @@ export const getProductSearch = catchAsync(async (req, res) => {
     200
   )
 })
+
 
 export const updateProduct = catchAsync(async (req, res) => {
   console.log(req.body);
@@ -89,6 +77,21 @@ export const deleteProduct = catchAsync(async (req, res) => {
     return errorResponse(res, 'Product not deleted!!', 400)
   }
   return successResponse(res, deletedProduct, 'Product delete succesfully', 200)
+})
+
+
+export const getProductById = catchAsync(async(req,res)=>{
+  const {id} = req.params;
+  console.log(id);
+  
+
+  const productbyIddata = await getProductByIdService(id);
+
+  if(!productbyIddata){
+    errorResponse(res,"Product not fount for the id",400)
+  }
+
+  successResponse(res,productbyIddata,"Product data fetch successfully by id",200)
 })
  
 

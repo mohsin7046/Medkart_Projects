@@ -1,6 +1,5 @@
 import {
   createPurchaseInvoiceService,
-  getAllPurchaseInvoicesService,
   deletePurchaseInvoiceService,
 } from '../../services/purchaseInvoice.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
@@ -42,25 +41,6 @@ export const createPurchaseInvoice = catchAsync(async (req, res) => {
 })
 
 
-
-export const getAllPurchaseInvoices = catchAsync(async (req, res) => {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  const sortby = req.query.sortby;
-
-  const invoices = await getAllPurchaseInvoicesService(page, limit, sortby)
-
-  if (!invoices) {
-    return errorResponse(res, 'purchase invoice not fetched', 400)
-  }
-
-  return successResponse(
-    res,
-    invoices,
-    'Purchase invoice successfully fetched',
-    200
-  )
-})
 
 export const deletePurchaseInvoice = catchAsync(async (req, res) => {
   const { invoice_number } = req.body

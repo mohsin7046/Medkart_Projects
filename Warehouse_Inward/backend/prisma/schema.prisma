@@ -45,7 +45,7 @@ model Product{
   last_purchase_price Float
   unit_of_measure String
   description String
-  hsn_code   Int
+  hsn_code   String
   gst_percentage Float
   status      String   @default("active") // active, inactive, discontinued
   created_at   DateTime @default(now())

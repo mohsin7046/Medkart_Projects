@@ -4,41 +4,53 @@ import { FiEdit, FiTrash2 } from "react-icons/fi";
 
 function Vendor() {
   const [vendors, setVendors] = useState([]);
+  const [metadata, setMetadata] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("d");
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const params = new URLSearchParams({
+          page,
+          limit,
+          sortby: `${sortField},${sortOrder}`,
+        });
+
+        if (searchTerm) params.append("search", searchTerm);
+        if (statusFilter !== "all") params.append("status", statusFilter);
+        params.append("name", "vendor");
+
+        if (searchField) {
+          params.append("field", searchField);
+        }
+
         const response = await fetch(
-          "http://localhost:3000/vendors/getAllvendor"
+          `http://localhost:3000/api/v1/vendors?${params.toString()}`
         );
+
         if (!response.ok) throw new Error("Network response was not ok");
         const data = await response.json();
-        setVendors(data);
+
+        console.log(data);
+        
+
+        setVendors(data.data.data || []);
+        setMetadata(data.data.metadata || {});
       } catch (error) {
         console.error("Error fetching vendors:", error);
       }
     };
+
     fetchData();
-  }, []);
-
-  const filteredVendors = vendors.filter((v) => {
-    const matchesSearch =
-      v.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.vendor_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.gst_number?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all"
-        ? true
-        : v.status?.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
-  });
+  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
   const handleDelete = async (vendor_code) => {
     if (window.confirm("Are you sure you want to delete this vendor?")) {
@@ -63,16 +75,32 @@ function Vendor() {
 
   return (
     <div>
-      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+      
+      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
+        <div className="flex items-center gap-2">
+
           <input
             type="text"
-            placeholder="Search by name, code, email, or GST..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-64"
+            className="border px-3 py-1 rounded-md w-52"
           />
 
+          <select
+            value={searchField}
+            onChange={(e) => setSearchField(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="name">Name</option>
+            <option value="vendor_code">Vendor Code</option>
+            <option value="email">Email</option>
+            <option value="gst_number">GST</option>
+            <option value="contact_number">Contact Number</option>
+            <option value="address">Address</option>
+          </select>
+
+    
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -81,6 +109,25 @@ function Vendor() {
             <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
+          </select>
+
+   
+          <select
+            value={sortField}
+            onChange={(e) => setSortField(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="created_at">Created At</option>
+            <option value="updated_at">Updated At</option>
+          </select>
+
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="border px-3 py-1 rounded-md"
+          >
+            <option value="a">Ascending</option>
+            <option value="d">Descending</option>
           </select>
         </div>
 
@@ -96,7 +143,7 @@ function Vendor() {
         <table className="w-full border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border px-4 py-2">ID</th>
+              <th className="border px-4 py-2">IDX</th>
               <th className="border px-4 py-2">Vendor Code</th>
               <th className="border px-4 py-2">Name</th>
               <th className="border px-4 py-2">Email</th>
@@ -108,10 +155,12 @@ function Vendor() {
             </tr>
           </thead>
           <tbody>
-            {filteredVendors.length > 0 ? (
-              filteredVendors.map((v, idx) => (
+            {vendors.length > 0 ? (
+              vendors.map((v, idx) => (
                 <tr key={v.id} className="text-center">
-                  <td className="border px-4 py-2">{idx + 1}</td>
+                  <td className="border px-4 py-2">
+                    {(page - 1) * limit + idx + 1}
+                  </td>
                   <td className="border px-4 py-2 break-words">{v.vendor_code}</td>
                   <td className="border px-4 py-2 break-words">{v.name}</td>
                   <td className="border px-4 py-2 break-words">{v.email}</td>
@@ -121,15 +170,16 @@ function Vendor() {
                   <td className="border px-4 py-2 break-words">{v.gst_number}</td>
                   <td className="border px-4 py-2 break-words">{v.address}</td>
                   <td className="border px-4 py-2">{v.status}</td>
-                  <td className="border px-4 py-2" >
+                  <td className="border px-4 py-2">
                     <div className="grid grid-cols-2 gap-2">
                       <button
-                        onClick={() => navigate(`/vendor/edit/${v.id}`, { state: v })}
+                        onClick={() =>
+                          navigate(`/vendor/edit/${v.id}`)
+                        }
                         className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                       >
                         <FiEdit className="text-green-600" size={18} />
                       </button>
-
                       <button
                         onClick={() => handleDelete(v.vendor_code)}
                         className="p-2 rounded-md hover:bg-gray-200 transition-colors"
@@ -149,6 +199,26 @@ function Vendor() {
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-center items-center mt-4 space-x-2">
+        <button
+          onClick={() => setPage(page - 1)}
+          disabled={!metadata.page || page <= 1}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span>
+          Page {metadata.page || 1} of {metadata.totalPages || 1}
+        </span>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page >= (metadata.totalPages || 1)}
+          className="px-3 py-1 border rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

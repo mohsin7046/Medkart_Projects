@@ -1,9 +1,9 @@
 import {
   createVendorService,
-  getAllVendorsService,
   searchVendorsService,
   updateVendorService,
   deleteVendorService,
+  getVendorByIdService
 } from '../../services/vendor.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
 import { updateVendorSchema } from '../../zodValidation/vendorValidation/vendorUpdate.zod.js'
@@ -23,19 +23,6 @@ export const createVendor = catchAsync(async (req, res) => {
     return errorResponse(res, 'Vendor not created', 400)
   }
   return successResponse(res, newVendor, 'Successfully created vendor', 200)
-})
-
-
-export const getAllVendors = catchAsync(async (req, res) => {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  const sortby = req.query.sortby;
-
-  const vendors = await getAllVendorsService(page, limit, sortby)
-  if (!vendors) {
-    return errorResponse(res, 'ALL Vendor are not fetch', 400)
-  }
-  return successResponse(res, vendors, 'Successfully getallVendors', 200)
 })
 
 
@@ -75,4 +62,19 @@ export const deleteVendor = catchAsync(async (req, res) => {
     return errorResponse(res, 'Vendor not deleted', 400)
   }
   return successResponse(res, vendordelete, 'Successfully delete Vendor', 200)
+})
+
+
+export const getVendoreById = catchAsync(async(req,res)=>{
+  const {id} = req.params;
+   console.log(id);
+
+   const vendorbyIddata = await getVendorByIdService(id);
+ 
+   if(!vendorbyIddata){
+     errorResponse(res,"Vendor not fount for the id",400)
+   }
+ 
+   successResponse(res,vendorbyIddata,"Vendor data fetch successfully by id",200)
+
 })

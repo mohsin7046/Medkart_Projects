@@ -1,6 +1,5 @@
 import {
   findPOByOrderNumber,
-  getALLGRNService,
   findGRNByNumber,
   createGRNRecord,
   updateGRNRecord,
@@ -51,21 +50,6 @@ export const createGRN = catchAsync(async (req, res) => {
 
   return successResponse(res, createGRN, 'Successfully created GRN', 200)
 })
-
-
-
-export const getAllGRNs = catchAsync(async (req, res) => {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  const sortby = req.query.sortby;
-
-  const getGRNS = await getALLGRNService(page, limit, sortby)
-  if (!getGRNS) {
-    return errorResponse(res, 'GRN not fetched', 400)
-  }
-  return successResponse(res, getGRNS, 'Successfully get all GRN')
-})
-
 
 
 

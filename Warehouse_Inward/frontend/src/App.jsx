@@ -1,4 +1,5 @@
 import React from "react";
+import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Product from "./components/ProductMaster/Product";
@@ -17,6 +18,7 @@ import PurchaseInvoiceView from "./components/PurchaseInvoice/PurchaseInvoiceVie
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Home />
       <div className=""> 
         <Routes>

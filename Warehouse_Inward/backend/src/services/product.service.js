@@ -2,6 +2,7 @@ import { prisma } from '../utilities/import.config.js'
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 
+
 export const addProductService = async (data) => {
   if (data.product_mrp < data.product_price) {
     throw new Error('Product MRP must be equal or greater than price')
@@ -19,37 +20,6 @@ export const addProductService = async (data) => {
   })
 
   return products
-}
-
-
-export const getAllProductsService = async (page, limit, sortby) => {
-  const skip = (page - 1) * limit
-
-
-  let orderBy = {};
-  if (sortby) {
-    const [field, direction] = sortby.split(",");
-    orderBy = {
-      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
-    };
-  }
-
-  const totalItems = await prisma.product.count()
-  const allProducts = await prisma.product.findMany({
-    where: { deleted_at: null },
-    skip,
-    take: limit,
-    orderBy
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-  const hasNextPage = page < totalPages
-  const hasPrevPage = page > 1
-
-  return {
-    allProducts,
-    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
-  }
 }
 
 
@@ -73,6 +43,7 @@ export const searchProductService = async (q) => {
 
   return searchProduct
 }
+
 
 export const updateProductService = async (formData) => {
   if (!formData.product_code) {
@@ -103,6 +74,7 @@ export const updateProductService = async (formData) => {
   return updateProduct
 }
 
+
 export const deleteProductService = async (product_code) => {
   if (!product_code) {
     throw new Error('Product code is required for deletion')
@@ -117,4 +89,13 @@ export const deleteProductService = async (product_code) => {
     throw new Error('Product is not deleted')
   }
   return softdeleteProduct
+}
+
+export const getProductByIdService = async(id)=>{
+  const data = await prisma.product.findUnique({
+    where:{id:parseInt(id)}
+  });
+  console.log(data);
+  
+  return data;
 }

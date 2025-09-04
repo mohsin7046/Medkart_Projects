@@ -1,6 +1,5 @@
 import {
   createPurchaseOrderService,
-  getAllPurchaseOrdersService,
   deletePurchaseOrderService,
   updatePurchaseOrderService,
 } from '../../services/purchaseOrder.service.js'
@@ -41,20 +40,6 @@ export const createPurchaseOrder = catchAsync(async (req, res) => {
   )
 })
 
-
-export const getAllPurchaseOrders = catchAsync(async (req, res) => {
-  const page = parseInt(req.query.page)
-  const limit = parseInt(req.query.limit)
-  const sortby = req.query.sortby;
-
-  const orders = await getAllPurchaseOrdersService(page, limit, sortby)
-
-  if (!orders) {
-    return errorResponse(res, 'Purchase Order not fetch', 400)
-  }
-
-  return successResponse(res, orders, 'Successfully getALL purchase Order', 200)
-})
 
 
 export const deletePurchaseOrder = catchAsync(async (req, res) => {

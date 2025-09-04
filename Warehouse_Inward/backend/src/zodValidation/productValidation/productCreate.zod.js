@@ -32,9 +32,8 @@ export const createProductSchema = z.object({
   unit_of_measure: z.string().min(1, 'Unit of measure is required'),
 
   hsn_code: z
-    .number()
-    .int('HSN code must be an integer')
-    .gte(1000, 'HSN code must be at least 4 digits'),
+    .string()
+    .min(4, 'HSN code must be at least 4 digits'),
 
   gst_percentage: z
     .number()

@@ -46,35 +46,6 @@ export const createPurchaseOrderService = async (data) => {
 }
 
 
-export const getAllPurchaseOrdersService = async (page, limit, sortby) => {
-  const skip = (page - 1) * limit
-
-  let orderBy = {};
-  if (sortby) {
-    const [field, direction] = sortby.split(",");
-    orderBy = {
-      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
-    };
-  }
-
-  const totalItems = await prisma.purchaseOrder.count()
-  const allProductOrders = await prisma.purchaseOrder.findMany({
-    where: { deleted_at: null },
-    skip,
-    take: limit,
-    include: { purchaseOrderItems: true },
-    orderBy
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-  const hasNextPage = page < totalPages
-  const hasPrevPage = page > 1
-
-  return {
-    allProductOrders,
-    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
-  }
-}
 
 
 export const deletePurchaseOrderService = async (order_id) => {

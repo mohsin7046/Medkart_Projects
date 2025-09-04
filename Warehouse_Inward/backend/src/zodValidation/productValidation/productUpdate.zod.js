@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { statusSchema } from '../statusSchemaValidate.js'
 
 export const updateProductSchema = z.object({
+  id: z.number().optional(),
   product_code: z.string()
     .optional(),
 
@@ -45,9 +46,8 @@ export const updateProductSchema = z.object({
   unit_of_measure: z.string().min(1, 'Unit of measure is required').optional(),
 
   hsn_code: z
-    .number()
-    .int('HSN code must be an integer')
-    .gte(1000, 'HSN code must be at least 4 digits')
+    .string()
+    .min(4, 'HSN code must be at least 4 digits')
     .optional(),
 
   gst_percentage: z
@@ -63,4 +63,8 @@ export const updateProductSchema = z.object({
     .optional(),
 
   status: statusSchema("product").optional(),
+
+  created_at: z.string().datetime().optional(),
+  updated_at: z.string().datetime().optional().nullable(),
+  deleted_at: z.string().datetime().optional().nullable(),
 }).strict()

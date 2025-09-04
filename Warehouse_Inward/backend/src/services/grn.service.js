@@ -255,38 +255,6 @@ export const updateGRNRecord = async (existingGRN, data) => {
 
 
 
-export const getALLGRNService = async (page, limit, sortby) => {
-  const skip = (page - 1) * limit
-
-  let orderBy = {};
-  if (sortby) {
-    const [field, direction] = sortby.split(",");
-    orderBy = {
-      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
-    };
-  }
-
-  const totalItems = await prisma.goodReceiptNote.count({
-    where: { deleted_at: null }
-  })
-  const allGRNs = await prisma.goodReceiptNote.findMany({
-    where: { deleted_at: null },
-    include: { goodReceiptNoteItems: true },
-    skip,
-    take: limit,
-    orderBy
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-  const hasNextPage = page < totalPages
-  const hasPrevPage = page > 1
-
-  return {
-    allGRNs,
-    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
-  }
-}
-
 export const deleteGRNRecord = async (grn_id) => {
   const deleteGRN = await prisma.goodReceiptNote.update({
     where: { id: grn_id },

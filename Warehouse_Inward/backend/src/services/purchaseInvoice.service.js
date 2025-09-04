@@ -85,36 +85,6 @@ export const createPurchaseInvoiceService = async ({
 
 
 
-export const getAllPurchaseInvoicesService = async (page, limit, sortby) => {
-  const skip = (page - 1) * limit
-
-  let orderBy = {};
-  if (sortby) {
-    const [field, direction] = sortby.split(",");
-    orderBy = {
-      [field]: direction?.toLowerCase() === "d" ? "desc" : "asc"
-    };
-  }
-
-  const totalItems = await prisma.purchaseInvoice.count()
-  const allPurchaseInvoices = await prisma.purchaseInvoice.findMany({
-    where: { deleted_at: null },
-    include: { PurchaseInvoiceItem: true },
-    skip,
-    take: limit,
-    orderBy
-  })
-
-  const totalPages = Math.ceil(totalItems / limit)
-  const hasNextPage = page < totalPages
-  const hasPrevPage = page > 1
-
-  return {
-    allPurchaseInvoices,
-    metadata: { page, limit, totalPages, totalItems, hasNextPage, hasPrevPage }
-  }
-}
-
 export const deletePurchaseInvoiceService = async (invoice_id) => {
   await prisma.purchaseInvoiceItem.updateMany({
     where: { invoice_id },

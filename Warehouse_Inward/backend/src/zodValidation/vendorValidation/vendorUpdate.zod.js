@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { statusSchema } from '../statusSchemaValidate.js'
 
 export const updateVendorSchema = z.object({
   vendor_code: z.string()
