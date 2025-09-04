@@ -57,6 +57,8 @@ export const updateVendor = catchAsync(async (req, res) => {
 
 export const deleteVendor = catchAsync(async (req, res) => {
   const { vendor_code } = req.body
+  console.log(vendor_code);
+  
   const vendordelete = await deleteVendorService(vendor_code)
   if (!vendordelete) {
     return errorResponse(res, 'Vendor not deleted', 400)

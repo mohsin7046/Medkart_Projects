@@ -9,15 +9,14 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
   const filters = req.query;
   const { name, field } = filters;
 
-  console.log(filters);
-  
-
+ 
   if (!SEARCHFILTERNAME[name]) {
     return errorResponse(res, `Invalid name: ${name}`, 400);
   }
 
   const model = SEARCHFILTERNAME[name];
   const allFields = FEILD[name];
+
 
   const where = buildFilter(filters, {
     name: { field: "name", type: "string" },

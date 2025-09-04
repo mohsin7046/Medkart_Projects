@@ -1,17 +1,17 @@
-import { useState, useEffect ,useRef} from "react";
+import { useState, useEffect, useRef } from "react";
 
 export function SearchSelect({ type, value, onSelect }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const isSelecting = useRef(false);
-  
+
   useEffect(() => {
-   
+
     if (value) {
-      setQuery(value); 
+      setQuery(value);
     }
-    
+
   }, [value]);
 
   useEffect(() => {
@@ -21,23 +21,23 @@ export function SearchSelect({ type, value, onSelect }) {
     }
 
     if (isSelecting.current) {
-      
+
       isSelecting.current = false;
       return;
     }
-    
+
 
     const delayDebounce = setTimeout(async () => {
-      const res = await fetch(`http://localhost:3000/${type}s/search/${query}`);
+      const res = await fetch(`http://localhost:3000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
-      setResults(data);
+       setResults(data.data || []);
       setShowDropdown(true);
     }, 300);
 
     return () => clearTimeout(delayDebounce);
   }, [query, type]);
 
-  
+
 
   return (
     <div className="relative w-full">
@@ -52,16 +52,16 @@ export function SearchSelect({ type, value, onSelect }) {
         <ul className="absolute bg-white border w-full max-h-40 overflow-y-auto z-10">
           {results.map((item) => (
             <li
-              key={item[`${type}_code`]}
+              key={item.id || item[`${type}_code`]}
               className="p-2 hover:bg-gray-200 cursor-pointer"
               onClick={() => {
-                setQuery(item.name); 
+                setQuery(item.name);
                 isSelecting.current = true;
                 setShowDropdown(false);
-                onSelect(item); 
+                onSelect(item);
               }}
             >
-              {item.name} ({item[`${type}_code`]})
+              {item.name}
             </li>
           ))}
         </ul>

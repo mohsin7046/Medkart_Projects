@@ -2,6 +2,7 @@ import {
   createPurchaseOrderService,
   deletePurchaseOrderService,
   updatePurchaseOrderService,
+  getPurchaseOrderByIdService
 } from '../../services/purchaseOrder.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
 import { updatePurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderUpdate.zod.js'
@@ -80,4 +81,17 @@ export const updatePurchaseOrder = catchAsync(async (req, res) => {
     'Successfully updated purchase Order',
     200
   )
+})
+
+export const getPurchaseOrderById = catchAsync(async(req,res)=>{
+    const {id} = req.params;
+     console.log(id);
+  
+     const PObyIddata = await getPurchaseOrderByIdService(id);
+   
+     if(!PObyIddata){
+       errorResponse(res,"Purchase Order not fount for the id",400)
+     }
+   
+     successResponse(res,PObyIddata,"Purchase order data fetch successfully by id",200)
 })

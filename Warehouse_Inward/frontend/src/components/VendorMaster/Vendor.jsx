@@ -56,11 +56,11 @@ function Vendor() {
     if (window.confirm("Are you sure you want to delete this vendor?")) {
       try {
         const response = await fetch(
-          `http://localhost:3000/vendors/deleteVendor`,
+          `http://localhost:3000/api/v1/vendors`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ vendor_code }),
+            body: JSON.stringify({ vendor_code}),
           }
         );
 

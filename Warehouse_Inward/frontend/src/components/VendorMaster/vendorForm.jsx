@@ -12,7 +12,6 @@ function VendorForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    vendor_code:"",
     contact_person: "",
     contact_number: "",
     gst_number: "",

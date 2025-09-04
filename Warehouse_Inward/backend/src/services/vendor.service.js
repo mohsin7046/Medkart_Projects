@@ -24,7 +24,7 @@ export const searchVendorsService = async (q) => {
       status: STATUS.ACTIVE
     },
     select: {
-      vendor_code: true,
+      id: true,
       name: true
     },
     take: LIMIT.VENDOR_LIMIT
@@ -48,7 +48,7 @@ export const updateVendorService = async (data) => {
 
 export const deleteVendorService = async (vendor_code) => {
   const softdeleteVendor = await prisma.vendor.update({
-    where: { vendor_code },
+    where: { vendor_code:vendor_code },
     data: {
       deleted_at: new Date()
     }

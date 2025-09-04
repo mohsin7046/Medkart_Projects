@@ -12,22 +12,26 @@ import { updateGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/g
 import { createGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 import { checkExpiry } from '../../utilities/checkExpiry.js'
+import logger from '../../utilities/logger.js'
 
 
 export const createGRN = catchAsync(async (req, res) => {
   const data = createGoodReceiptNoteSchema.parse(req.body)
 
   if (!data) {
+    logger.error(data.error)
     return errorResponse(res, 'All feilds are required', 400)
   }
 
 
   data.items.map((item) => {
     if (parseFloat(item.item_mrp) < parseFloat(item.item_price)) {
+      logger.error(`MRP is not less than price in product ${item.product_id}`)
       return errorResponse(res, `MRP is not less than price in product ${item.product_id}`, 400)
     }
 
     if (!checkExpiry(item.expiry_date)) {
+      logger.error(`Expiry date is ${SETEXPIRY.expiryMonth} month always greater`)
       return errorResponse(res, `Expiry date is ${SETEXPIRY.expiryMonth} month always greater`, 400)
     }
   })
@@ -35,19 +39,23 @@ export const createGRN = catchAsync(async (req, res) => {
   const existingPO = await findPOByOrderNumber(data.order_id)
 
   if (!existingPO) {
-    return errorResponse(res, "'Purchase order not found'", 400)
+    logger.error("Purchase order not found")
+    return errorResponse(res, "Purchase order not found", 400)
   }
 
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingPO.status)) {
-    return errorResponse(res, "'GRN already created for this order", 400)
+    logger.error("'GRN already created for this order")
+    return errorResponse(res, "GRN already created for this order", 400)
   }
 
   const createGRN = await createGRNRecord(existingPO, data)
 
   if (!createGRN) {
+    logger.error('GRN isnot created')
     return errorResponse(res, 'GRN isnot created', 400)
   }
 
+  logger.info('Successfully created GRN')
   return successResponse(res, createGRN, 'Successfully created GRN', 200)
 })
 

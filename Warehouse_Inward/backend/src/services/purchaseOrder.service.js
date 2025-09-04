@@ -50,12 +50,12 @@ export const createPurchaseOrderService = async (data) => {
 
 export const deletePurchaseOrderService = async (order_id) => {
 
-  const existingPO = await prisma.goodReceiptNote.findFirst({
-    where: { order_id: order_id, deleted_at: null }
+  const existingPO = await prisma.purchaseOrder.findFirst({
+    where: { id:order_id, deleted_at: null }
   })
 
   if (existingPO && (existingPO.status === STATUS.COMPLETED && existingPO.status === STATUS.CANCELLED)) {
-    throw new Error('Cannot delete purchase order with completed or cancelled GRN')
+    throw new Error('Cannot delete purchase order with completed or cancelled PurchaseOrder')
   }
 
   await prisma.purchaseOrderItem.updateMany({
@@ -79,7 +79,6 @@ export const deletePurchaseOrderService = async (order_id) => {
 
   return deletePO
 }
-
 
 
 export const updatePurchaseOrderService = async (formData) => {
@@ -120,3 +119,24 @@ export const updatePurchaseOrderService = async (formData) => {
   return updatedPO
 }
 
+export const getPurchaseOrderByIdService = async(id)=>{
+  const data = await prisma.purchaseOrder.findUnique({
+    where: { id: parseInt(id) },
+    include: {
+      vendor: {
+        select: { id: true, name: true},
+      },
+      purchaseOrderItems: {
+        include: {
+          product: {
+            select: { id: true, name: true},
+          },
+        },
+      },
+    },
+  });
+
+  console.log(data);
+  
+  return data;
+}

@@ -49,15 +49,15 @@ function Product() {
     fetchData();
   }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
-  const handleDelete = (id) => async () => {
+  const handleDelete = (product_code) => async () => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
         const response = await fetch(
-          `http://localhost:3000/products/deleteProduct`,
+          `http://localhost:3000/api/v1/products`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ product_id: id }),
+            body: JSON.stringify({ product_code }),
           }
         );
         if (!response.ok) {
@@ -187,7 +187,7 @@ function Product() {
                       <FiEdit className="text-green-600" size={18} />
                     </button>
                     <button
-                      onClick={handleDelete(p.id)}
+                      onClick={handleDelete(p.product_code)}
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       <FiTrash2 className="text-red-500" size={18} />

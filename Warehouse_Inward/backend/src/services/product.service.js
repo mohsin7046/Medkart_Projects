@@ -34,7 +34,7 @@ export const searchProductService = async (q) => {
       status: STATUS.ACTIVE
     },
     select: {
-      product_code: true,
+      id: true,
       name: true
     },
     take: LIMIT.PRODUCT_LIMIT

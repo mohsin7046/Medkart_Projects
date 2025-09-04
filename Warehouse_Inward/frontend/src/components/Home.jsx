@@ -27,7 +27,7 @@ function Home() {
                 selected === "product" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
               }`}
             >
-              AddProduct
+              Product Master
             </Link>
 
             <Link
@@ -37,7 +37,7 @@ function Home() {
                 selected === "vendor" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
               }`}
             >
-              AddVendor
+              Vendor Master
             </Link>
 
             <Link

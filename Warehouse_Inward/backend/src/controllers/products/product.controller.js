@@ -9,26 +9,28 @@ import { successResponse, errorResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
 import { updateProductSchema } from '../../zodValidation/productValidation/productUpdate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
+import logger from '../../utilities/logger.js'
+
  
 
 export const addProduct = catchAsync(async (req, res) => {
 
   console.log(req.body);
-  
   const data = createProductSchema.parse(req.body);
 
-
   if (!data) {
-    console.log(data.error);
-      
+    logger.error(data.error)
     return errorResponse(res, 'All feilds are required', 400)
   }
 
   const newProduct = await addProductService(data);
 
   if (!newProduct) {
+    logger.error('Product not created')
     return errorResponse(res, 'Product not created', 400);
   }
+  
+  logger.info('Product created Successfully')
   return successResponse(res, newProduct, 'Product created Successfully', 200)
 })
 

@@ -13,7 +13,6 @@ function ProductForm() {
   const [formData, setFormData] = useState({
     name: "",
     category: "",
-    product_code:"",
     combination: [],
     product_mrp: "",
     product_price: "",
