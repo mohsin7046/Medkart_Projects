@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ALLEndpoint } from "../../constant/endPoints.js";
 
 function PurchaseInvoiceForm() {
   const { id } = useParams();
@@ -12,7 +13,7 @@ function PurchaseInvoiceForm() {
   useEffect(() => {
     const fetchGRN = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/v1/grn/${id}`);
+        const response = await fetch(`${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`);
         if (!response.ok) throw new Error("Failed to fetch GRN");
         const data = await response.json();
         console.log("Fetched GRN:", data);
@@ -70,9 +71,9 @@ function PurchaseInvoiceForm() {
     console.log(payload);
 
     try {
-      const url = "http://localhost:3000/api/v1/purchase-invoice";
+      const url =  `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.endpoint}`;
       const response = await fetch(url, {
-        method: "POST",
+        method:  `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.method}`,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });

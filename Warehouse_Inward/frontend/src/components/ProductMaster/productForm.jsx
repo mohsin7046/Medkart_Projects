@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
 
 function ProductForm() {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ function ProductForm() {
       const fetchProduct = async () => {
         try {
           setLoading(true);
-          const response = await fetch(`http://localhost:3000/api/v1/products/${id}`);
+          const response = await fetch(`${ALLEndpoint.ProductEndpoints.getProductById.endpoint}/${id}`);
           if (!response.ok) {
             throw new Error("Failed to fetch product");
           }
@@ -111,12 +112,12 @@ function ProductForm() {
     setLoading(true);
 
     try {
-      let url = "http://localhost:3000/api/v1/products";
-      let method = "POST";
+      let url = `${ALLEndpoint.ProductEndpoints.addProduct.endpoint}`;
+      let method = `${ALLEndpoint.ProductEndpoints.addProduct.method}`;
 
       if (id) {
-        url = `http://localhost:3000/api/v1/products`;
-        method = "PUT";
+        url = `${ALLEndpoint.ProductEndpoints.updateProduct.endpoint}`;
+        method = `${ALLEndpoint.ProductEndpoints.updateProduct.method}`;
       }
 
       const payload = {

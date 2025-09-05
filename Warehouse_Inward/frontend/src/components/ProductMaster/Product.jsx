@@ -1,91 +1,50 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import {  toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 
 function Product() {
-  const [products, setProducts] = useState([]);
-  const [metadata, setMetadata] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d");
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false); 
 
   const limit = 2;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page,
-          limit,
-          sortby: `${sortField},${sortOrder}`,
-        });
+  const { data: products, metadata, loading, setData: setProducts } = useFetchData({
+    endpoint: ALLEndpoint.ProductEndpoints.getProduct.endpoint,
+    name: "product",
+    page,
+    limit,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+    debounceDelay: 500
+  });
 
-        if (searchTerm) params.append("search", searchTerm);
-        if (statusFilter !== "all") params.append("status", statusFilter);
-        params.append("name", "product");
+  const { deleteItem } = useDeleteData(
+    ALLEndpoint.ProductEndpoints.deleteProduct.endpoint,
+    ALLEndpoint.ProductEndpoints.deleteProduct.method
+  );
 
-        if (searchField) {
-          params.append("field", searchField);
-        }
 
-        const response = await fetch(
-          `http://localhost:3000/api/v1/products?${params.toString()}`
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch products");
-        }
-
-        const data = await response.json();
-
-        setProducts(data.data?.data || []);
-        setMetadata(data.data?.metadata || {});
-        toast.success("Products fetch successfully")
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        toast.error("Failed to load products. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
-
-  const handleDelete = (product_code) => async () => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/v1/products`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ product_code }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          toast.error(errorData.error || "Failed to delete product");
-          return;
-        }
-
-        toast.success("Product deleted successfully!");
-        setProducts(products.filter((p) => p.product_code !== product_code));
-       
-      } catch (error) {
-        console.error("Error deleting product:", error);
-        toast.error("Something went wrong while deleting product.");
-      }
-    }
+  const handleDelete = (product_code) => {
+    deleteItem({
+      idField: "product_code",
+      idValue: product_code,
+      setState: setProducts,
+    });
   };
 
   return (
     <div>
-
       <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
         <div className="flex items-center gap-2">
           <input
@@ -196,7 +155,7 @@ function Product() {
                         <FiEdit className="text-green-600" size={18} />
                       </button>
                       <button
-                        onClick={handleDelete(p.product_code)}
+                        onClick={()=>handleDelete(p.product_code)}
                         className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                       >
                         <FiTrash2 className="text-red-500" size={18} />

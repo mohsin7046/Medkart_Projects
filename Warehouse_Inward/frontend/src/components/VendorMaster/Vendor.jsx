@@ -1,95 +1,53 @@
-import  { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
-import {  toast } from "react-toastify";
-
+import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 
 function Vendor() {
-  const [vendors, setVendors] = useState([]);
-  const [metadata, setMetadata] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d");
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false); 
 
   const limit = 2;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          page,
-          limit,
-          sortby: `${sortField},${sortOrder}`,
-        });
 
-        if (searchTerm) params.append("search", searchTerm);
-        if (statusFilter !== "all") params.append("status", statusFilter);
-        params.append("name", "vendor");
+  const { data: vendors, metadata, loading, setData: setVendors } = useFetchData({
+    endpoint: ALLEndpoint.VendorEndpoints.getVendor.endpoint,
+    name: "vendor",
+    page,
+    limit,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+    debounceDelay: 500
+  });
 
-        if (searchField) {
-          params.append("field", searchField);
-        }
-
-        const response = await fetch(
-          `http://localhost:3000/api/v1/vendors?${params.toString()}`
-        );
-
-        if (!response.ok) {
-          toast.error("Failed to fetch vendors")
-          throw new Error("Failed to fetch vendors");
-        }
-
-        const data = await response.json();
-        setVendors(data.data?.data || []);
-        setMetadata(data.data?.metadata || {});
-        toast.success("Vendors fetch successfully");
-      } catch (error) {
-        console.error("Error fetching vendors:", error);
-        toast.error("Failed to load vendors. Please try again.");
-      } finally {
-        setLoading(false);
-      }
+  const { deleteItem } = useDeleteData(
+      ALLEndpoint.VendorEndpoints.deleteVendor.endpoint,
+      ALLEndpoint.VendorEndpoints.deleteVendor.method
+    );
+  
+  
+    const handleDelete = (vendor_code) => {
+      deleteItem({
+        idField: "vendor_code",
+        idValue: vendor_code,
+        setState: setVendors,
+      });
     };
-
-    fetchData();
-  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
-
-  const handleDelete = async (vendor_code) => {
-    if (window.confirm("Are you sure you want to delete this vendor?")) {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/v1/vendors`,
-          {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ vendor_code }),
-          }
-        );
-
-        if (!response.ok) {
-          const err = await response.json();
-          toast.error(err.error || "Failed to delete vendor");
-          return;
-        }
-
-        setVendors(vendors.filter((v) => v.vendor_code !== vendor_code));
-        toast.success("Vendor deleted successfully!");
-      } catch (error) {
-        console.error("Error deleting vendor:", error);
-        toast.error("Something went wrong while deleting vendor.");
-      }
-    }
-  };
 
   return (
     <div>
-  
+      
       <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
         <div className="flex items-center gap-2">
           <input
@@ -150,7 +108,7 @@ function Vendor() {
         </button>
       </div>
 
-     
+
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
         {loading ? (
           <div className="flex justify-center items-center">
@@ -217,7 +175,7 @@ function Vendor() {
         )}
       </div>
 
-      
+
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button
           onClick={() => setPage(page - 1)}

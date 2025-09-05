@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SearchSelect } from "../utility/SearchSelect";
 import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
 
 function PurchaseOrderForm() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ function PurchaseOrderForm() {
       (async () => {
         try {
           setLoading(true);
-          const res = await fetch(`http://localhost:3000/api/v1/purchase-order/${id}`);
+          const res = await fetch(`${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`);
           if (!res.ok){
             toast.error("Failed to fetch the purchase Order details")
             throw new Error("Failed to fetch order");
@@ -121,12 +122,12 @@ function PurchaseOrderForm() {
       };
 
     try {
-      let url = "http://localhost:3000/api/v1/purchase-order";
-      let method = "POST";
+      let url = `${ALLEndpoint.PurchaseOrderEndpoints.addPurchaseOrder.endpoint}`;
+      let method = `${ALLEndpoint.PurchaseOrderEndpoints.addPurchaseOrder.method}`;
 
       if (id) {
-        url = "http://localhost:3000/api/v1/purchase-order";
-        method = "PUT";
+        url = `${ALLEndpoint.PurchaseOrderEndpoints.updatePurchaseOrder.endpoint}`;
+        method = `${ALLEndpoint.PurchaseOrderEndpoints.updatePurchaseOrder.method}`;
         normalizedData["order_id"] = parseInt(id);
       }
 

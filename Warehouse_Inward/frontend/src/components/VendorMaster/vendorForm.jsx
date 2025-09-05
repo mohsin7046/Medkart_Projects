@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
 
 function VendorForm() {
   const { id } = useParams();
@@ -25,7 +26,7 @@ function VendorForm() {
       const fetchVendor = async () => {
         try {
           setLoading(true);
-          const res = await fetch(`http://localhost:3000/api/v1/vendors/${id}`);
+          const res = await fetch(`${ALLEndpoint.VendorEndpoints.getVendorById.endpoint}/${id}`);
           const response = await res.json();
           if (!res.ok) {
           toast.error("Error fetch vendor details")
@@ -80,12 +81,12 @@ function VendorForm() {
     setLoading(true);
 
     try {
-      let url = "http://localhost:3000/api/v1/vendors";
-      let method = "POST";
+      let url = `${ALLEndpoint.VendorEndpoints.addVendor.endpoint}`;
+      let method = `${ALLEndpoint.VendorEndpoints.addVendor.method}`;
 
       if (id) {
-        url = `http://localhost:3000/api/v1/vendors`;
-        method = "PUT";
+        url =`${ALLEndpoint.VendorEndpoints.updateVendor.endpoint}`;
+        method = `${ALLEndpoint.VendorEndpoints.updateVendor.method}`;
       }
 
       console.log(url,method);

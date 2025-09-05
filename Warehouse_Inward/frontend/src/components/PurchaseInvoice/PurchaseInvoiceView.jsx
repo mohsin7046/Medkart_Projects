@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ALLEndpoint } from "../../constant/endPoints";
 
 function PurchaseInvoiceView() {
   const { id } = useParams();
@@ -10,7 +11,7 @@ function PurchaseInvoiceView() {
   useEffect(() => {
     const fetchInvoice = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/v1/purchase-invoice/${id}`);
+        const res = await fetch(`${ALLEndpoint.PurchaseInvoiceEndpoints.getPurchaseInvoiceById.endpoint}/${id}`);
         const response = await res.json();
         const data = response.data
         console.log(data);

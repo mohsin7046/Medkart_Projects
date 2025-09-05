@@ -89,7 +89,7 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   await prisma.purchaseInvoiceItem.updateMany({
     where: { invoice_id },
     data: {
-      deletedAt: Date.now()
+      deleted_at: new Date()
     }
   })
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {toast} from 'react-toastify'
+import { ALLEndpoint } from "../../constant/endPoints";
 
 function GrnForm() {
    const { id } = useParams();
@@ -30,10 +31,13 @@ function GrnForm() {
       try {
         let url = "";
         if (mode === "edit") {
-          url = `http://localhost:3000/api/v1/grn/${id}`; 
+          url = `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`; 
         } else if(mode === "create") {
-          url = `http://localhost:3000/api/v1/purchase-order/${id}`;
+          url = `${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`;
         }
+
+        console.log(url);
+        
 
         const res = await fetch(url);
         const response = await res.json();
@@ -41,7 +45,6 @@ function GrnForm() {
 
         console.log("Fetched data",data);
         
-
         if (mode === "edit") {
           setFormData({
             grn_id: data.id,
@@ -155,12 +158,12 @@ function GrnForm() {
     }
 
     try {
-      let url = "http://localhost:3000/api/v1/grn";
-      let method = "POST";
+      let url = `${ALLEndpoint.GRNEndpoints.addGRN.endpoint}`;
+      let method = `${ALLEndpoint.GRNEndpoints.addGRN.method}`;
 
       if (mode === "edit") {
-        url = `http://localhost:3000/api/v1/grn`;
-        method = "PUT";
+        url = `${ALLEndpoint.GRNEndpoints.updateGRN.endpoint}`;
+        method = `${ALLEndpoint.GRNEndpoints.updateGRN.method}`;
       }
 
       console.log(url,method);

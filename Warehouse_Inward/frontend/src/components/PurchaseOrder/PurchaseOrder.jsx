@@ -1,57 +1,40 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEdit, FiTrash2, FiFilePlus } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 
 function PurchaseOrder() {
-  const [orders, setOrders] = useState([]);
-  const [metadata, setMetadata] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("order_number");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d");
   const [page, setPage] = useState(1);
-   const [loading, setLoading] = useState(false); 
-  const limit = 10;
 
+  const limit = 10;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const params = new URLSearchParams({
-          page,
-          limit,
-          sortby: `${sortField},${sortOrder}`,
-          name: "order",
-        });
 
-        if (searchTerm) params.append("search", searchTerm);
-        if (statusFilter !== "all") params.append("status", statusFilter);
-        if (searchField) params.append("field", searchField);
-
-        const response = await fetch(`http://localhost:3000/api/v1/purchase-order?${params.toString()}`);
-      
-        if (!response.ok) throw new Error("Network response was not ok");
-
-        const data = await response.json();
-        console.log(data);
-        
-
-        setOrders(data.data.data || []);
-        setMetadata(data.data.metadata || {});
-      } catch (error) {
-        toast.error("Error fetching purchase orders:")
-        console.error("Error fetching purchase orders:", error);
-      }
-       finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
+  const {
+    data: orders,
+    metadata,
+    loading,
+    setData: setOrders,
+  } = useFetchData({
+    endpoint: ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrder.endpoint,
+    name: "order",
+    page,
+    limit,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+    debounceDelay: 500,
+  });
 
   const formatDate = (dateStr) =>
     dateStr
@@ -62,39 +45,24 @@ function PurchaseOrder() {
         })
       : "-";
 
-  const handleDelete = (order_id) => async () => {
-    if (window.confirm("Are you sure you want to delete this purchase order?")) {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/api/v1/purchase-order`,
-          {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({order_id }),
-          }
-        );
-        if (!response.ok) {
-          const errorData = await response.json();
-          toast.error("Failed to delete purchase order")
-          alert(errorData.error || "Failed to delete purchase order");
-          return;
-        }
-        setOrders((prev) => prev.filter((o) => o.order_id !== order_id));
-        toast.success("Purchase order deleted successfully")
+  const { deleteItem } = useDeleteData(
+    ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.endpoint,
+    ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.method
+  );
 
-      } catch (error) {
-        console.error("Error deleting purchase order:", error);
-        toast.error("Failed to delete purchase order")
-      }
-    }
+  const handleDelete = (order_id) => {
+    deleteItem({
+      idField: "order_id",
+      idValue: order_id,
+      setState: setOrders,
+    });
   };
 
   return (
     <div>
- 
+     
       <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
         <div className="flex items-center gap-2">
-   
           <input
             type="text"
             placeholder="Search..."
@@ -111,7 +79,6 @@ function PurchaseOrder() {
             <option value="order_number">Order Number</option>
           </select>
 
-  
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -124,7 +91,6 @@ function PurchaseOrder() {
             <option value="cancelled">Cancelled</option>
           </select>
 
- 
           <select
             value={sortField}
             onChange={(e) => setSortField(e.target.value)}
@@ -152,106 +118,101 @@ function PurchaseOrder() {
         </button>
       </div>
 
+    
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
         {loading ? (
           <div className="flex justify-center items-center">
             <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
           </div>
         ) : (
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">IDX</th>
-              <th className="border px-4 py-2">Order Number</th>
-              <th className="border px-4 py-2">Vendor ID</th>
-              <th className="border px-4 py-2">Order Date</th>
-              <th className="border px-4 py-2">Total Amount</th>
-              <th className="border px-4 py-2">Expected Delivery</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Action</th>
-              <th className="border px-4 py-2">Create GRN</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length > 0 ? (
-              orders.map((o, idx) => {
-                const isDisabled = ["completed", "cancelled"].includes(o.status);
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border px-4 py-2">IDX</th>
+                <th className="border px-4 py-2">Order Number</th>
+                <th className="border px-4 py-2">Vendor ID</th>
+                <th className="border px-4 py-2">Order Date</th>
+                <th className="border px-4 py-2">Total Amount</th>
+                <th className="border px-4 py-2">Expected Delivery</th>
+                <th className="border px-4 py-2">Status</th>
+                <th className="border px-4 py-2">Action</th>
+                <th className="border px-4 py-2">Create GRN</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.length > 0 ? (
+                orders.map((o, idx) => {
+                  const isDisabled = ["completed", "cancelled"].includes(o.status);
 
-                return (
-                  <tr
-                    key={o.order_number}
-                    className={`text-center ${
-                      isDisabled
-                        ? "bg-gray-100 opacity-60 pointer-events-none"
-                        : ""
-                    }`}
-                  >
-                    <td className="border px-4 py-2">
-                      {(page - 1) * limit + idx + 1}
-                    </td>
-                    <td className="border px-4 py-2">{o.order_number}</td>
-                    <td className="border px-4 py-2">{o.vendor_id}</td>
-                    <td className="border px-4 py-2">{formatDate(o.order_date)}</td>
-                    <td className="border px-4 py-2">₹{o.total_amount}</td>
-                    <td className="border px-4 py-2">
-                      {formatDate(o.expected_delivery_date)}
-                    </td>
-                    <td className="border px-4 py-2">{o.status}</td>
-                    <td className="border px-4 py-2">
-                      <button
-                        disabled={isDisabled}
-                        onClick={() =>
-                          navigate(`/purchase-order/edit/${o.id}`, {
-                            state: { order: o },
-                          })
-                        }
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
-                      >
-                        <FiEdit className="text-green-600" size={18} />
-                      </button>
-
-                      <button
-                        disabled={isDisabled}
-                        onClick={handleDelete(o.id)}
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        <FiTrash2 className="text-red-700" size={18} />
-                      </button>
-                    </td>
-                    <td className="border px-4 py-2">
-                      <button
-                        disabled={isDisabled}
-                        onClick={() => navigate(`/grn/add/${o.id}`, { state: { order: o } })}
-                        className="relative group p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
-                      >
-                        <FiFilePlus className="text-orange-500" size={18} />
-                        {!isDisabled && (
-                          <span
-                            className="absolute left-1/2 -translate-x-1/2 mt-1 
+                  return (
+                    <tr
+                      key={o.order_number}
+                      className={`text-center ${
+                        isDisabled ? "bg-gray-100 opacity-60 pointer-events-none" : ""
+                      }`}
+                    >
+                      <td className="border px-4 py-2">{(page - 1) * limit + idx + 1}</td>
+                      <td className="border px-4 py-2">{o.order_number}</td>
+                      <td className="border px-4 py-2">{o.vendor_id}</td>
+                      <td className="border px-4 py-2">{formatDate(o.order_date)}</td>
+                      <td className="border px-4 py-2">₹{o.total_amount}</td>
+                      <td className="border px-4 py-2">
+                        {formatDate(o.expected_delivery_date)}
+                      </td>
+                      <td className="border px-4 py-2">{o.status}</td>
+                      <td className="border px-4 py-2">
+                        <button
+                          disabled={isDisabled}
+                          onClick={() =>
+                            navigate(`/purchase-order/edit/${o.id}`, {
+                              state: { order: o },
+                            })
+                          }
+                          className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                        >
+                          <FiEdit className="text-green-600" size={18} />
+                        </button>
+                        <button
+                          disabled={isDisabled}
+                          onClick={() => handleDelete(o.id)}
+                          className="p-2 rounded-md hover:bg-gray-200 transition-colors"
+                        >
+                          <FiTrash2 className="text-red-700" size={18} />
+                        </button>
+                      </td>
+                      <td className="border px-4 py-2">
+                        <button
+                          disabled={isDisabled}
+                          onClick={() => navigate(`/grn/add/${o.id}`, { state: { order: o } })}
+                          className="relative group p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                        >
+                          <FiFilePlus className="text-orange-500" size={18} />
+                          {!isDisabled && (
+                            <span className="absolute left-1/2 -translate-x-1/2 mt-1 
                               text-xs bg-gray-800 text-white px-2 py-1 rounded 
                               opacity-0 group-hover:opacity-100 transition-opacity 
-                              whitespace-nowrap"
-                          >
-                            Create GRN
-                          </span>
-                        )}
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center py-4 text-gray-500">
-                  No purchase orders found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                              whitespace-nowrap">
+                              Create GRN
+                            </span>
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center py-4 text-gray-500">
+                    No purchase orders found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         )}
       </div>
 
+    
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button
           onClick={() => setPage(page - 1)}

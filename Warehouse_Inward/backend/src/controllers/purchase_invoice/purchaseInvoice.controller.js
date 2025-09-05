@@ -44,13 +44,13 @@ export const createPurchaseInvoice = catchAsync(async (req, res) => {
 
 
 export const deletePurchaseInvoice = catchAsync(async (req, res) => {
-  const { invoice_number } = req.body
+  const { invoice_id} = req.body
 
-  if (!invoice_number) {
+  if (!invoice_id) {
     return errorResponse(res, 'All feilds are required', 400)
   }
 
-  const deletedInvoice = await deletePurchaseInvoiceService(invoice_number)
+  const deletedInvoice = await deletePurchaseInvoiceService(invoice_id)
 
   if (!deletedInvoice) {
     return errorResponse(res, 'Purchase invoice is not deleted', 400)

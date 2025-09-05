@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ALLEndpoint } from "../../constant/endPoints.js";
 
 
 function GRNView() {
-  const { id } = useParams(); // get id from route
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [grn, setGrn] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // fetch GRN details
   useEffect(() => {
     const fetchGRN = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/api/v1/grn/${id}`);
+        const res = await fetch(`${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`);
 
         if(!res.ok){
           toast.error("Failed to fetch GRN")
@@ -89,7 +89,7 @@ function GRNView() {
         </div>
       </div>
 
-      {/* Items table */}
+ 
       <h3 className="text-2xl font-semibold mb-3 text-gray-800">🛒 Items</h3>
       <div className="overflow-x-auto shadow-lg border border-gray-100">
         <table className="w-full border-collapse text-sm md:text-base">

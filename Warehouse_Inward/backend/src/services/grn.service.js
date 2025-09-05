@@ -136,10 +136,7 @@ export const createGRNRecord = async (existingPO, data) => {
 
 
 export const updateGRNRecord = async (existingGRN, data) => {
-
-  console.log(data);
   
-
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) {
     throw new Error('Cannot update a completed or cancelled GRN')
   }
@@ -148,16 +145,11 @@ export const updateGRNRecord = async (existingGRN, data) => {
     const purchase_order_id = data.order_id
     const grn_id = data.grn_id
 
-
-
     const existingPO = await findPOByOrderNumber(data.order_id)
 
     if (!existingPO) {
       throw new Error('Purchase order not found')
     }
-
-    console.log(existingPO);
-
 
     let statusUpdatePO = ''
     let statusUpdateGRN = '';
@@ -211,7 +203,7 @@ export const updateGRNRecord = async (existingGRN, data) => {
 
       const deleteGRN = await tx.goodReceiptNote.update({
         where: { id: grn_id },
-        data: { status: STATUS.CANCELLED,deleted_at:new Date()}
+        data: { status: STATUS.CANCELLED}
       })
 
       return deleteGRN

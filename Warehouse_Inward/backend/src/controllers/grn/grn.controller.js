@@ -62,13 +62,16 @@ export const createGRN = catchAsync(async (req, res) => {
 
 
 export const updateGRN = catchAsync(async (req, res) => {
+  console.log(req.body);
+  
   const data = updateGoodReceiptNoteSchema.parse(req.body)
 
   if (!data) {
     return errorResponse(res, 'All feilds are required', 400)
   }
 
-  const existingGRN = await findGRNByNumber(data.grn_number)
+
+  const existingGRN = await findGRNByNumber(data.grn_id)
 
   if (!existingGRN) {
     return errorResponse(res, 'GRN not found', 400)
