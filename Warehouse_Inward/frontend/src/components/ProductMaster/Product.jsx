@@ -1,39 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
 import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
+import { columns,searchFields,statusFilters } from "../../constant/productConstant.js";
 
 function Product() {
+  const [page, setPage] = useState(1);
+  const limit = 2;
+  const navigate = useNavigate();
+
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("d");
-  const [page, setPage] = useState(1);
+  const [sortOrder, setSortOrder] = useState("a");
 
-  const limit = 2;
-  const navigate = useNavigate();
 
-  const { data: products, metadata, loading, setData: setProducts } = useFetchData({
-    endpoint: ALLEndpoint.ProductEndpoints.getProduct.endpoint,
+  const { data: products, metadata, loading, setData: setProducts } =
+    useFetchData({
+      endpoint: ALLEndpoint.ProductEndpoints.getProduct.endpoint,
     name: "product",
     page,
     limit,
+    debounceDelay: 500,
     searchTerm,
     searchField,
     statusFilter,
     sortField,
     sortOrder,
-    debounceDelay: 500
-  });
+    });
 
   const { deleteItem } = useDeleteData(
     ALLEndpoint.ProductEndpoints.deleteProduct.endpoint,
     ALLEndpoint.ProductEndpoints.deleteProduct.method
   );
-
 
   const handleDelete = (product_code) => {
     deleteItem({
@@ -43,157 +46,46 @@ function Product() {
     });
   };
 
+  const handleSearch = ({ field, value }) => {
+    setSearchField(field);
+    setSearchTerm(value);
+    setPage(1); 
+  };
+
+  const handleFilter = ({ status }) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  const handleSort = ({ field, order }) => {
+    setSortField(field);
+    setSortOrder(order);
+    setPage(1);
+  };
+
+ 
+
   return (
     <div>
-      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex flex-wrap items-center gap-3 justify-between">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-52"
-          />
-
-          <select
-            value={searchField}
-            onChange={(e) => setSearchField(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="name">Name</option>
-            <option value="product_code">Product Code</option>
-            <option value="category">Category</option>
-            <option value="product_price">Price</option>
-            <option value="product_mrp">MRP</option>
-            <option value="hsn_code">HSN</option>
-          </select>
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-
-          <select
-            value={sortField}
-            onChange={(e) => setSortField(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="created_at">Created At</option>
-            <option value="updated_at">Updated At</option>
-          </select>
-
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="a">Ascending</option>
-            <option value="d">Descending</option>
-          </select>
-        </div>
-
-        <button
-          onClick={() => navigate("/product/add")}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md"
-        >
-          Add Product +
-        </button>
-      </div>
-
-      <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
-        {loading ? (
-          <div className="flex justify-center items-center">
-            <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
-          </div>
-        ) : (
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border px-4 py-2">IDX</th>
-                <th className="border px-4 py-2">Product Code</th>
-                <th className="border px-4 py-2">Name</th>
-                <th className="border px-4 py-2">Category</th>
-                <th className="border px-4 py-2">Price</th>
-                <th className="border px-4 py-2">MRP</th>
-                <th className="border px-4 py-2">Unit</th>
-                <th className="border px-4 py-2">HSN</th>
-                <th className="border px-4 py-2">GST %</th>
-                <th className="border px-4 py-2">Status</th>
-                <th className="border px-4 py-2">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.length > 0 ? (
-                products.map((p, idx) => (
-                  <tr key={p.id} className="text-center">
-                    <td className="border px-4 py-2">
-                      {(page - 1) * limit + idx + 1}
-                    </td>
-                    <td className="border px-4 py-2">{p.product_code}</td>
-                    <td className="border px-4 py-2">{p.name}</td>
-                    <td className="border px-4 py-2">{p.category}</td>
-                    <td className="border px-4 py-2">₹{p.product_price}</td>
-                    <td className="border px-4 py-2">₹{p.product_mrp}</td>
-                    <td className="border px-4 py-2">{p.unit_of_measure}</td>
-                    <td className="border px-4 py-2">{p.hsn_code}</td>
-                    <td className="border px-4 py-2">{p.gst_percentage}%</td>
-                    <td className="border px-4 py-2">{p.status}</td>
-                    <td className="border px-4 py-2">
-                      <button
-                        onClick={() =>
-                          navigate(`/product/edit/${p.id}`, {
-                            state: { product: p },
-                          })
-                        }
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
-                      >
-                        <FiEdit className="text-green-600" size={18} />
-                      </button>
-                      <button
-                        onClick={()=>handleDelete(p.product_code)}
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        <FiTrash2 className="text-red-500" size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="11" className="text-center py-4 text-gray-500">
-                    No products found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <div className="flex justify-center items-center mt-4 space-x-2">
-        <button
-          onClick={() => setPage(page - 1)}
-          disabled={!metadata.page || page <= 1}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span>
-          Page {metadata.page || 1} of {metadata.totalPages || 1}
-        </span>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={page >= (metadata.totalPages || 1)}
-          className="px-3 py-1 border rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+      <CommonDataTable
+        columns={columns}
+        data={products}
+        page={page}
+        limit={limit}
+        metadata={metadata}
+        loading={loading}
+        setPage={setPage}
+        searchFields={searchFields}
+        statusFilters={statusFilters}
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        onSort={handleSort}
+        onAdd={() => navigate("/product/add")}
+        onEdit={(product) =>
+          navigate(`/product/edit/${product.id}`, { state: { product } })
+        }
+        onDelete={(product) => handleDelete(product.product_code)}
+      />
     </div>
   );
 }

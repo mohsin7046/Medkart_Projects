@@ -78,6 +78,9 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
 
   const totalPages = Math.ceil(totalItems / limit);
 
+  console.log(items);
+  
+
   return successResponse(
     res,
     {

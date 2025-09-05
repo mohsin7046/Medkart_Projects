@@ -17,6 +17,7 @@ function CommonDataTable({
   showActions = true,
   setPage,
   searchFields = [], 
+  statusFilters = []
 }) {
   const totalPages = metadata.totalPages || 1;
   const currentPage = metadata.page || page || 1;
@@ -24,7 +25,7 @@ function CommonDataTable({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState(searchFields[0]?.key || "");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(statusFilters[0]?.key || "");
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("a"); 
 
@@ -83,15 +84,19 @@ function CommonDataTable({
           )}
 
           
-          <select
-            value={statusFilter}
-            onChange={handleStatusChange}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
+          {statusFilters.length > 0 && (
+            <select
+              value={statusFilter}
+              onChange={handleStatusChange}
+              className="border px-3 py-1 rounded-md"
+            >
+              {statusFilters.map((f) => (
+                <option key={f.key} value={f.key}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          )}
 
        
           <select
