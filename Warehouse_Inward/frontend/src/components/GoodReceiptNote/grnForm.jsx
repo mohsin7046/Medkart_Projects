@@ -1,95 +1,96 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {toast} from 'react-toastify'
 
 function GrnForm() {
-  const { id } = useParams();
-
+   const { id } = useParams();
   const navigate = useNavigate();
-
   const location = useLocation();
-  const [mode, setMode] = useState("create");
 
+  const [mode, setMode] = useState("");
   const [formData, setFormData] = useState({
-    grn_number: "",
-    purchase_order_number: "",
+    grn_id: "",
+    order_id: "",
     received_date: new Date().toISOString().split("T")[0],
-    damaged_qty: 0,
-    shortage_qty: 0,
     status: "pending",
     items: [],
   });
-
 
   useEffect(() => {
     if (location.pathname.includes("/grn/edit")) {
       setMode("edit");
     } else if (location.pathname.includes("/grn/add")) {
-      setMode("create");
+      setMode("create"); 
     }
   }, [location]);
 
-
   useEffect(() => {
+    
     const fetchData = async () => {
       try {
         let url = "";
         if (mode === "edit") {
-          url = `http://localhost:3000/api/v1/grn/${id}`;
-        } else {
+          url = `http://localhost:3000/api/v1/grn/${id}`; 
+        } else if(mode === "create") {
           url = `http://localhost:3000/api/v1/purchase-order/${id}`;
         }
-        
+
         const res = await fetch(url);
         const response = await res.json();
         const data = response.data || response;
-        console.log(mode === "edit" ? "Editing GRN" : "Creating GRN from PO", data);
 
-        setFormData({
-          grn_number: mode === "edit" ? data.grn_number : "",
-          order_id:
-            mode === "edit"
-              ? data?.order_id
-              : data.id,
-          received_date:
-            mode === "edit"
-              ? data.received_date.split("T")[0]
-              : new Date().toISOString().split("T")[0],
-          items:
-            mode === "edit"
-              ? data.goodReceiptNoteItems.map((i) => ({
-                product_id: i.product_id || "",
-                batch_number: i.batch_number || "",
-                ordered_qty: i.ordered_qty,
-                recevied_qty: i.recevied_qty || 0,
-                batch_number: String(i.batch_number),
-                expiry_date: i.expiry_date.split("T")[0],
-                damaged_qty: i.damaged_qty || 0,
-                shortage_qty: i.shortage_qty || 0,
-                item_price: i.item_price,
-                item_mrp: i.item_mrp,
-                totalAmount: i.totalAmount,
-              }))
-              : data.purchaseOrderItems.map((i) => ({
-                id: i.id,
-                product_id: i.product_id || "",
-                batch_number: "",
-                ordered_qty: i.quantity || i.ordered_qty,
-                recevied_qty: 0,
-                damaged_qty: 0,
-                shortage_qty: 0,
-                item_price: i.item_price,
-                item_mrp: i.item_mrp,
-                totalAmount: i.totalAmount,
-              })),
-        });
+        console.log("Fetched data",data);
+        
+
+        if (mode === "edit") {
+          setFormData({
+            grn_id: data.id,
+            order_id: data.order_id,
+            received_date: data.received_date.split("T")[0],
+            status: data.status || "pending",
+            items: data.goodReceiptNoteItems.map((i) => ({
+              product_id: i.product_id,
+              batch_number: String(i.batch_number),
+              ordered_qty: i.ordered_qty,
+              recevied_qty: i.recevied_qty || 0,
+              expiry_date: i.expiry_date.split("T")[0],
+              damaged_qty: i.damaged_qty || 0,
+              shortage_qty: i.shortage_qty || 0,
+              item_price: i.item_price,
+              item_mrp: i.item_mrp,
+              totalAmount: i.totalAmount,
+            })),
+          });
+        } else if(mode === "create"){
+          setFormData({
+            grn_number: "",
+            order_id: id,
+            received_date: new Date().toISOString().split("T")[0],
+            damaged_qty: 0,
+            shortage_qty: 0,
+            status: "pending",
+            items: data.purchaseOrderItems.map((i) => ({
+              product_id: i.product_id,
+              batch_number: "",
+              ordered_qty: i.quantity,
+              recevied_qty: 0,
+              expiry_date: "",
+              damaged_qty: 0,
+              shortage_qty: 0,
+              item_price: i.item_price,
+              item_mrp: i.item_mrp,
+              totalAmount: 0,
+            })),
+          });
+        }
       } catch (err) {
+        toast.error("❌ Failed to fetch data");
         console.error("Error fetching GRN/PO:", err);
       }
     };
 
     if (id) fetchData();
   }, [id, mode]);
-
 
   const handleItemChange = (index, field, value) => {
     const updatedItems = [...formData.items];
@@ -110,22 +111,9 @@ function GrnForm() {
     setFormData({ ...formData, items: updatedItems });
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const totalAmount = formData.items.reduce(
-      (sum, i) => sum + (i.totalAmount || 0),
-      0
-    );
-    const totalDamaged = formData.items.reduce(
-      (sum, i) => sum + (parseInt(i.damaged_qty) || 0),
-      0
-    );
-    const totalShortage = formData.items.reduce(
-      (sum, i) => sum + (parseInt(i.shortage_qty) || 0),
-      0
-    );
 
     let payload;
 
@@ -133,26 +121,24 @@ function GrnForm() {
       payload = {
         order_id: Number(id),
         received_date: formData.received_date,
-        damaged_qty: totalDamaged,
-        shortage_qty: totalShortage,
         items: formData.items.map((i) => ({
           product_id: Number(i.product_id),
           batch_number: String(i.batch_number),
           expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
           recevied_qty: Number(i.recevied_qty),
           ordered_qty: Number(i.ordered_qty),
+           damaged_qty:Number(i.damaged_qty),
+           shortage_qty:Number(i. shortage_qty),
           item_price: Number(i.item_price),
           item_mrp: Number(i.item_mrp),
         })),
       };
     } else {
       payload = {
-        grn_id: Number(id),
-        order_id: Number(formData.order_id) || undefined,
+        grn_id: Number(id), 
+        order_id: Number(formData.order_id),
         received_date: formData.received_date,
-        damaged_qty: totalDamaged,
-        shortage_qty: totalShortage,
-        status: formData.status || undefined,
+        status: formData.status,
         items: formData.items.map((i) => ({
           id: i.id,
           product_id: Number(i.product_id),
@@ -160,16 +146,15 @@ function GrnForm() {
           expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
           recevied_qty: Number(i.recevied_qty),
           ordered_qty: Number(i.ordered_qty),
+          damaged_qty:Number(i.damaged_qty),
+           shortage_qty:Number(i. shortage_qty),
           item_price: Number(i.item_price),
           item_mrp: Number(i.item_mrp),
         })),
       };
     }
 
-    console.log("Submitting GRN:", payload);
-
     try {
-
       let url = "http://localhost:3000/api/v1/grn";
       let method = "POST";
 
@@ -178,8 +163,9 @@ function GrnForm() {
         method = "PUT";
       }
 
-      console.log(url, method);
-
+      console.log(url,method);
+      console.log(payload);
+      
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -188,21 +174,18 @@ function GrnForm() {
 
       if (!response.ok) {
         const Error = await response.json();
-        alert("Error: " + Error.error);
+        toast.error("❌ " + (Error.error || "Something went wrong"));
         return;
       }
 
-      alert(id ? "GRN updated successfully!" : "GRN created successfully!");
+      toast.success(
+        mode === "edit" ? "✅ GRN updated successfully!" : "✅ GRN created successfully!"
+      );
 
-      if (mode === "edit") {
-        navigate('/grn')
-      }else{
-        navigate("/purchase-order");
-      }
-
-    
+      navigate(mode === "edit" ? "/grn" : "/purchase-order");
     } catch (error) {
       console.error("Error saving GRN:", error);
+      toast.error("❌ Failed to save GRN");
     }
   };
 
@@ -350,7 +333,7 @@ function GrnForm() {
             type="submit"
             className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow"
           >
-            {id ? "Update GRN" : "Save GRN"}
+            {mode === "edit" ? "Update GRN" : "Save GRN"}
           </button>
         </div>
       </form>

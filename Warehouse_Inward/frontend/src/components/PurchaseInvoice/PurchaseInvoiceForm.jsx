@@ -24,8 +24,7 @@ function PurchaseInvoiceForm() {
           order_id: grn.order_id,
           invoice_date: new Date().toISOString().slice(0, 10),
           total_amount: grn.total_amount,
-          damaged_qty: grn.damaged_qty,
-          shortage_qty: grn.shortage_qty,
+
           status: grn.status,
           items:
             grn.goodReceiptNoteItems?.map((item) => ({
@@ -34,6 +33,8 @@ function PurchaseInvoiceForm() {
               expiry_date: item.expiry_date?.slice(0, 10),
               ordered_qty: item.ordered_qty,
               recevied_qty: item.recevied_qty,
+              damaged_qty: item.damaged_qty,
+              shortage_qty: item.shortage_qty,
               item_price: item.item_price,
               item_mrp: item.item_mrp,
               totalAmount: item.totalAmount,
@@ -53,7 +54,7 @@ function PurchaseInvoiceForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+
 
     const payload = {
       grn_id: Number(id),
@@ -67,7 +68,7 @@ function PurchaseInvoiceForm() {
     };
 
     console.log(payload);
-    
+
     try {
       const url = "http://localhost:3000/api/v1/purchase-invoice";
       const response = await fetch(url, {
@@ -137,35 +138,12 @@ function PurchaseInvoiceForm() {
           </div>
         </div>
 
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">Damaged Qty</label>
-            <input
-              type="number"
-              value={formData.damaged_qty}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Shortage Qty</label>
-            <input
-              type="number"
-              value={formData.shortage_qty}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
-          </div>
-        </div>
-
-
         <div>
           <h3 className="font-semibold mb-2">Items</h3>
           {formData.items.map((item, index) => (
             <div
               key={index}
-              className="grid grid-cols-7 gap-2 mb-3 border p-2 rounded"
+              className="grid grid-cols-9 gap-1 mb-3 border p-2 rounded"
             >
               <div>
                 <label className="text-sm">Product ID</label>
@@ -207,7 +185,25 @@ function PurchaseInvoiceForm() {
                 <label className="text-sm">Received Qty</label>
                 <input
                   type="number"
-                  value={item.received_qty}
+                  value={item.recevied_qty}
+                  className="border rounded px-2 py-1 bg-gray-200 w-full"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="text-sm">Shortage Qty</label>
+                <input
+                  type="number"
+                  value={item.shortage_qty}
+                  className="border rounded px-2 py-1 bg-gray-200 w-full"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="text-sm">Damaged Qty</label>
+                <input
+                  type="number"
+                  value={item.damaged_qty}
                   className="border rounded px-2 py-1 bg-gray-200 w-full"
                   readOnly
                 />

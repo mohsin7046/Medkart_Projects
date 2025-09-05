@@ -15,10 +15,21 @@ const goodReceiptNoteItemSchema = z.object({
     .int('Received quantity must be an integer')
     .nonnegative('Received quantity cannot be negative'),
 
-  ordered_qty: z  
+  ordered_qty: z
     .number()
     .int('Ordered quantity must be an integer')
     .positive('Ordered quantity must be greater than 0'),
+
+  damaged_qty: z
+    .number()
+    .int('Damaged quantity must be an integer')
+    .nonnegative('Damaged quantity cannot be negative')
+    .optional(),
+
+  shortage_qty: z
+    .number()
+    .int('Shortage quantity must be an integer')
+    .optional(),
 
   item_price: z
     .number()
@@ -38,18 +49,6 @@ export const createGoodReceiptNoteSchema = z.object({
   received_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: 'Invalid received_date format'
   }),
-
-  damaged_qty: z
-    .number()
-    .int('Damaged quantity must be an integer')
-    .nonnegative('Damaged quantity cannot be negative')
-    .optional(),
-
-  shortage_qty: z
-    .number()
-    .int('Shortage quantity must be an integer')
-    .nonnegative('Shortage quantity cannot be negative')
-    .optional(),
 
   items: z
     .array(goodReceiptNoteItemSchema)

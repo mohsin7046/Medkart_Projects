@@ -18,7 +18,7 @@ import PurchaseInvoiceView from "./components/PurchaseInvoice/PurchaseInvoiceVie
 function App() {
   return (
     <Router>
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={1000} />
       <Home />
       <div className=""> 
         <Routes>

@@ -17,6 +17,9 @@ export const createPurchaseOrder = catchAsync(async (req, res) => {
     return errorResponse(res, 'All feilds are required', 400)
   }
 
+  console.log(data);
+  
+
   if(data.expected_delivery_date <= data.order_date){
     return errorResponse(res,"expected_delivery_date is always greater than order_date",400)
   }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEdit, FiTrash2, FiFilePlus } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function PurchaseOrder() {
   const [orders, setOrders] = useState([]);
@@ -11,6 +12,7 @@ function PurchaseOrder() {
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d");
   const [page, setPage] = useState(1);
+   const [loading, setLoading] = useState(false); 
   const limit = 10;
 
   const navigate = useNavigate();
@@ -18,6 +20,7 @@ function PurchaseOrder() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const params = new URLSearchParams({
           page,
           limit,
@@ -29,22 +32,22 @@ function PurchaseOrder() {
         if (statusFilter !== "all") params.append("status", statusFilter);
         if (searchField) params.append("field", searchField);
 
-        console.log(params.toString());
-        
-        const response = await fetch(
-          `http://localhost:3000/api/v1/purchase-order?${params.toString()}`
-        );
-
+        const response = await fetch(`http://localhost:3000/api/v1/purchase-order?${params.toString()}`);
+      
         if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
 
+        const data = await response.json();
         console.log(data);
         
 
         setOrders(data.data.data || []);
         setMetadata(data.data.metadata || {});
       } catch (error) {
+        toast.error("Error fetching purchase orders:")
         console.error("Error fetching purchase orders:", error);
+      }
+       finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -72,14 +75,16 @@ function PurchaseOrder() {
         );
         if (!response.ok) {
           const errorData = await response.json();
+          toast.error("Failed to delete purchase order")
           alert(errorData.error || "Failed to delete purchase order");
           return;
         }
         setOrders((prev) => prev.filter((o) => o.order_id !== order_id));
-        alert("Purchase order deleted successfully");
+        toast.success("Purchase order deleted successfully")
+
       } catch (error) {
         console.error("Error deleting purchase order:", error);
-        alert("Failed to delete purchase order");
+        toast.error("Failed to delete purchase order")
       }
     }
   };
@@ -98,7 +103,6 @@ function PurchaseOrder() {
             className="border px-3 py-1 rounded-md w-52"
           />
 
-     
           <select
             value={searchField}
             onChange={(e) => setSearchField(e.target.value)}
@@ -149,6 +153,11 @@ function PurchaseOrder() {
       </div>
 
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+          </div>
+        ) : (
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
@@ -240,6 +249,7 @@ function PurchaseOrder() {
             )}
           </tbody>
         </table>
+        )}
       </div>
 
       <div className="flex justify-center items-center mt-4 space-x-2">

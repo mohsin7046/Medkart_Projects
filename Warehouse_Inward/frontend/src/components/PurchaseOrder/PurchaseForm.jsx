@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { SearchSelect } from "../utility/SearchSelect";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function PurchaseOrderForm() {
   const { id } = useParams();
@@ -24,8 +23,12 @@ function PurchaseOrderForm() {
         try {
           setLoading(true);
           const res = await fetch(`http://localhost:3000/api/v1/purchase-order/${id}`);
-          if (!res.ok) throw new Error("Failed to fetch order");
+          if (!res.ok){
+            toast.error("Failed to fetch the purchase Order details")
+            throw new Error("Failed to fetch order");
+          }
           const response = await res.json();
+          
           const data = response.data;
 
           setFormData({
@@ -44,8 +47,11 @@ function PurchaseOrderForm() {
                 item_mrp: item.item_mrp,
               })) || [],
           });
+
+           toast.success("Purchase Order details fetch successfully")
         } catch (err) {
           toast.error("Error loading purchase order");
+          
         } finally {
           setLoading(false);
         }
@@ -125,6 +131,8 @@ function PurchaseOrderForm() {
       }
 
       console.log(normalizedData);
+      console.log(url,method);
+      
 
       const res = await fetch(url, {
         method,
@@ -134,7 +142,7 @@ function PurchaseOrderForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.error || "Failed to save purchase order");
+        toast.error(data.message || "Failed to save purchase order");
         return;
       }
 

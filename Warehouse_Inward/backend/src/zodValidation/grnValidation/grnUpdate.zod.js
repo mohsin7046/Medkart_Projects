@@ -27,6 +27,17 @@ const goodReceiptNoteItemSchema = z.object({
     .positive('Ordered quantity must be greater than 0')
     .optional(),
 
+  damaged_qty: z
+    .number()
+    .int('Damaged quantity must be an integer')
+    .nonnegative('Damaged quantity cannot be negative')
+    .optional(),
+
+  shortage_qty: z
+    .number()
+    .int('Shortage quantity must be an integer')
+    .optional(),
+
   item_price: z
     .number()
     .positive('Item price must be greater than 0')
@@ -57,17 +68,6 @@ export const updateGoodReceiptNoteSchema = z.object({
     })
     .optional(),
 
-  damaged_qty: z
-    .number()
-    .int('Damaged quantity must be an integer')
-    .nonnegative('Damaged quantity cannot be negative')
-    .optional(),
-
-  shortage_qty: z
-    .number()
-    .int('Shortage quantity must be an integer')
-    .nonnegative('Shortage quantity cannot be negative')
-    .optional(),
 
   status: statusSchema("grn", [STATUS.CANCELLED, STATUS.COMPLETED]).optional(),
 

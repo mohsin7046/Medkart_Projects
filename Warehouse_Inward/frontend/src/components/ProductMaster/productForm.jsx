@@ -42,7 +42,7 @@ function ProductForm() {
     { value: "azithromycin 500", label: "azithromycin 500" },
   ];
 
-  
+
   useEffect(() => {
     if (id) {
       const fetchProduct = async () => {
@@ -54,8 +54,8 @@ function ProductForm() {
           }
           const res = await response.json();
 
-         const data = res.data;
-         
+          const data = res.data;
+
           setFormData({
             name: data.name || "",
             product_code: data.product_code || "",
@@ -133,7 +133,7 @@ function ProductForm() {
       };
 
       console.log(payload);
-      
+
 
       const response = await fetch(url, {
         method,
@@ -177,7 +177,7 @@ function ProductForm() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
+
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Product Name <span className="text-red-500">*</span>
@@ -197,15 +197,23 @@ function ProductForm() {
             <label className="block text-gray-700 font-medium mb-1">
               Category <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              placeholder="Enter category"
               className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
               required
-            />
+            >
+              <option value="">Select category</option>
+              <option value="tablet">Tablet</option>
+              <option value="syrup">Syrup</option>
+              <option value="capsule">Capsule</option>
+              <option value="injection">Injection</option>
+              <option value="ointment">Ointment</option>
+              <option value="cream">Cream</option>
+              <option value="powder">Powder</option>
+              <option value="drops">Drops</option>
+            </select>
           </div>
 
           <div className="md:col-span-2">
@@ -221,7 +229,7 @@ function ProductForm() {
             />
           </div>
 
-        
+
           <div>
             <label className="block text-gray-700 font-medium mb-1">Product MRP</label>
             <input
@@ -261,7 +269,7 @@ function ProductForm() {
             />
           </div>
 
-         
+
           <div>
             <label className="block text-gray-700 font-medium mb-1">Unit of Measure</label>
             <select
@@ -306,7 +314,7 @@ function ProductForm() {
             />
           </div>
 
-         
+
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">Description</label>
             <textarea
@@ -320,7 +328,7 @@ function ProductForm() {
             />
           </div>
 
-         
+
           <div>
             <label className="block text-gray-700 font-medium mb-1">Status</label>
             <select
@@ -335,7 +343,7 @@ function ProductForm() {
             </select>
           </div>
 
-          
+
           <div className="md:col-span-2 flex justify-between mt-8">
             <button
               type="button"
@@ -347,11 +355,10 @@ function ProductForm() {
             <button
               type="submit"
               disabled={loading}
-              className={`px-5 py-2 rounded-lg shadow text-white ${
-                loading
+              className={`px-5 py-2 rounded-lg shadow text-white ${loading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-              }`}
+                }`}
             >
               {loading ? "Saving..." : id ? "Update Product" : "Add Product"}
             </button>

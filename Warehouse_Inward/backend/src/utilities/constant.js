@@ -59,3 +59,11 @@ export const SEARCHFILTERNAME = Object.freeze({
 export const SETEXPIRY = Object.freeze({
   expiryMonth:3
 })
+
+export const ENTITY = Object.freeze({
+  vendor: "vendor",
+  product: "product",
+  po: "po",
+  grn: "grn",
+  pi: "pi",
+});

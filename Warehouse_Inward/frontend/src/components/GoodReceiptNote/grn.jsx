@@ -11,6 +11,7 @@ function GRNList() {
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d"); 
   const [page, setPage] = useState(1);
+   const [loading, setLoading] = useState(false); 
   const limit = 10;
 
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function GRNList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const params = new URLSearchParams({
           page,
           limit,
@@ -36,16 +38,21 @@ function GRNList() {
         if (!response.ok) throw new Error("Network response was not ok");
         const data = await response.json();
 
+        console.log(data);
+        
+
         setGrns(data.data.data || []);
         setMetadata(data.data.metadata || {});
       } catch (error) {
         console.error("Error fetching GRNs:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
   }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
-  const handleDelete = (grn_number) => async () => {
+  const handleDelete = (grn_id) => async () => {
     if (window.confirm("Are you sure you want to delete this GRN?")) {
       try {
         const response = await fetch(
@@ -53,7 +60,7 @@ function GRNList() {
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ grn_number }),
+            body: JSON.stringify({ grn_id }),
           }
         );
         if (!response.ok) {
@@ -62,7 +69,7 @@ function GRNList() {
           return;
         }
 
-        setGrns(grns.filter((g) => g.grn_number !== grn_number));
+        setGrns(grns.filter((g) => g.grn_id !== grn_id));
         alert("GRN deleted successfully");
       } catch (error) {
         console.error("Error deleting GRN:", error);
@@ -127,6 +134,11 @@ function GRNList() {
       </div>
 
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+          </div>
+        ) : (
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
@@ -164,7 +176,7 @@ function GRNList() {
                       <FiEdit className="text-green-600" size={18} />
                     </button>
                     <button
-                      onClick={handleDelete(grn.grn_number)}
+                      onClick={handleDelete(grn.id)}
                       className="p-2 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       <FiTrash2 className="text-red-500" size={18} />
@@ -199,6 +211,7 @@ function GRNList() {
             )}
           </tbody>
         </table>
+        )}
       </div>
 
      

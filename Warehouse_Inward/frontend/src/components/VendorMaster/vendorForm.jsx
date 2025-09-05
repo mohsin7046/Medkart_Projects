@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -26,16 +26,19 @@ function VendorForm() {
         try {
           setLoading(true);
           const res = await fetch(`http://localhost:3000/api/v1/vendors/${id}`);
-          if (!res.ok) throw new Error("Failed to fetch vendor");
           const response = await res.json();
+          if (!res.ok) {
+          toast.error("Error fetch vendor details")
+          throw new Error("Error fetch vendor details")
+          }
           const data = response.data;
 
           console.log(data);
-          
+
           setFormData({
             name: data.name || "",
             email: data.email || "",
-            vendor_code:data.vendor_code,
+            vendor_code: data.vendor_code,
             contact_person: data.contact_person || "",
             contact_number: data.contact_number?.toString() || "",
             gst_number: data.gst_number?.toString() || "",
@@ -44,6 +47,7 @@ function VendorForm() {
           });
 
           setLoading(false);
+          toast.success()
         } catch (error) {
           console.error(error);
           toast.error("Error loading vendor details");
@@ -84,7 +88,7 @@ function VendorForm() {
         method = "PUT";
       }
 
-      console.log(formData);
+      console.log(url,method);
       
       const response = await fetch(url, {
         method,
@@ -92,14 +96,14 @@ function VendorForm() {
         body: JSON.stringify(formData),
       });
 
+      const resaData = await response.json();
+      console.log(resaData);
+    
       if (!response.ok) {
-        const err = await response.json();
-        toast.error("Error: " + err.error);
-        setLoading(false);
-        return;
-      }
-
-      await response.json();
+      toast.error("Error submitting vendor data")
+      setLoading(false);
+      return;
+    }
       toast.success(id ? "Vendor updated successfully!" : "Vendor added successfully!");
       setIsDirty(false);
       setLoading(false);
@@ -111,7 +115,7 @@ function VendorForm() {
     }
   };
 
-  // Handle back/cancel with confirmation
+
   const handleBack = () => {
     if (isDirty) {
       if (!window.confirm("Entered data may be lost. Do you want to continue?")) {
@@ -129,7 +133,7 @@ function VendorForm() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Vendor Name */}
+         
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Vendor Name <span className="text-red-500">*</span>
@@ -145,7 +149,7 @@ function VendorForm() {
             />
           </div>
 
-          {/* Email */}
+      
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Email <span className="text-red-500">*</span>
@@ -161,7 +165,6 @@ function VendorForm() {
             />
           </div>
 
-          {/* Contact Person */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Contact Person <span className="text-red-500">*</span>
@@ -177,7 +180,6 @@ function VendorForm() {
             />
           </div>
 
-          {/* Contact Number */}
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Contact Number <span className="text-red-500">*</span>
@@ -193,7 +195,7 @@ function VendorForm() {
             />
           </div>
 
-          {/* GST Number */}
+         
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               GST Number <span className="text-red-500">*</span>
@@ -209,7 +211,7 @@ function VendorForm() {
             />
           </div>
 
-          {/* Status */}
+         
           <div>
             <label className="block text-gray-700 font-medium mb-1">
               Status <span className="text-red-500">*</span>
@@ -226,7 +228,7 @@ function VendorForm() {
             </select>
           </div>
 
-          {/* Address */}
+         
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">
               Address <span className="text-red-500">*</span>
@@ -242,7 +244,7 @@ function VendorForm() {
             />
           </div>
 
-          {/* Buttons */}
+          
           <div className="md:col-span-2 flex justify-between mt-8">
             <button
               type="button"
@@ -254,11 +256,10 @@ function VendorForm() {
             <button
               type="submit"
               disabled={loading}
-              className={`px-5 py-2 rounded-lg shadow text-white ${
-                loading
+              className={`px-5 py-2 rounded-lg shadow text-white ${loading
                   ? "bg-blue-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700"
-              }`}
+                }`}
             >
               {loading ? "Saving..." : id ? "Update Vendor" : "Add Vendor"}
             </button>

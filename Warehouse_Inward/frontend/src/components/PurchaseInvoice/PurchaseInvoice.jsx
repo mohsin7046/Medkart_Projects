@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FiEye, FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function PurchaseInvoiceList() {
   const [invoices, setInvoices] = useState([]);
@@ -11,6 +12,7 @@ function PurchaseInvoiceList() {
   const [sortField, setSortField] = useState("created_at");
   const [sortOrder, setSortOrder] = useState("d"); 
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false); 
   const limit = 10;
 
   const navigate = useNavigate();
@@ -19,6 +21,7 @@ function PurchaseInvoiceList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const params = new URLSearchParams({
           page,
           limit,
@@ -41,6 +44,8 @@ function PurchaseInvoiceList() {
         setMetadata(data.data?.metadata || {});
       } catch (error) {
         console.error("Error fetching invoices:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -133,6 +138,11 @@ function PurchaseInvoiceList() {
 
    
       <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+          </div>
+        ) : (
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-gray-100">
@@ -188,6 +198,7 @@ function PurchaseInvoiceList() {
             )}
           </tbody>
         </table>
+        )}
       </div>
 
       <div className="flex justify-center items-center mt-4 space-x-2">

@@ -39,7 +39,7 @@ function PurchaseInvoiceView() {
       <h2 className="text-xl font-bold mb-4">Invoice Details</h2>
       <div className="space-y-2">
         <p><strong>Invoice Number:</strong> {invoice.invoice_number}</p>
-        <p><strong>GRN Number:</strong> {invoice.grn_number}</p>
+        <p><strong>GRN Number:</strong> {invoice.goodReceiptNote.grn_number}</p>
         <p><strong>Date:</strong> {new Date(invoice.invoice_date).toLocaleDateString()}</p>
         <p><strong>Total Amount:</strong> ₹{invoice.total_amount}</p>
         <p><strong>Status:</strong> {invoice.status}</p>
@@ -50,6 +50,7 @@ function PurchaseInvoiceView() {
         <thead>
           <tr className="bg-gray-100">
             <th className="border px-4 py-2">Product ID</th>
+            <th className="border px-4 py-2">Product Name</th>
             <th className="border px-4 py-2">Quantity</th>
             <th className="border px-4 py-2">Price</th>
             <th className="border px-4 py-2">MRP</th>
@@ -61,11 +62,12 @@ function PurchaseInvoiceView() {
           {invoice.PurchaseInvoiceItem?.map((item) => (
             <tr key={item.id} className="text-center">
               <td className="border px-4 py-2">{item.product_id}</td>
+              <td className="border px-4 py-2">{item.product.name}</td>
               <td className="border px-4 py-2">{item.quantity}</td>
               <td className="border px-4 py-2">₹{item.item_price}</td>
               <td className="border px-4 py-2">₹{item.item_mrp}</td>
               <td className="border px-4 py-2">₹{item.totalAmount}</td>
-              <td className="border px-4 py-2">{item.gst_percentage}%</td>
+              <td className="border px-4 py-2">{item.product.gst_percentage}%</td>
             </tr>
           ))}
         </tbody>

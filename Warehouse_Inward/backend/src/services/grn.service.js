@@ -21,11 +21,12 @@ export const findGRNByNumber = async (grn_id) => {
 
 
 export const createGRNRecord = async (existingPO, data) => {
- 
+
   return await prisma.$transaction(async (tx) => {
 
     const purchase_order_id = data.order_id
-    let statusUpdate = ''
+    let statusUpdatePO = ''
+    let statusUpdateGRN = ''
 
     const receivedItemMap = data.items.reduce((map, item) => {
       map[item.product_id] = item
@@ -44,41 +45,46 @@ export const createGRNRecord = async (existingPO, data) => {
       const shortage_qty = receivedItem.shortage_qty || 0
 
       if (receivedItem.recevied_qty > receivedItem.ordered_qty && shortage_qty < 0) {
-        statusUpdate = STATUS.CANCELLED
+        statusUpdatePO = STATUS.CANCELLED
+        statusUpdatePO = STATUS.CANCELLED
         break
       } else if (
         receivedItem.recevied_qty < receivedItem.ordered_qty &&
         shortage_qty > 0
       ) {
-        statusUpdate = STATUS.PARTIAL_RECEVIED
+        statusUpdatePO = STATUS.PARTIAL_RECEVIED
       }
 
       const lastProductIteMRP = await tx.product.findFirst({
         where: { id: poItem.product_id, deleted_at: null },
-        select:{last_purchase_price:true}
+        select: { last_purchase_price: true }
       })
 
       if (lastProductIteMRP) {
         const allowedMRP = lastProductIteMRP * 1.2
         if (receivedItem.item_mrp > allowedMRP) {
-          statusUpdate = STATUS.CANCELLED
+          statusUpdatePO = STATUS.CANCELLED
+          statusUpdatePO = STATUS.CANCELLED
           break
         }
       }
     }
 
-    if (statusUpdate === STATUS.CANCELLED) {
-      await tx.purchaseOrder.update({
+    if (statusUpdatePO === STATUS.CANCELLED) {
+      const deletePO = await tx.purchaseOrder.update({
         where: { id: purchase_order_id },
         data: { status: STATUS.CANCELLED }
       })
-      throw new Error('Received quantity or MRP is not valid')
+     return deletePO
     }
 
-    if (statusUpdate === '' || statusUpdate !== STATUS.PARTIAL_RECEVIED) {
-      statusUpdate = STATUS.COMPLETED
+    if (statusUpdatePO === '' || statusUpdatePO !== STATUS.PARTIAL_RECEVIED) {
+      statusUpdatePO = STATUS.COMPLETED
     }
 
+    let newGRN;
+
+    if(statusUpdateGRN !== STATUS.CANCELLED){
     const grn_number = generateRandom('GRN');
 
     const itemsWithTotal = data.items.map((item) => {
@@ -94,13 +100,11 @@ export const createGRNRecord = async (existingPO, data) => {
       0
     ));
 
-    const newGRN = await tx.goodReceiptNote.create({
+     newGRN = await tx.goodReceiptNote.create({
       data: {
         grn_number,
         order_id: purchase_order_id,
         received_date: new Date(data.received_date),
-        damaged_qty: data.damaged_qty || 0,
-        shortage_qty: data.shortage_qty || 0,
         goodReceiptNoteItems: {
           create: data.items.map((item, idx) => ({
             product_id: item.product_id,
@@ -109,26 +113,32 @@ export const createGRNRecord = async (existingPO, data) => {
             recevied_qty: item.recevied_qty,
             item_price: item.item_price,
             ordered_qty: item.ordered_qty,
+            damaged_qty: item.damaged_qty ,
+            shortage_qty: item.shortage_qty,
             item_mrp: item.item_mrp,
             totalAmount: itemsWithTotal[idx].totalAmount
           }))
         },
         total_amount,
-        status: statusUpdate === STATUS.COMPLETED ? STATUS.PENDING : statusUpdate
+        status: STATUS.PENDING
       }
     })
 
     await tx.purchaseOrder.update({
       where: { id: purchase_order_id },
-      data: { status: statusUpdate }
+      data: { status: statusUpdatePO }
     })
+  }
 
-    return newGRN
+    return newGRN;
   })
 }
 
 
 export const updateGRNRecord = async (existingGRN, data) => {
+
+  console.log(data);
+  
 
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) {
     throw new Error('Cannot update a completed or cancelled GRN')
@@ -137,6 +147,8 @@ export const updateGRNRecord = async (existingGRN, data) => {
   return await prisma.$transaction(async (tx) => {
     const purchase_order_id = data.order_id
     const grn_id = data.grn_id
+
+
 
     const existingPO = await findPOByOrderNumber(data.order_id)
 
@@ -147,7 +159,8 @@ export const updateGRNRecord = async (existingGRN, data) => {
     console.log(existingPO);
 
 
-    let statusUpdate = ''
+    let statusUpdatePO = ''
+    let statusUpdateGRN = '';
 
     const receivedItemMap = data.items.reduce((map, item) => {
       map[item.product_id] = item
@@ -165,50 +178,54 @@ export const updateGRNRecord = async (existingGRN, data) => {
       const shortage_qty = receivedItem.shortage_qty || 0
 
       if (receivedItem.recevied_qty > receivedItem.ordered_qty && shortage_qty < 0) {
-        statusUpdate = STATUS.CANCELLED
+        statusUpdatePO = STATUS.CANCELLED
+        statusUpdateGRN = STATUS.CANCELLED
         break
       } else if (
         receivedItem.recevied_qty < receivedItem.ordered_qty &&
         shortage_qty > 0
       ) {
-        statusUpdate = STATUS.PARTIAL_RECEVIED
+        statusUpdatePO = STATUS.PARTIAL_RECEVIED
       }
 
-      // const lastGRNItem = await tx.goodReceiptNoteItem.findFirst({
-      //   where: { product_id: poItem.product_id, deleted_at: null },
-      //   orderBy: { id: 'desc' }
-      // })
+      const lastProductIteMRP = await tx.product.findFirst({
+        where: { id: poItem.product_id, deleted_at: null },
+        select: { last_purchase_price: true }
+      })
 
-      // console.log(lastGRNItem);
-
-
-      //   if (lastGRNItem) {
-      //     const allowedMRP = lastGRNItem.item_mrp * 1.2
-      //     if (Number(receivedItem.item_mrp) > allowedMRP) {
-      //       statusUpdate = STATUS.CANCELLED
-      //       break
-      //     }
-      //   }
+      if (lastProductIteMRP) {
+        const allowedMRP = lastProductIteMRP * 1.2
+        if (receivedItem.item_mrp > allowedMRP) {
+          statusUpdatePO = STATUS.CANCELLED
+          statusUpdateGRN = STATUS.CANCELLED
+          break
+        }
+      }
     }
 
-    if (statusUpdate === STATUS.CANCELLED) {
+    if (statusUpdatePO === STATUS.CANCELLED && statusUpdateGRN === STATUS.CANCELLED) {
       await tx.purchaseOrder.update({
         where: { id: purchase_order_id },
         data: { status: STATUS.CANCELLED }
       })
 
-      await tx.goodReceiptNote.update({
+      const deleteGRN = await tx.goodReceiptNote.update({
         where: { id: grn_id },
-        data: { status: STATUS.CANCELLED }
+        data: { status: STATUS.CANCELLED,deleted_at:new Date()}
       })
 
-      throw new Error('Received quantity or MRP is not valid')
+      return deleteGRN
     }
 
-    if (statusUpdate === '' || statusUpdate !== STATUS.PARTIAL_RECEVIED) {
-      statusUpdate = STATUS.PENDING
+    if (statusUpdatePO === '' || statusUpdatePO !== STATUS.PARTIAL_RECEVIED) {
+      statusUpdatePO = STATUS.COMPLETED
     }
 
+    if(statusUpdateGRN === '' || statusUpdateGRN !== STATUS.CANCELLED){
+      statusUpdateGRN = STATUS.PENDING
+    }
+    let updatedGRN;
+    if(statusUpdateGRN !== STATUS.CANCELLED){
     const itemsWithTotal = data.items.map((item) => {
       const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
       return {
@@ -222,14 +239,12 @@ export const updateGRNRecord = async (existingGRN, data) => {
       0
     ));
 
-    const updatedGRN = await tx.goodReceiptNote.update({
+     updatedGRN = await tx.goodReceiptNote.update({
       where: { id: grn_id },
       data: {
         received_date: new Date(data.received_date),
-        damaged_qty: data.damaged_qty || 0,
-        shortage_qty: data.shortage_qty || 0,
         total_amount,
-        status: statusUpdate,
+        status: statusUpdateGRN,
         goodReceiptNoteItems: {
           deleteMany: { grn_id: grn_id },
           create: data.items.map((item, idx) => ({
@@ -239,6 +254,8 @@ export const updateGRNRecord = async (existingGRN, data) => {
             recevied_qty: item.recevied_qty,
             item_price: item.item_price,
             ordered_qty: item.ordered_qty,
+            damaged_qty: item.damaged_qty ,
+            shortage_qty: item.shortage_qty,
             item_mrp: item.item_mrp,
             totalAmount: itemsWithTotal[idx].totalAmount
           }))
@@ -248,8 +265,9 @@ export const updateGRNRecord = async (existingGRN, data) => {
 
     await tx.purchaseOrder.update({
       where: { id: purchase_order_id },
-      data: { status: statusUpdate }
+      data: { status: statusUpdatePO }
     })
+  }
 
     return updatedGRN
   })
@@ -258,6 +276,8 @@ export const updateGRNRecord = async (existingGRN, data) => {
 
 
 export const deleteGRNRecord = async (grn_id) => {
+  console.log(grn_id);
+  
   const deleteGRN = await prisma.goodReceiptNote.update({
     where: { id: grn_id },
     data: {
@@ -278,10 +298,15 @@ export const deleteGRNItemsById = async (grn_id) => {
   return deleteAllItem
 }
 
-export const getGRNByIdService = async(id)=>{
-   const data = await prisma.goodReceiptNote.findUnique({
-    where:{id:parseInt(id)},
-    include:{goodReceiptNoteItems:true}
+export const getGRNByIdService = async (id) => {
+  const data = await prisma.goodReceiptNote.findUnique({
+    where: { id: parseInt(id) },
+    include: { 
+      purchaseOrder:{select:{
+        order_number:true,
+      }
+    },
+      goodReceiptNoteItems: true }
   });
   console.log(data);
   return data;

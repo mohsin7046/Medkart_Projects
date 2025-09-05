@@ -103,8 +103,6 @@ model GoodReceiptNote{
   purchaseOrder PurchaseOrder @relation(fields: [order_id], references: [id])
   received_date DateTime
   total_amount Float
-  damaged_qty Int?
-  shortage_qty Int?
   status      String   @default("pending") // pending, completed, cancelled
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
@@ -126,6 +124,8 @@ model GoodReceiptNoteItem{
   expiry_date DateTime
   recevied_qty    Int
   ordered_qty  Int
+  damaged_qty Int?
+  shortage_qty Int?
   item_price       Float
   item_mrp        Float
   totalAmount       Float
