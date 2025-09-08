@@ -4,97 +4,40 @@ import {
   updatePurchaseOrderService,
   getPurchaseOrderByIdService
 } from '../../services/purchaseOrder.service.js'
-import { errorResponse, successResponse } from '../../utilities/response.js'
+import {  successResponse } from '../../utilities/response.js'
 import { updatePurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderUpdate.zod.js'
 import { createPurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
-
+import { STATUSCODE } from '../../utilities/constant.js'
 
 
 export const createPurchaseOrder = catchAsync(async (req, res) => {
-  const data = createPurchaseOrderSchema.parse(req.body)
-  if (!data) {
-    return errorResponse(res, 'All feilds are required', 400)
-  }
-
-  console.log(data);
-  
-
-  if(data.expected_delivery_date <= data.order_date){
-    return errorResponse(res,"expected_delivery_date is always greater than order_date",400)
-  }
-
-  data.items.map((item) => {
-    if (item.item_mrp < item.item_price) {
-      return errorResponse(res,`MRP is not less than price in product ${item.product_id}`,400)
-    }
-  })
-
-  const newPurchaseOrder = await createPurchaseOrderService(data)
-
-  if (!newPurchaseOrder) {
-    return errorResponse(res, 'Purchase Order not created', 400)
-  }
-
-  return successResponse(
-    res,
-    newPurchaseOrder,
-    'Successfully created purchase Order',
-    200
-  )
+  req.component = "po"; 
+  const data = createPurchaseOrderSchema.parse(req.body);
+  const newPO = await createPurchaseOrderService(data);
+  return successResponse(res, newPO, 'Successfully created Purchase Order', STATUSCODE.OK);
 })
-
 
 
 export const deletePurchaseOrder = catchAsync(async (req, res) => {
-  const { order_id } = req.body
-
-  const deletePurchaseOrder = await deletePurchaseOrderService(order_id)
-
-  if (!deletePurchaseOrder) {
-    return errorResponse(res, 'Purchase Order not deleted', 400)
-  }
-
-  return successResponse(
-    res,
-    deletePurchaseOrder,
-    'Successfully deleted purchase Order',
-    200
-  )
+  req.component = "po";
+  const { order_id } = req.body;
+  const deletedPO = await deletePurchaseOrderService(order_id);
+  return successResponse(res, deletedPO, 'Successfully deleted Purchase Order', STATUSCODE.OK);
 })
-
 
 
 export const updatePurchaseOrder = catchAsync(async (req, res) => {
-  const formData = updatePurchaseOrderSchema.parse(req.body)
-
-  if (!formData) {
-    return errorResponse(res, 'All feilds are required', 400)
-  }
-
-  const updatedOrder = await updatePurchaseOrderService(formData)
-
-  if (!updatedOrder) {
-    return errorResponse(res, 'Purchase Order not updated', 400)
-  }
-
-  return successResponse(
-    res,
-    updatedOrder,
-    'Successfully updated purchase Order',
-    200
-  )
+ req.component = "po";
+  const formData = updatePurchaseOrderSchema.parse(req.body);
+  const updatedPO = await updatePurchaseOrderService(formData);
+  return successResponse(res, updatedPO, 'Successfully updated Purchase Order', STATUSCODE.OK);
 })
 
+
 export const getPurchaseOrderById = catchAsync(async(req,res)=>{
-    const {id} = req.params;
-     console.log(id);
-  
-     const PObyIddata = await getPurchaseOrderByIdService(id);
-   
-     if(!PObyIddata){
-       errorResponse(res,"Purchase Order not fount for the id",400)
-     }
-   
-     successResponse(res,PObyIddata,"Purchase order data fetch successfully by id",200)
+  req.component = "po";
+  const { id } = req.params;
+  const poData = await getPurchaseOrderByIdService(id);
+  return successResponse(res, poData, 'Purchase Order data fetched successfully', STATUSCODE.OK);
 })

@@ -2,16 +2,16 @@ import { catchAsync } from "../../utilities/tryCatchAsyncHandler.js";
 import { FEILD, SEARCHFILTERNAME } from "../../utilities/constant.js";
 import { errorResponse, successResponse } from "../../utilities/response.js";
 import { buildFilter } from "../../utilities/builderFilter.js";
+import { STATUSCODE } from "../../utilities/constant.js";
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
-  console.log("Query for get: ",req.query);
-
+ 
   const filters = req.query;
   const { name, field } = filters;
 
  
   if (!SEARCHFILTERNAME[name]) {
-    return errorResponse(res, `Invalid name: ${name}`, 400);
+    return errorResponse(res, `Invalid name: ${name}`, STATUSCODE.BAD_REQUEST);
   }
 
   const model = SEARCHFILTERNAME[name];
@@ -75,7 +75,6 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
 
   const totalPages = Math.ceil(totalItems / limit);
 
-  console.log(items);
   
   return successResponse(
     res,
@@ -89,6 +88,6 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
       },
     },
     `${name} fetched successfully`,
-    200
+    STATUSCODE.OK
   );
 });

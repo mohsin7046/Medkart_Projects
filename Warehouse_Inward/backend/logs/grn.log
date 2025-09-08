@@ -1,60 +1,9 @@
-2025-09-08 11:38:54 [ERROR]: ❌ Error in addProductService: logger is not defined
-2025-09-08 11:39:06 [ERROR]: ❌ Error in addProductService: logger is not defined
-2025-09-08 11:39:22 [ERROR]: ❌ Validation failed: MRP < Price while adding product
-2025-09-08 11:39:22 [ERROR]: ❌ Error in addProductService: Product MRP must be equal or greater than price
-2025-09-08 11:55:00 [ERROR]: ❌ Validation failed: MRP < Price for product_code PC-6935242776
-2025-09-08 11:55:00 [ERROR]: ❌ Error in updateProductService: Product MRP must be equal or greater than price
-2025-09-08 11:55:00 [ERROR]: Product MRP must be equal or greater than price
-2025-09-08 11:55:08 [ERROR]: Validation Error: [{"field":"hsn_code","message":"HSN code must be at least 4 digits"}]
-2025-09-08 11:55:54 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
-2025-09-08 11:56:01 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
-2025-09-08 11:57:06 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
-2025-09-08 11:57:09 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
-2025-09-08 11:57:14 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
-2025-09-08 11:57:18 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"}]
-2025-09-08 12:15:33 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:15:33 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
-2025-09-08 12:15:33 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:15:35 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:15:35 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
-2025-09-08 12:15:35 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:15:38 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:15:38 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
-2025-09-08 12:15:38 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:16:08 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:16:08 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 
-2025-09-08 12:16:08 [ERROR]: MRP cannot be less than price for product 
-2025-09-08 12:17:47 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: formDataorder_date is not defined
-2025-09-08 12:17:47 [ERROR]: formDataorder_date is not defined
-2025-09-08 12:17:50 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: formDataorder_date is not defined
-2025-09-08 12:17:50 [ERROR]: formDataorder_date is not defined
-2025-09-08 12:17:59 [ERROR]: MRP cannot be less than price for product 6
-2025-09-08 12:17:59 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: MRP cannot be less than price for product 
-2025-09-08 12:17:59 [ERROR]: MRP cannot be less than price for product 
-2025-09-08 12:20:16 [ERROR]: ❌ Failed to delete Purchase Order | ID: 11 | Error: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:20:16 [ERROR]: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:07 [ERROR]: ❌ Failed to delete Purchase Order | ID: 12 | Error: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:07 [ERROR]: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:20 [ERROR]: ❌ Failed to delete Purchase Order | ID: 12 | Error: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:20 [ERROR]: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:32 [ERROR]: ❌ Failed to delete Purchase Order | ID: 11 | Error: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:21:32 [ERROR]: Cannot delete completed or cancelled Purchase Order
-2025-09-08 12:30:53 [ERROR]: expected_delivery_date must be greater than order_date
-2025-09-08 12:30:53 [ERROR]: ❌ Failed to create Purchase Order | Error: expected_delivery_date must be greater than order_date
-2025-09-08 12:30:53 [ERROR]: expected_delivery_date must be greater than order_date
-2025-09-08 12:31:01 [ERROR]: MRP cannot be less than price for product 10
-2025-09-08 12:31:01 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 
-2025-09-08 12:31:01 [ERROR]: MRP cannot be less than price for product 
-2025-09-08 12:38:26 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
-2025-09-08 12:38:30 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
-2025-09-08 12:38:32 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
-2025-09-08 12:38:34 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
-2025-09-08 12:38:36 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
-2025-09-08 12:38:49 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
 2025-09-08 14:06:21 [ERROR]: checkExpiry is not defined
 2025-09-08 14:06:26 [ERROR]: checkExpiry is not defined
 2025-09-08 14:06:45 [ERROR]: grnLogger is not defined
+2025-09-08 14:07:49 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:07:49 [ERROR]: calculateItemsTotal is not defined
+2025-09-08 14:08:02 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:08:02 [ERROR]: 
 Invalid `prisma.goodReceiptNote.create()` invocation:
 
@@ -86,6 +35,7 @@ Invalid `prisma.goodReceiptNote.create()` invocation:
 
 Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
 2025-09-08 14:10:12 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
+2025-09-08 14:10:37 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:10:37 [ERROR]: 
 Invalid `prisma.goodReceiptNote.create()` invocation:
 
@@ -116,6 +66,7 @@ Invalid `prisma.goodReceiptNote.create()` invocation:
 }
 
 Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
+2025-09-08 14:11:09 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:11:09 [ERROR]: 
 Invalid `prisma.goodReceiptNote.create()` invocation:
 
@@ -147,8 +98,21 @@ Invalid `prisma.goodReceiptNote.create()` invocation:
 
 Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
 2025-09-08 14:12:35 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
+2025-09-08 14:12:50 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:12:50 [INFO]: GRN created successfully with id: 9
 2025-09-08 14:13:17 [ERROR]: Cannot read properties of undefined (reading 'order_id')
 2025-09-08 14:13:21 [ERROR]: Cannot read properties of undefined (reading 'order_id')
+2025-09-08 14:16:05 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:16:05 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:16:05 [INFO]: GRN updated successfully with id: 9
+2025-09-08 14:18:00 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:18:00 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:18:51 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:18:51 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:19:39 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:19:39 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:23:45 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:23:45 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:23:45 [ERROR]: 
 Invalid `prisma.goodReceiptNote.update()` invocation:
 
@@ -176,6 +140,8 @@ Invalid `prisma.goodReceiptNote.update()` invocation:
 }
 
 Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:23:48 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:23:48 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:23:48 [ERROR]: 
 Invalid `prisma.goodReceiptNote.update()` invocation:
 
@@ -203,6 +169,8 @@ Invalid `prisma.goodReceiptNote.update()` invocation:
 }
 
 Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:24:03 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:24:03 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:24:03 [ERROR]: 
 Invalid `prisma.goodReceiptNote.update()` invocation:
 
@@ -230,8 +198,12 @@ Invalid `prisma.goodReceiptNote.update()` invocation:
 }
 
 Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:24:25 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:24:25 [INFO]:  PO with order_id: 14 is founded
 2025-09-08 14:24:25 [ERROR]: Cannot read properties of undefined (reading 'id')
-2025-09-08 14:25:43 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:25:29 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:25:29 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:25:29 [INFO]: GRN updated successfully with id: 9
 2025-09-08 14:25:48 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:27:13 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:27:16 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
@@ -248,6 +220,9 @@ Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `
 2025-09-08 14:29:57 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:30:01 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:30:07 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:30:22 [INFO]:  GRN with grn_id: 8 is founded
+2025-09-08 14:30:22 [INFO]:  PO with order_id: 12 is founded
+2025-09-08 14:30:22 [INFO]: GRN updated successfully with id: 8
 2025-09-08 14:30:48 [ERROR]: 
 Invalid `prisma.goodReceiptNote.update()` invocation:
 
@@ -469,38 +444,19 @@ Invalid `prisma.goodReceiptNote.update()` invocation:
 }
 
 Argument `id`: Invalid value provided. Expected Int, provided Object.
-2025-09-08 14:44:40 [ERROR]: Invoice creation blocked: GRN 9 already cancelled
-2025-09-08 14:44:40 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:46:21 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:46:21 [ERROR]: Purchase Invoice already created for this GRN
 2025-09-08 14:46:33 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:46:36 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:46:39 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
-2025-09-08 14:46:46 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:46:46 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:47:04 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:47:04 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:47:33 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:47:33 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:49:11 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:49:11 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:49:46 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:49:46 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:50:08 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:50:08 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:50:12 [ERROR]: Invoice creation blocked: GRN 7 already completed
-2025-09-08 14:50:12 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:51:38 [ERROR]: Invoice creation blocked: GRN 10 already completed
-2025-09-08 14:51:38 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:53:36 [ERROR]: Invoice creation blocked: GRN 10 already completed
-2025-09-08 14:53:36 [ERROR]: Purchase Invoice already created for this GRN
-2025-09-08 14:53:40 [ERROR]: Invoice creation blocked: GRN 10 already completed
-2025-09-08 14:53:40 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:50:47 [INFO]:  PO with order_id: 12 is founded
+2025-09-08 14:50:47 [INFO]: GRN created successfully with id: 10
+2025-09-08 14:54:20 [INFO]:  PO with order_id: 15 is founded
+2025-09-08 14:54:20 [WARN]: PO cancelled due to invalid received quantities
 2025-09-08 14:55:10 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
 2025-09-08 14:55:21 [ERROR]: MRP cannot be less than price for product 10
+2025-09-08 14:55:34 [INFO]:  PO with order_id: 16 is founded
+2025-09-08 14:55:34 [INFO]: GRN created successfully with id: 11
 2025-09-08 14:58:21 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:04 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:07 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:19 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:22 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
-2025-09-08 15:23:32 [ERROR]: Purchase Invoice not found

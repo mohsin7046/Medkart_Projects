@@ -9,10 +9,12 @@ import {
   purchaseOrderSearchFields,
   purchaseOrderStatusFilters,
 } from "../../constant/purchaseOrderConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/purchaseOrderConstant.js";
 
 function PurchaseOrder() {
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,7 +74,6 @@ function PurchaseOrder() {
 
   return (
     <CommonDataTable
-      title="Purchase Order List"
       columns={purchaseOrderColumns}
       data={orders}
       page={page}
@@ -85,10 +86,16 @@ function PurchaseOrder() {
       onSearch={handleSearch}
       onFilter={handleFilter}
       onSort={handleSort}
-      onAdd={() => navigate("/purchase-order/add")}
+      onAdd={() => navigate(ROUTES.PURCHASE_ORDER.ADD)}
       onEdit={(order) =>
-        navigate(`/purchase-order/edit/${order.id}`, { state: { order } })
+        navigate(ROUTES.PURCHASE_ORDER.EDIT(order.id))
       }
+      onView={(order) =>{
+        navigate(ROUTES.PURCHASE_ORDER.VIEW('purchaseOrder', order.id))
+      }
+      }
+
+
       onDelete={(order) => handleDelete(order.id)}
       extraAction={(order) => {
         const isDisabled = ["completed", "cancelled"].includes(order.status);
@@ -96,11 +103,10 @@ function PurchaseOrder() {
           <button
             disabled={isDisabled}
             onClick={() =>
-              navigate(`/grn/add/${order.id}`, { state: { order } })
+              navigate(ROUTES.GRN.ADD(order.id))
             }
-            className={`bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition-colors ${
-              isDisabled ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+            className={`bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition-colors ${isDisabled ? "opacity-50 cursor-not-allowed" : ""
+              }`}
           >
             Create GRN
           </button>

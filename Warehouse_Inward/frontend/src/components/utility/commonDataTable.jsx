@@ -1,4 +1,4 @@
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiEye, FiTrash2 } from "react-icons/fi";
 import { useState } from "react";
 
 function CommonDataTable({
@@ -13,7 +13,8 @@ function CommonDataTable({
   onSearch,
   onFilter,
   onSort,
-  onAdd, 
+  onAdd,
+  onView,
   showActions = true,
   setPage,
   searchFields = [], 
@@ -166,6 +167,14 @@ return (
                           className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
                         >
                           <FiEdit className="text-green-600" size={18} />
+                        </button>
+                      )}
+                       {onView && (
+                        <button
+                          onClick={() => onView(item)}
+                          className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                        >
+                          <FiEye className="text-orange-400" size={18} />
                         </button>
                       )}
                       {onDelete && (

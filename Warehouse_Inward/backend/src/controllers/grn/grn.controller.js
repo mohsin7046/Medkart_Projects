@@ -1,131 +1,53 @@
 import {
-  findPOByOrderNumber,
-  findGRNByNumber,
-  createGRNRecord,
-  updateGRNRecord,
-  deleteGRNRecord,
-  deleteGRNItemsById,
+  createGRNRecordService,
+  updateGRNRecordService,
+  deleteGRNRecordService,
   getGRNByIdService
 } from '../../services/grn.service.js'
 import { errorResponse, successResponse } from '../../utilities/response.js'
-import { SETEXPIRY, STATUS } from '../../utilities/constant.js'
+
 import { updateGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnUpdate.zod.js'
 import { createGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
-import { checkExpiry } from '../../utilities/checkExpiry.js'
-import logger from '../../utilities/logger.js'
+import { STATUSCODE } from '../../utilities/constant.js'
+
 
 
 export const createGRN = catchAsync(async (req, res) => {
-  const data = createGoodReceiptNoteSchema.parse(req.body)
-
-  if (!data) {
-    logger.error(data.error) 
-    return errorResponse(res, 'All feilds are required', 400)
-  }
-
-  data.items.map((item) => {
-    if (item.item_mrp < item.item_price) {
-      logger.error(`MRP is not less than price in product ${item.product_id}`)
-      return errorResponse(res, `MRP is not less than price in product ${item.product_id}`, 400)
-    }
-
-    if (!checkExpiry(item.expiry_date)) {
-      logger.error(`Expiry date is ${SETEXPIRY.expiryMonth} month always greater`)
-      return errorResponse(res, `Expiry date is ${SETEXPIRY.expiryMonth} month always greater`, 400)
-    }
-  })
-
-  const existingPO = await findPOByOrderNumber(data.order_id)
-
-  if (!existingPO) {
-    logger.error("Purchase order not found")
-    return errorResponse(res, "Purchase order not found", 400)
-  }
-
-  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingPO.status)) {
-    logger.error("'GRN already created for this order")
-    return errorResponse(res, "GRN already created for this order", 400)
-  }
-
-  const createGRN = await createGRNRecord(existingPO, data)
-
-  if (!createGRN) {
-    logger.error('GRN isnot created')
-    return errorResponse(res, 'GRN isnot created', 400)
-  }
-
-  logger.info('Successfully created GRN')
-  return successResponse(res, createGRN, 'Successfully created GRN', 200)
-})
+  req.component = "grn"; 
+  const data = createGoodReceiptNoteSchema.parse(req.body);
+  const createdGRN = await createGRNRecordService(data);
+  return successResponse(res, createdGRN, 'Successfully created GRN', STATUSCODE.OK);
+});
 
 
 
 export const updateGRN = catchAsync(async (req, res) => {
-  console.log(req.body);
-  
-  const data = updateGoodReceiptNoteSchema.parse(req.body)
-
-  if (!data) {
-    return errorResponse(res, 'All feilds are required', 400)
-  }
-
-
-  const existingGRN = await findGRNByNumber(data.grn_id)
-
-  if (!existingGRN) {
-    return errorResponse(res, 'GRN not found', 400)
-  }
-
-  const updateGRN = await updateGRNRecord(existingGRN, data)
-
-  if (!updateGRN) {
-    return errorResponse(res, 'GRN is not updated', 400)
-  }
-
-  return successResponse(res, updateGRN, 'Successfully updated GRN', 200)
-})
+  req.component = "grn"; 
+  const data = updateGoodReceiptNoteSchema.parse(req.body);
+  const updatedGRN = await updateGRNRecordService(data);
+  return successResponse(res, updatedGRN, 'Successfully updated GRN', STATUSCODE.OK);
+});
 
 
 
 export const deleteGRN = catchAsync(async (req, res) => {
-  const { grn_id } = req.body
-
-  const existingGRN = await findGRNByNumber(grn_id)
-
-  if (!existingGRN) {
-    return errorResponse(res, 'GRN not found', 400)
-  }
-
-  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) {
-    return errorResponse(res, 'GRN is completed or cancelled', 400)
-  }
-
-  const deleteGRNItems = deleteGRNItemsById(grn_id);
-
-  if (!deleteGRNItems) {
-    return errorResponse(res, 'GRNItems not found', 400)
-  }
-
-  const deletedGRN = deleteGRNRecord(grn_id)
-
-  if (!deletedGRN) {
-    return errorResponse(res, 'GRN not found', 400)
-  }
-
-  return successResponse(res, deleteGRN, 'GRN deleted succesfully', 200)
-})
-
-export const getGRNByID = catchAsync(async(req,res)=>{
-   const {id} = req.params;
-  console.log(id);
+  req.component = "grn"; 
+  const { grn_id } = req.body;
+  console.log("FROm",grn_id);
   
-  const grnbyIddata = await getGRNByIdService(id);
+  const deletedGRN = await deleteGRNRecordService(grn_id);
+  return successResponse(res, deletedGRN, 'GRN deleted successfully', STATUSCODE.OK);
+});
 
-  if(!grnbyIddata){
-    errorResponse(res,"GRN not fount for the id",400)
+
+export const getGRNByID = catchAsync(async (req, res) => {
+  req.component = "grn"; 
+  const { id } = req.params;
+  const grnData = await getGRNByIdService(id);
+  if (!grnData) {
+    return errorResponse(res, "GRN not found for the id", STATUSCODE.BAD_REQUEST);
   }
-
-  successResponse(res,grnbyIddata,"GRN data fetch successfully by id",200)
-})
+  return successResponse(res, grnData, "GRN data fetched successfully by id", STATUSCODE.OK);
+});
 

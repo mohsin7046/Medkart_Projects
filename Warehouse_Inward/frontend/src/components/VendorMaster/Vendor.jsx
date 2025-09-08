@@ -5,10 +5,12 @@ import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
 import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 import { columns,searchFields,statusFilters } from "../../constant/vendorConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/vendorConstant.js";
 
 function Vendor() {
   const [page, setPage] = useState(1);
-  const limit = 2;
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -79,9 +81,9 @@ function Vendor() {
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
-        onAdd={() => navigate("/vendor/add")}
+        onAdd={() => navigate(ROUTES.VENDOR.ADD)}
         onEdit={(vendor) =>
-          navigate(`/vendor/edit/${vendor.id}`, { state: { vendor } })
+          navigate(ROUTES.VENDOR.EDIT(vendor.id))
         }
         onDelete={(vendor) => handleDelete(vendor.vendor_code)}
       />

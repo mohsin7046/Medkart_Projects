@@ -9,10 +9,12 @@ import {
   invoiceSearchFields,
   invoiceStatusFilters,
 } from "../../constant/purchaseInvoiceConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/purchaseInvoiceConstant.js";
 
 function PurchaseInvoiceList() {
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -84,9 +86,8 @@ function PurchaseInvoiceList() {
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
-        onAdd={() => navigate("/purchase-invoice/add")}
-        onEdit={(invoice) =>
-          navigate(`/purchase-invoice/view/${invoice.id}`, { state: { invoice } })
+        onView={(invoice) =>
+        navigate(ROUTES.PURCHASE_INVOICE.VIEW('invoice',invoice.id))
         }
         onDelete={(invoice) => handleDelete(invoice.id)}
       />

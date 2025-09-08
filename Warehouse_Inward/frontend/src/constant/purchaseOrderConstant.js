@@ -32,3 +32,5 @@ export const purchaseOrderStatusFilters = [
   { key: "completed", label: "Completed" },
   { key: "cancelled", label: "Cancelled" },
 ];
+
+export const LIMITPAGE = 3;

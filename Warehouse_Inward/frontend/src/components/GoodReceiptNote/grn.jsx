@@ -9,10 +9,12 @@ import {
   grnSearchFields,
   grnStatusFilters,
 } from "../../constant/grnConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/grnConstant.js";
 
 function GRNList() {
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -71,7 +73,6 @@ function GRNList() {
 
   return (
     <CommonDataTable
-      title="GRN List"
       columns={grnColumns}
       data={grns}
       page={page}
@@ -84,13 +85,16 @@ function GRNList() {
       onSearch={handleSearch}
       onFilter={handleFilter}
       onSort={handleSort}
-      onAdd={() => navigate("/grn/add")}
-      onEdit={(grn) => navigate(`/grn/edit/${grn.id}`, { state: { grn } })}
-      onView={(grn) => navigate(`/grn/view/${grn.id}`, { state: { grn } })}
-      onDelete={(grn) => handleDelete(grn.grn_id)}
+      onEdit={(grn) =>
+        navigate(ROUTES.GRN.EDIT(grn.id))
+      }
+      onView={(grn) =>
+        navigate(ROUTES.GRN.VIEW('grn',grn.id))
+      }
+      onDelete={(grn) => handleDelete(grn.id)}
       extraAction={(grn) => (
         <button
-          onClick={() => navigate(`/purchase-invoice/add/${grn.id}`)}
+          onClick={() => navigate(ROUTES.PURCHASE_INVOICE.ADD(grn.id))}
           className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
         >
           Create Invoice

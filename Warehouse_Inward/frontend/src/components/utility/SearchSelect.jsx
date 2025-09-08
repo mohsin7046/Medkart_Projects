@@ -10,6 +10,8 @@ export function SearchSelect({ type, value, onSelect }) {
 
     if (value) {
       setQuery(value);
+    }else {
+      setQuery(""); 
     }
 
   }, [value]);

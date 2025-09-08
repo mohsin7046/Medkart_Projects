@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
+import { ROUTES } from "../../constant/routePath.js";
 
 function VendorForm() {
   const { id } = useParams();
@@ -97,18 +98,27 @@ function VendorForm() {
         body: JSON.stringify(formData),
       });
 
-      const resaData = await response.json();
-      console.log(resaData);
-    
       if (!response.ok) {
-      toast.error("Error submitting vendor data")
-      setLoading(false);
-      return;
-    }
+        const resData = await response.json();
+        console.log(resData);
+
+        if (Array.isArray(resData.message)) {
+          resData.message.forEach((err) => {
+            toast.error(`${err.field}: ${err.message}`);
+          });
+        } else {
+
+          toast.error(resData.error || resData.message || "Something went wrong");
+        }
+
+        setLoading(false);
+        return;
+      }
+     
       toast.success(id ? "Vendor updated successfully!" : "Vendor added successfully!");
       setIsDirty(false);
       setLoading(false);
-      navigate("/vendor");
+     navigate(ROUTES.VENDOR.LIST);
     } catch (error) {
       console.error("Error saving vendor:", error);
       toast.error("Something went wrong!");
@@ -123,7 +133,7 @@ function VendorForm() {
         return;
       }
     }
-    navigate("/vendor");
+    navigate(ROUTES.VENDOR.LIST);
   };
 
   return (

@@ -1,275 +1,165 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS } from '../utilities/constant.js'
+import { SETEXPIRY, STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
+import { calculateItemsTotal, determineStatus } from '../helper/grn.helper.js'
+import { checkExpiry } from '../utilities/checkExpiry.js'
+import { grnLogger } from '../utilities/logger.js'
 
 export const findPOByOrderNumber = async (order_id) => {
+
   const POOrderNumber = await prisma.purchaseOrder.findFirst({
     where: { id: order_id, deleted_at: null },
     include: { purchaseOrderItems: true }
   })
+  if (!POOrderNumber) {
+    grnLogger.error(`Error Finding PO with order_id: ${order_id}`);
+  }
+  grnLogger.info(` PO with order_id: ${order_id} is founded`);
   return POOrderNumber
 }
+
 
 export const findGRNByNumber = async (grn_id) => {
   const grnfind = await prisma.goodReceiptNote.findFirst({
     where: { id: grn_id, deleted_at: null },
     include: { goodReceiptNoteItems: true }
   })
+  if (!grnfind) {
+    grnLogger.error(`Error Finding grn with grn_id: ${grn_id}`);
+  }
+  grnLogger.info(` GRN with grn_id: ${grn_id} is founded`);
   return grnfind
 }
 
 
-export const createGRNRecord = async (existingPO, data) => {
 
-  return await prisma.$transaction(async (tx) => {
+export const createGRNRecordService = async (data) => {
 
-    const purchase_order_id = data.order_id
-    let statusUpdatePO = ''
-    let statusUpdateGRN = ''
-
-    const receivedItemMap = data.items.reduce((map, item) => {
-      map[item.product_id] = item
-      return map
-    }, {})
-
-    for (const poItem of existingPO.purchaseOrderItems) {
-      const receivedItem = receivedItemMap[poItem.product_id]
-
-      if (!receivedItem) {
-        throw new Error(
-          `Received item with product code ${poItem.product_id} not found in PO items`
-        )
-      }
-
-      const shortage_qty = receivedItem.shortage_qty || 0
-
-      if (receivedItem.recevied_qty > receivedItem.ordered_qty && shortage_qty < 0) {
-        statusUpdatePO = STATUS.CANCELLED
-        statusUpdatePO = STATUS.CANCELLED
-        break
-      } else if (
-        receivedItem.recevied_qty < receivedItem.ordered_qty &&
-        shortage_qty > 0
-      ) {
-        statusUpdatePO = STATUS.PARTIAL_RECEVIED
-      }
-
-      const lastProductIteMRP = await tx.product.findFirst({
-        where: { id: poItem.product_id, deleted_at: null },
-        select: { last_purchase_price: true }
-      })
-
-      if (lastProductIteMRP) {
-        const allowedMRP = lastProductIteMRP * 1.2
-        if (receivedItem.item_mrp > allowedMRP) {
-          statusUpdatePO = STATUS.CANCELLED
-          statusUpdatePO = STATUS.CANCELLED
-          break
-        }
-      }
-    }
-
-    if (statusUpdatePO === STATUS.CANCELLED) {
-      const deletePO = await tx.purchaseOrder.update({
-        where: { id: purchase_order_id },
-        data: { status: STATUS.CANCELLED }
-      })
-     return deletePO
-    }
-
-    if (statusUpdatePO === '' || statusUpdatePO !== STATUS.PARTIAL_RECEVIED) {
-      statusUpdatePO = STATUS.COMPLETED
-    }
-
-    let newGRN;
-
-    if(statusUpdateGRN !== STATUS.CANCELLED){
-    const grn_number = generateRandom('GRN');
-
-    const itemsWithTotal = data.items.map((item) => {
-      const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
-      return {
-        ...item,
-        totalAmount,
-      };
-    });
-
-    const total_amount = decimalConversion(itemsWithTotal.reduce(
-      (sum, item) => sum + item.totalAmount,
-      0
-    ));
-
-     newGRN = await tx.goodReceiptNote.create({
-      data: {
-        grn_number,
-        order_id: purchase_order_id,
-        received_date: new Date(data.received_date),
-        goodReceiptNoteItems: {
-          create: data.items.map((item, idx) => ({
-            product_id: item.product_id,
-            batch_number: item.batch_number,
-            expiry_date: new Date(item.expiry_date),
-            recevied_qty: item.recevied_qty,
-            item_price: item.item_price,
-            ordered_qty: item.ordered_qty,
-            damaged_qty: item.damaged_qty ,
-            shortage_qty: item.shortage_qty,
-            item_mrp: item.item_mrp,
-            totalAmount: itemsWithTotal[idx].totalAmount
-          }))
-        },
-        total_amount,
-        status: STATUS.PENDING
-      }
-    })
-
-    await tx.purchaseOrder.update({
-      where: { id: purchase_order_id },
-      data: { status: statusUpdatePO }
-    })
+  if (!data.items?.length) {
+    grnLogger.error("No items provided");
+    throw new Error('No items provided');
   }
 
+  data.items.forEach(item => {
+    if (item.item_mrp < item.item_price){
+      grnLogger.error(`MRP cannot be less than price for product ${item.product_id}`)
+      throw new Error(`MRP cannot be less than price for product ${item.product_id}`)  
+    };
+    if (!checkExpiry(item.expiry_date)){
+      grnLogger.error(`Expiry date must be at least ${SETEXPIRY.expiryMonth} months`)
+      throw new Error(`Expiry date must be at least ${SETEXPIRY.expiryMonth} months`)
+    };
+  });
+
+  const existingPO = await findPOByOrderNumber(data.order_id);
+  if (!existingPO){ 
+    grnLogger.error("Purchase Order not found while creating the GRN")
+    throw new Error("Purchase order not found")
+  };
+  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingPO.status)) {
+    grnLogger.error("GRN already created for this order");
+    throw new Error("GRN already created for this order")
+  }
+
+  return await prisma.$transaction(async (tx) => {
+    const receivedMap = data.items.reduce((map, item) => (map[item.product_id] = item, map), {});
+    const { statusPO, statusGRN } = await determineStatus(existingPO.purchaseOrderItems, receivedMap, tx);
+
+    if (statusPO === STATUS.CANCELLED) {
+      grnLogger.error(`PO cancelled due to invalid received quantities`);
+      return await tx.purchaseOrder.update({ where: { id: data.order_id }, data: { status: STATUS.CANCELLED } });
+    }
+
+    const grn_number = generateRandom('GRN');
+    const itemsWithTotal = calculateItemsTotal(data.items);
+    const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
+
+    let newGRN;
+    if (statusGRN !== STATUS.CANCELLED) {
+      newGRN = await tx.goodReceiptNote.create({
+        data: {
+          grn_number,
+          order_id: data.order_id,
+          received_date: new Date(data.received_date),
+          goodReceiptNoteItems: { create: itemsWithTotal },
+          total_amount,
+          status: STATUS.PENDING
+        }
+      });
+
+      await tx.purchaseOrder.update({
+        where: { id: data.order_id },
+        data: { status: statusPO || STATUS.COMPLETED }
+      });
+    }
+
+    if (!newGRN) {
+      grnLogger.error(`Failed to create a GRN`);
+      throw new Error("Failed to create GRN")
+    }
+
+    grnLogger.info(`GRN created successfully with id: ${newGRN.id}`);
     return newGRN;
   })
 }
 
 
-export const updateGRNRecord = async (existingGRN, data) => {
-  
-  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) {
-    throw new Error('Cannot update a completed or cancelled GRN')
-  }
+export const updateGRNRecordService = async (data) => {
+
+  console.log(data);
+
+  const existingGRN = await findGRNByNumber(data.grn_id);
+  if (!existingGRN) throw new Error('GRN not found');
+  if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) throw new Error('Cannot update a completed or cancelled GRN');
 
   return await prisma.$transaction(async (tx) => {
-    const purchase_order_id = data.order_id
-    const grn_id = data.grn_id
+    const existingPO = await findPOByOrderNumber(data.order_id);
+    if (!existingPO) throw new Error('Purchase order not found');
 
-    const existingPO = await findPOByOrderNumber(data.order_id)
+    const receivedMap = data.items.reduce((map, item) => (map[item.product_id] = item, map), {});
+    const { statusPO, statusGRN } = await determineStatus(existingPO.purchaseOrderItems, receivedMap, tx);
 
-    if (!existingPO) {
-      throw new Error('Purchase order not found')
+    if (statusPO === STATUS.CANCELLED && statusGRN === STATUS.CANCELLED) {
+       await tx.purchaseOrder.update({ where: { id: data.order_id }, data: { status: STATUS.CANCELLED } });
+      await tx.goodReceiptNote.update({ where: { id: data.grn_id }, data: { status: STATUS.CANCELLED } });
     }
 
-    let statusUpdatePO = ''
-    let statusUpdateGRN = '';
+    const itemsWithTotal = calculateItemsTotal(data.items);
+    const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
 
-    const receivedItemMap = data.items.reduce((map, item) => {
-      map[item.product_id] = item
-      return map
-    }, {})
-
-    for (const poItem of existingPO.purchaseOrderItems) {
-      const receivedItem = receivedItemMap[poItem.product_id]
-      if (!receivedItem) {
-        throw new Error(
-          `Received item with product code ${poItem.product_id} not found in PO items`
-        )
-      }
-
-      const shortage_qty = receivedItem.shortage_qty || 0
-
-      if (receivedItem.recevied_qty > receivedItem.ordered_qty && shortage_qty < 0) {
-        statusUpdatePO = STATUS.CANCELLED
-        statusUpdateGRN = STATUS.CANCELLED
-        break
-      } else if (
-        receivedItem.recevied_qty < receivedItem.ordered_qty &&
-        shortage_qty > 0
-      ) {
-        statusUpdatePO = STATUS.PARTIAL_RECEVIED
-      }
-
-      const lastProductIteMRP = await tx.product.findFirst({
-        where: { id: poItem.product_id, deleted_at: null },
-        select: { last_purchase_price: true }
-      })
-
-      if (lastProductIteMRP) {
-        const allowedMRP = lastProductIteMRP * 1.2
-        if (receivedItem.item_mrp > allowedMRP) {
-          statusUpdatePO = STATUS.CANCELLED
-          statusUpdateGRN = STATUS.CANCELLED
-          break
-        }
-      }
-    }
-
-    if (statusUpdatePO === STATUS.CANCELLED && statusUpdateGRN === STATUS.CANCELLED) {
-      await tx.purchaseOrder.update({
-        where: { id: purchase_order_id },
-        data: { status: STATUS.CANCELLED }
-      })
-
-      const deleteGRN = await tx.goodReceiptNote.update({
-        where: { id: grn_id },
-        data: { status: STATUS.CANCELLED}
-      })
-
-      return deleteGRN
-    }
-
-    if (statusUpdatePO === '' || statusUpdatePO !== STATUS.PARTIAL_RECEVIED) {
-      statusUpdatePO = STATUS.COMPLETED
-    }
-
-    if(statusUpdateGRN === '' || statusUpdateGRN !== STATUS.CANCELLED){
-      statusUpdateGRN = STATUS.PENDING
-    }
     let updatedGRN;
-    if(statusUpdateGRN !== STATUS.CANCELLED){
-    const itemsWithTotal = data.items.map((item) => {
-      const totalAmount = decimalConversion(item.recevied_qty * item.item_price);
-      return {
-        ...item,
-        totalAmount,
-      };
-    });
 
-    const total_amount = decimalConversion(itemsWithTotal.reduce(
-      (sum, item) => sum + item.totalAmount,
-      0
-    ));
+    if (statusGRN !== STATUS.CANCELLED) {
+      updatedGRN = await tx.goodReceiptNote.update({
+        where: { id: data.grn_id },
+        data: {
+          received_date: new Date(data.received_date),
+          total_amount,
+          status: statusGRN || STATUS.PENDING,
+          goodReceiptNoteItems: {
+            deleteMany: { grn_id: data.grn_id },
+            create: itemsWithTotal
+          }
+        }
+      });
 
-     updatedGRN = await tx.goodReceiptNote.update({
-      where: { id: grn_id },
-      data: {
-        received_date: new Date(data.received_date),
-        total_amount,
-        status: statusUpdateGRN,
-        goodReceiptNoteItems: {
-          deleteMany: { grn_id: grn_id },
-          create: data.items.map((item, idx) => ({
-            product_id: item.product_id,
-            batch_number: item.batch_number,
-            expiry_date: new Date(item.expiry_date),
-            recevied_qty: item.recevied_qty,
-            item_price: item.item_price,
-            ordered_qty: item.ordered_qty,
-            damaged_qty: item.damaged_qty ,
-            shortage_qty: item.shortage_qty,
-            item_mrp: item.item_mrp,
-            totalAmount: itemsWithTotal[idx].totalAmount
-          }))
-        },
-      }
-    })
+      await tx.purchaseOrder.update({
+        where: { id: data.order_id },
+        data: { status: statusPO || STATUS.COMPLETED }
+      });
+    }
 
-    await tx.purchaseOrder.update({
-      where: { id: purchase_order_id },
-      data: { status: statusUpdatePO }
-    })
-  }
-
-    return updatedGRN
+    grnLogger.info(`GRN updated successfully with id: ${data.grn_id}`);
+    return updatedGRN;
   })
 }
 
 
 
-export const deleteGRNRecord = async (grn_id) => {
+export const deleteGRNRecordService = async (grn_id) => {
   console.log(grn_id);
-  
+
   const deleteGRN = await prisma.goodReceiptNote.update({
     where: { id: grn_id },
     data: {
@@ -293,12 +183,14 @@ export const deleteGRNItemsById = async (grn_id) => {
 export const getGRNByIdService = async (id) => {
   const data = await prisma.goodReceiptNote.findUnique({
     where: { id: parseInt(id) },
-    include: { 
-      purchaseOrder:{select:{
-        order_number:true,
-      }
-    },
-      goodReceiptNoteItems: true }
+    include: {
+      purchaseOrder: {
+        select: {
+          order_number: true,
+        }
+      },
+      goodReceiptNoteItems: true
+    }
   });
   console.log(data);
   return data;

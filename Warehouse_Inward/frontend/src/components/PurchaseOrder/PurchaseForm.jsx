@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { SearchSelect } from "../utility/SearchSelect";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
+import { ROUTES } from "../../constant/routePath.js";
 
 function PurchaseOrderForm() {
   const { id } = useParams();
@@ -18,47 +19,70 @@ function PurchaseOrderForm() {
     items: [{ product_id: "", quantity: "", item_price: "", item_mrp: "" }],
   });
 
-  useEffect(() => {
-    if (id) {
-      (async () => {
-        try {
-          setLoading(true);
-          const res = await fetch(`${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`);
-          if (!res.ok){
-            toast.error("Failed to fetch the purchase Order details")
-            throw new Error("Failed to fetch order");
-          }
-          const response = await res.json();
-          
-          const data = response.data;
-
-          setFormData({
-            vendor_id: data.vendor_id || "",
-            vendor_name: data.vendor?.name || "",
-            order_date: data.order_date ? data.order_date.slice(0, 10) : "",
-            expected_delivery_date: data.expected_delivery_date
-              ? data.expected_delivery_date.slice(0, 10)
-              : "",
-            items:
-              data.purchaseOrderItems?.map((item) => ({
-                product_id: item.product_id,
-                product_name: item.product?.name || "",
-                quantity: item.quantity,
-                item_price: item.item_price,
-                item_mrp: item.item_mrp,
-              })) || [],
-          });
-
-           toast.success("Purchase Order details fetch successfully")
-        } catch (err) {
-          toast.error("Error loading purchase order");
-          
-        } finally {
-          setLoading(false);
+useEffect(() => {
+  if (id) {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`);
+        if (!res.ok) {
+          toast.error("Failed to fetch the purchase Order details");
+          throw new Error("Failed to fetch order");
         }
-      })();
-    }
-  }, [id]);
+        const response = await res.json();
+        const data = response.data; 
+   
+        let vendor_name = "";
+        let vendor_id = "";
+        if (data.vendor && data.vendor.status === "active") {
+          vendor_name = data.vendor.name;
+          vendor_id = data.vendor.id;
+        }
+
+        if(!vendor_name){
+          toast.error("Vendor may be inactive")
+        }
+
+      
+        const items = data.purchaseOrderItems?.map((item) => {
+          let product_name = "";
+          let product_id = "";
+          if (item.product && item.product.status === "active") {
+            product_name = item.product.name;
+            product_id = item.product_id;
+          }
+           if(!product_name){
+          toast.error("Product may be inactive")
+        }
+          return {
+            product_id,
+            product_name,
+            quantity: item.quantity,
+            item_price: item.item_price,
+            item_mrp: item.item_mrp,
+          };
+        }) || [];
+
+        setFormData({
+          vendor_id,
+          vendor_name,
+          order_date: data.order_date ? data.order_date.slice(0, 10) : "",
+          expected_delivery_date: data.expected_delivery_date ? data.expected_delivery_date.slice(0, 10) : "",
+          items,
+        });
+
+        toast.success("Purchase Order details fetched successfully");
+      } catch (err) {
+        toast.error("Error loading purchase order");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }
+}, [id]);
+
 
   const handleChange = (e) => {
     setFormDirty(true);
@@ -110,16 +134,16 @@ function PurchaseOrderForm() {
     setLoading(true);
 
     const normalizedData = {
-        vendor_id: formData.vendor_id,
-        order_date: formData.order_date,
-        expected_delivery_date: formData.expected_delivery_date,
-        items: formData.items.map((item) => ({
-          product_id: item.product_id,
-          quantity: parseFloat(item.quantity) || 0,
-          item_price: parseFloat(item.item_price) || 0,
-          item_mrp: parseFloat(item.item_mrp) || 0,
-        })),
-      };
+      vendor_id: formData.vendor_id,
+      order_date: formData.order_date,
+      expected_delivery_date: formData.expected_delivery_date,
+      items: formData.items.map((item) => ({
+        product_id: item.product_id,
+        quantity: parseFloat(item.quantity) || 0,
+        item_price: parseFloat(item.item_price) || 0,
+        item_mrp: parseFloat(item.item_mrp) || 0,
+      })),
+    };
 
     try {
       let url = `${ALLEndpoint.PurchaseOrderEndpoints.addPurchaseOrder.endpoint}`;
@@ -132,8 +156,8 @@ function PurchaseOrderForm() {
       }
 
       console.log(normalizedData);
-      console.log(url,method);
-      
+      console.log(url, method);
+
 
       const res = await fetch(url, {
         method,
@@ -141,14 +165,23 @@ function PurchaseOrderForm() {
         body: JSON.stringify(normalizedData),
       });
 
-      const data = await res.json();
+
       if (!res.ok) {
-        toast.error(data.message || "Failed to save purchase order");
+        const resData = await res.json();
+
+        if (Array.isArray(resData.message)) {
+          resData.message.forEach((err) => {
+            toast.error(`${err.field}: ${err.message}`);
+          });
+        } else {
+          toast.error(resData.error || resData.message || "Something went wrong");
+        }
+        setLoading(false);
         return;
       }
 
       toast.success("Purchase order saved successfully!");
-      navigate("/purchase-order");
+      navigate(ROUTES.PURCHASE_ORDER.LIST);
     } catch (error) {
       toast.error("Error submitting purchase order");
     } finally {
@@ -271,7 +304,7 @@ function PurchaseOrderForm() {
           <div className="flex justify-between">
             <button
               type="button"
-              onClick={() => confirmNavigation("/purchase-order")}
+              onClick={() => confirmNavigation(ROUTES.PURCHASE_ORDER.LIST)}
               className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
             >
               Back

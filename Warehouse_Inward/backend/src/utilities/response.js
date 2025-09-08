@@ -1,8 +1,10 @@
+import { STATUSCODE } from "./constant.js"
+
 export const successResponse = (
   res,
   data,
   message = 'Success',
-  status = 200
+  status = STATUSCODE.OK
 ) => {
   return res.status(status).json({
     success: true,
@@ -14,7 +16,7 @@ export const successResponse = (
 export const errorResponse = (
   res,
   message = 'Something went wrong',
-  status = 500
+  status = STATUSCODE.INTERNAL_SERVER_ERROR
 ) => {
   return res.status(status).json({
     success: false,

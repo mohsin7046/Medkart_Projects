@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALLEndpoint } from "../../constant/endPoints.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { toast } from 'react-toastify'
 
 function PurchaseInvoiceForm() {
   const { id } = useParams();
@@ -53,9 +55,8 @@ function PurchaseInvoiceForm() {
   }, [id]);
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
-
-
 
     const payload = {
       grn_id: Number(id),
@@ -79,15 +80,25 @@ function PurchaseInvoiceForm() {
       });
 
       if (!response.ok) {
-        const Error = await response.json();
-        alert("Error: " + Error.error);
+        const resData = await response.json();
+
+        if (Array.isArray(resData.message)) {
+          resData.message.forEach((err) => {
+            toast.error(`${err.field}: ${err.message}`);
+          })
+        } else {
+          toast.error(resData.error || resData.message || "Something went wrong");
+        }
+        setLoading(false);
         return;
       }
 
       alert("Invoice created successfully!");
-      navigate("/purchase-invoice");
+      navigate(ROUTES.PURCHASE_INVOICE.LIST);
     } catch (err) {
       console.error("Error saving invoice:", err);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -243,9 +254,19 @@ function PurchaseInvoiceForm() {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center ${
+            loading ? "opacity-70 cursor-not-allowed" : ""
+          }`}
+          disabled={loading}
         >
-          Save Invoice
+          {length ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Saving...
+            </>
+          ) : (
+            "Save Invoice"
+          )}
         </button>
       </form>
     </div>

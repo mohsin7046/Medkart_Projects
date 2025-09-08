@@ -1,34 +1,36 @@
-import { ZodError } from "zod";
-import { StatusCodes } from "http-status-codes";
+import { errorResponse } from "../utilities/response.js";
+import { productLogger, vendorLogger, poLogger, grnLogger, piLogger, appLogger } from "../utilities/logger.js";
+import { STATUSCODE } from "../utilities/constant.js";
+
+const loggerMap = {
+  product: productLogger,
+  vendor: vendorLogger,
+  po: poLogger,
+  grn: grnLogger,
+  pi: piLogger,
+  app: appLogger,
+};
 
 export const errorHandler = (err, req, res) => {
-  // ✅ Handle Zod validation errors
-  if (err instanceof ZodError) {
-    const errors = {};
-    err.errors.forEach((issue) => {
-      const field = issue.path.join(".");
-      errors[field] = issue.message;
-    });
+  const component = req.component || "app";
+  const logger = loggerMap[component] || appLogger;
 
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      success: false,
-      message: "Validation failed",
-      errors
-    });
+  if (err.name === "ZodError") {
+    const validationErrors = err.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+
+    logger.error(`Validation Error: ${JSON.stringify(validationErrors)}`);
+
+    return errorResponse(res, validationErrors || "Validation error", STATUSCODE.BAD_REQUEST);
   }
 
-  // ✅ Handle known errors with statusCode
-  if (err.statusCode) {
-    return res.status(err.statusCode).json({
-      success: false,
-      message: err.message || "Something went wrong"
-    });
-  }
+  logger.error(err.message || "Unexpected error");
 
-  // ✅ Handle unexpected errors
-  console.error("🔥 Unhandled Error:", err);
-  res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-    success: false,
-    message: "Internal server error"
-  });
+  return errorResponse(
+    res,
+    err.message || "Something went wrong",
+    err.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR
+  );
 };

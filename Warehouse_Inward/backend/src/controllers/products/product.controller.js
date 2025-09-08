@@ -5,95 +5,62 @@ import {
   deleteProductService,
   getProductByIdService
 } from '../../services/product.service.js'
-import { successResponse, errorResponse } from '../../utilities/response.js'
+import { successResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
 import { updateProductSchema } from '../../zodValidation/productValidation/productUpdate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
-import logger from '../../utilities/logger.js'
+import { STATUSCODE } from '../../utilities/constant.js'
 
- 
 
 export const addProduct = catchAsync(async (req, res) => {
-
-  console.log(req.body);
-  const data = createProductSchema.parse(req.body);
-
-  if (!data) {
-    logger.error(data.error)
-    return errorResponse(res, 'All feilds are required', 400)
-  }
+  req.component = "product";
+const data = createProductSchema.parse(req.body);
 
   const newProduct = await addProductService(data);
 
-  if (!newProduct) {
-    logger.error('Product not created')
-    return errorResponse(res, 'Product not created', 400);
-  }
-  
-  logger.info('Product created Successfully')
-  return successResponse(res, newProduct, 'Product created Successfully', 200)
+  return successResponse(res, newProduct, "Product created successfully", STATUSCODE.OK);
 })
 
-
-export const getProductSearch = catchAsync(async (req, res) => {
-  const { q } = req.params
-
-  const products = await searchProductService(q)
-  if (!products) {
-    return errorResponse(res, 'Product not fetched for the query!!', 400)
-  }
-  return successResponse(
-    res,
-    products,
-    'Product fetch succesfully for query',
-    200
-  )
-})
 
 
 export const updateProduct = catchAsync(async (req, res) => {
-  console.log(req.body);
-  
+  req.component = "product";
   const formData = updateProductSchema.parse(req.body);
 
-  if (!formData) {
-    return errorResponse(res, 'All feilds are required', 400)
-  }
+  const updatedProduct = await updateProductService(formData);
 
-  console.log(formData);
-  
-
-  const updatedProduct = await updateProductService(formData)
-  if (!updatedProduct) {
-    return errorResponse(res, 'Product not updated!!', 400)
-  }
-  return successResponse(res, updatedProduct, 'Product update succesfully', 200)
+  return successResponse(res, updatedProduct, "Product updated successfully", STATUSCODE.OK);
 })
 
+
+
+export const getProductSearch = catchAsync(async (req, res) => {
+  req.component = "product";
+  const { q } = req.params;
+
+  const products = await searchProductService(q);
+
+  return successResponse(res, products, "Products fetched successfully", STATUSCODE.OK);
+})
+
+
 export const deleteProduct = catchAsync(async (req, res) => {
+    req.component = "product";
   const { product_code } = req.body
 
   const deletedProduct = await deleteProductService(product_code)
 
-  if (!deletedProduct) {
-    return errorResponse(res, 'Product not deleted!!', 400)
-  }
-  return successResponse(res, deletedProduct, 'Product delete succesfully', 200)
+  return successResponse(res, deletedProduct, 'Product delete succesfully', STATUSCODE.OK)
 })
 
 
-export const getProductById = catchAsync(async(req,res)=>{
-  const {id} = req.params;
-  console.log(id);
-  
+export const getProductById = catchAsync(async (req, res) => {
+    req.component = "product";
+const { id } = req.params;
 
-  const productbyIddata = await getProductByIdService(id);
+  const productByIdData = await getProductByIdService(id);
 
-  if(!productbyIddata){
-    errorResponse(res,"Product not fount for the id",400)
-  }
-
-  successResponse(res,productbyIddata,"Product data fetch successfully by id",200)
+  return successResponse(res, productByIdData, "Product data fetched successfully by id", STATUSCODE.OK);
 })
- 
+
 

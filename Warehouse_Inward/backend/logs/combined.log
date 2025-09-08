@@ -1,31 +1,681 @@
-2025-09-04 15:42:24 [INFO]: Product created Successfully
-2025-09-04 16:40:13 [INFO]: Successfully created GRN
-2025-09-04 16:40:53 [INFO]: Successfully created GRN
-2025-09-04 16:41:42 [INFO]: Successfully created GRN
-2025-09-04 16:42:23 [INFO]: Successfully created GRN
-2025-09-04 16:55:42 [INFO]: Successfully created GRN
-2025-09-04 17:02:40 [INFO]: Successfully created GRN
-2025-09-04 17:25:59 [INFO]: Successfully created GRN
-2025-09-05 09:46:26 [INFO]: Product created Successfully
-2025-09-05 09:49:06 [INFO]: Product created Successfully
-2025-09-05 09:49:46 [INFO]: Product created Successfully
-2025-09-05 11:12:21 [INFO]: Successfully created GRN
-2025-09-05 11:48:07 [INFO]: Product created Successfully
-2025-09-05 11:57:09 [INFO]: Successfully created GRN
-2025-09-05 12:27:43 [INFO]: Successfully created GRN
-2025-09-05 12:34:26 [INFO]: Successfully created GRN
-2025-09-05 12:36:38 [INFO]: Successfully created GRN
-2025-09-05 12:37:21 [INFO]: Successfully created GRN
-2025-09-05 14:57:14 [INFO]: Product created Successfully
-2025-09-05 15:18:36 [INFO]: Successfully created GRN
-2025-09-05 16:26:54 [INFO]: Product created Successfully
-2025-09-05 16:32:18 [INFO]: Product created Successfully
-2025-09-05 16:35:13 [INFO]: Successfully created GRN
-2025-09-05 16:35:57 [INFO]: Successfully created GRN
-2025-09-05 16:57:34 [INFO]: Product created Successfully
-2025-09-05 16:58:13 [INFO]: Product created Successfully
-2025-09-05 17:00:19 [INFO]: Product created Successfully
-2025-09-05 17:13:46 [INFO]: Product created Successfully
-2025-09-07 14:42:33 [INFO]: Product created Successfully
-2025-09-07 14:43:47 [INFO]: Product created Successfully
-2025-09-07 15:28:57 [INFO]: Successfully created GRN
+2025-09-08 11:37:08 [INFO]: 📦 Generated product_code: PC-6281973482
+2025-09-08 11:37:08 [INFO]: ✅ Product created successfully: PC-6281973482
+2025-09-08 11:38:54 [ERROR]: ❌ Error in addProductService: logger is not defined
+2025-09-08 11:39:06 [ERROR]: ❌ Error in addProductService: logger is not defined
+2025-09-08 11:39:22 [ERROR]: ❌ Validation failed: MRP < Price while adding product
+2025-09-08 11:39:22 [ERROR]: ❌ Error in addProductService: Product MRP must be equal or greater than price
+2025-09-08 11:54:56 [INFO]: ✅ Product fetched successfully for id: 6
+2025-09-08 11:55:00 [ERROR]: ❌ Validation failed: MRP < Price for product_code PC-6935242776
+2025-09-08 11:55:00 [ERROR]: ❌ Error in updateProductService: Product MRP must be equal or greater than price
+2025-09-08 11:55:00 [ERROR]: Product MRP must be equal or greater than price
+2025-09-08 11:55:08 [ERROR]: Validation Error: [{"field":"hsn_code","message":"HSN code must be at least 4 digits"}]
+2025-09-08 11:55:15 [INFO]: ✅ Product updated in DB: PC-6935242776
+2025-09-08 11:55:54 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-08 11:56:01 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-08 11:57:06 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-08 11:57:09 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-08 11:57:14 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"},{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-08 11:57:18 [ERROR]: Validation Error: [{"field":"email","message":"Invalid email format"}]
+2025-09-08 11:57:23 [INFO]: ✅ Vendor created successfully | Code: VC-8436721430
+2025-09-08 12:15:00 [INFO]: ✅ Vendor search completed | Query: mo | Results: 2
+2025-09-08 12:15:08 [INFO]: ✅ Vendor search completed | Query: Moh | Results: 2
+2025-09-08 12:15:17 [WARN]: ⚠️ No products found for query: dol
+2025-09-08 12:15:20 [INFO]: ✅ Found 3 products for query: az
+2025-09-08 12:15:33 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:15:33 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
+2025-09-08 12:15:33 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:15:35 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:15:35 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
+2025-09-08 12:15:35 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:15:38 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:15:38 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 6
+2025-09-08 12:15:38 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:16:08 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:16:08 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 
+2025-09-08 12:16:08 [ERROR]: MRP cannot be less than price for product 
+2025-09-08 12:16:15 [INFO]: ✅ Purchase Order created | Order Number: ORD-9759281338
+2025-09-08 12:16:18 [INFO]: ✅ Purchase Order fetched | ID: 13
+2025-09-08 12:16:19 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 2
+2025-09-08 12:16:19 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:16:25 [INFO]: ✅ Purchase Order updated | ID: 13
+2025-09-08 12:16:27 [INFO]: ✅ Purchase Order fetched | ID: 13
+2025-09-08 12:16:28 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 2
+2025-09-08 12:16:28 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:17:47 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: formDataorder_date is not defined
+2025-09-08 12:17:47 [ERROR]: formDataorder_date is not defined
+2025-09-08 12:17:50 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: formDataorder_date is not defined
+2025-09-08 12:17:50 [ERROR]: formDataorder_date is not defined
+2025-09-08 12:17:59 [ERROR]: MRP cannot be less than price for product 6
+2025-09-08 12:17:59 [ERROR]: ❌ Failed to update Purchase Order | ID: 13 | Error: MRP cannot be less than price for product 
+2025-09-08 12:17:59 [ERROR]: MRP cannot be less than price for product 
+2025-09-08 12:18:06 [INFO]: ✅ Purchase Order updated | ID: 13
+2025-09-08 12:18:09 [INFO]: ✅ Purchase Order fetched | ID: 13
+2025-09-08 12:18:09 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 2
+2025-09-08 12:18:09 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:18:13 [INFO]: ✅ Purchase Order fetched | ID: 13
+2025-09-08 12:18:14 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 2
+2025-09-08 12:18:14 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:18:30 [INFO]: ✅ Vendor fetched successfully | ID: 8
+2025-09-08 12:18:33 [INFO]: ✅ Vendor updated successfully | Code: VC-8436721430
+2025-09-08 12:18:35 [INFO]: ✅ Vendor fetched successfully | ID: 7
+2025-09-08 12:18:37 [INFO]: ✅ Vendor updated successfully | Code: VC-7861012591
+2025-09-08 12:18:42 [INFO]: ✅ Purchase Order fetched | ID: 13
+2025-09-08 12:18:43 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 0
+2025-09-08 12:18:43 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:20:10 [INFO]: ✅ Purchase Order deleted | ID: 13
+2025-09-08 12:20:16 [ERROR]: ❌ Failed to delete Purchase Order | ID: 11 | Error: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:20:16 [ERROR]: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:07 [ERROR]: ❌ Failed to delete Purchase Order | ID: 12 | Error: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:07 [ERROR]: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:20 [ERROR]: ❌ Failed to delete Purchase Order | ID: 12 | Error: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:20 [ERROR]: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:32 [ERROR]: ❌ Failed to delete Purchase Order | ID: 11 | Error: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:21:32 [ERROR]: Cannot delete completed or cancelled Purchase Order
+2025-09-08 12:22:27 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:22:27 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:22:27 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 0
+2025-09-08 12:26:36 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 0
+2025-09-08 12:26:36 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:26:40 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:26:40 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 0
+2025-09-08 12:27:28 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:27:29 [INFO]: ✅ Vendor search completed | Query: Mohsinali Gulamali Datardi | Results: 0
+2025-09-08 12:27:29 [INFO]: ✅ Found 3 products for query: Azithro
+2025-09-08 12:27:31 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:28:03 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:28:27 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:29:09 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:29:19 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 12:29:47 [INFO]: ✅ Product deleted successfully. Code: PC-6935242776
+2025-09-08 12:29:57 [INFO]: ✅ Product deleted successfully. Code: PC-6281973482
+2025-09-08 12:30:04 [INFO]: ✅ Product fetched successfully for id: 9
+2025-09-08 12:30:07 [INFO]: ✅ Product updated in DB: PC-0332623420
+2025-09-08 12:30:12 [INFO]: ✅ Product fetched successfully for id: 10
+2025-09-08 12:30:17 [INFO]: ✅ Product updated in DB: PC-5111047938
+2025-09-08 12:30:24 [INFO]: ✅ Vendor deleted successfully | Code: VC-7861012591
+2025-09-08 12:30:34 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-08 12:30:44 [INFO]: ✅ Found 1 products for query: Am
+2025-09-08 12:30:53 [ERROR]: expected_delivery_date must be greater than order_date
+2025-09-08 12:30:53 [ERROR]: ❌ Failed to create Purchase Order | Error: expected_delivery_date must be greater than order_date
+2025-09-08 12:30:53 [ERROR]: expected_delivery_date must be greater than order_date
+2025-09-08 12:31:01 [ERROR]: MRP cannot be less than price for product 10
+2025-09-08 12:31:01 [ERROR]: ❌ Failed to create Purchase Order | Error: MRP cannot be less than price for product 
+2025-09-08 12:31:01 [ERROR]: MRP cannot be less than price for product 
+2025-09-08 12:31:03 [INFO]: ✅ Purchase Order created | Order Number: ORD-8637233342
+2025-09-08 12:31:06 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:31:50 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:31:53 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:31:56 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:31:56 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:32:28 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:32:31 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:33:01 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:33:05 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:33:12 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:35:15 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:35:19 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:35:22 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:35:59 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:00 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:04 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:07 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:17 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:18 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:20 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:31 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:49 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:51 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:36:54 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:01 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:30 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:31 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
+2025-09-08 12:37:31 [INFO]: ✅ Found 1 products for query: Amxocylin
+2025-09-08 12:37:35 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:37 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:39 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:47 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:37:47 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
+2025-09-08 12:37:47 [INFO]: ✅ Found 1 products for query: Amxocylin
+2025-09-08 12:37:55 [INFO]: ✅ Purchase Order updated | ID: 14
+2025-09-08 12:38:01 [INFO]: ✅ Product fetched successfully for id: 10
+2025-09-08 12:38:04 [INFO]: ✅ Product updated in DB: PC-5111047938
+2025-09-08 12:38:06 [INFO]: ✅ Vendor fetched successfully | ID: 6
+2025-09-08 12:38:12 [INFO]: ✅ Vendor updated successfully | Code: VC-0432755606
+2025-09-08 12:38:15 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:38:20 [INFO]: ✅ Vendor search completed | Query: mo | Results: 0
+2025-09-08 12:38:22 [INFO]: ✅ Vendor search completed | Query: pr | Results: 0
+2025-09-08 12:38:26 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:38:30 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:38:32 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:38:34 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:38:36 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:38:49 [ERROR]: Validation Error: [{"field":"vendor_id","message":"Invalid input: expected number, received string"},{"field":"items.0.product_id","message":"Invalid input: expected number, received string"}]
+2025-09-08 12:41:32 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:41:36 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:41:53 [INFO]: ✅ Vendor fetched successfully | ID: 6
+2025-09-08 12:41:55 [INFO]: ✅ Vendor updated successfully | Code: VC-0432755606
+2025-09-08 12:41:59 [INFO]: ✅ Product fetched successfully for id: 10
+2025-09-08 12:42:02 [INFO]: ✅ Product updated in DB: PC-5111047938
+2025-09-08 12:42:05 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 12:42:05 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
+2025-09-08 12:42:05 [INFO]: ✅ Found 1 products for query: Amxocylin
+2025-09-08 12:42:08 [INFO]: ✅ Purchase Order updated | ID: 14
+2025-09-08 14:06:05 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 14:06:21 [ERROR]: checkExpiry is not defined
+2025-09-08 14:06:26 [ERROR]: checkExpiry is not defined
+2025-09-08 14:06:45 [ERROR]: grnLogger is not defined
+2025-09-08 14:07:49 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:07:49 [ERROR]: calculateItemsTotal is not defined
+2025-09-08 14:08:02 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:08:02 [ERROR]: 
+Invalid `prisma.goodReceiptNote.create()` invocation:
+
+{
+  data: {
+    grn_number: "GRN-6829479394",
+    order_id: 14,
+    received_date: new Date("2025-09-08T00:00:00.000Z"),
+    goodReceiptNoteItems: {
+      create: [
+        {
+          product_id: 10,
+          batch_number: "v1",
+          expiry_date: "2025-10-03",
+          recevied_qty: 10,
+          ordered_qty: 10,
+          damaged_qty: 1,
+          shortage_qty: 0,
+          item_price: 10,
+          item_mrp: 30,
+          totalAmount: 100
+        }
+      ]
+    },
+    total_amount: 100,
+    status: "pending"
+  }
+}
+
+Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
+2025-09-08 14:10:05 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 14:10:07 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 14:10:12 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
+2025-09-08 14:10:37 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:10:37 [ERROR]: 
+Invalid `prisma.goodReceiptNote.create()` invocation:
+
+{
+  data: {
+    grn_number: "GRN-8379034679",
+    order_id: 14,
+    received_date: new Date("2025-09-08T00:00:00.000Z"),
+    goodReceiptNoteItems: {
+      create: [
+        {
+          product_id: 10,
+          batch_number: "c1",
+          expiry_date: "2025-09-26",
+          recevied_qty: 10,
+          ordered_qty: 10,
+          damaged_qty: 1,
+          shortage_qty: 0,
+          item_price: 10,
+          item_mrp: 20,
+          totalAmount: 100
+        }
+      ]
+    },
+    total_amount: 100,
+    status: "pending"
+  }
+}
+
+Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
+2025-09-08 14:11:09 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:11:09 [ERROR]: 
+Invalid `prisma.goodReceiptNote.create()` invocation:
+
+{
+  data: {
+    grn_number: "GRN-8696337969",
+    order_id: 14,
+    received_date: new Date("2025-09-08T00:00:00.000Z"),
+    goodReceiptNoteItems: {
+      create: [
+        {
+          product_id: 10,
+          batch_number: "c1",
+          expiry_date: "2025-09-26",
+          recevied_qty: 10,
+          ordered_qty: 10,
+          damaged_qty: 1,
+          shortage_qty: 0,
+          item_price: 10,
+          item_mrp: 20,
+          totalAmount: 100
+        }
+      ]
+    },
+    total_amount: 100,
+    status: "pending"
+  }
+}
+
+Invalid value for argument `expiry_date`: premature end of input. Expected ISO-8601 DateTime.
+2025-09-08 14:11:40 [INFO]: ✅ Purchase Order fetched | ID: 14
+2025-09-08 14:12:35 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
+2025-09-08 14:12:50 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:12:50 [INFO]: GRN created successfully with id: 9
+2025-09-08 14:13:17 [ERROR]: Cannot read properties of undefined (reading 'order_id')
+2025-09-08 14:13:21 [ERROR]: Cannot read properties of undefined (reading 'order_id')
+2025-09-08 14:16:05 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:16:05 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:16:05 [INFO]: GRN updated successfully with id: 9
+2025-09-08 14:18:00 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:18:00 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:18:51 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:18:51 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:19:39 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:19:39 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:23:45 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:23:45 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:23:45 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:23:48 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:23:48 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:23:48 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:24:03 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:24:03 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:24:03 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:24:25 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:24:25 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:24:25 [ERROR]: Cannot read properties of undefined (reading 'id')
+2025-09-08 14:25:29 [INFO]:  GRN with grn_id: 9 is founded
+2025-09-08 14:25:29 [INFO]:  PO with order_id: 14 is founded
+2025-09-08 14:25:29 [INFO]: GRN updated successfully with id: 9
+2025-09-08 14:25:43 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:25:48 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:27:13 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:27:16 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:27:18 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:28:12 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:28:15 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:28:21 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:28:25 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:28:44 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:29:02 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:29:05 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:29:10 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:29:30 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:29:57 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:30:01 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:30:07 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:30:22 [INFO]:  GRN with grn_id: 8 is founded
+2025-09-08 14:30:22 [INFO]:  PO with order_id: 12 is founded
+2025-09-08 14:30:22 [INFO]: GRN updated successfully with id: 8
+2025-09-08 14:30:48 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:00:48.090Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:30:55 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:00:55.297Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:31:39 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:01:39.868Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:32:16 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:02:16.646Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:32:48 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:02:48.068Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:33:59 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:03:59.931Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:35:19 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   grn_number?: String,
+?   AND?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   OR?: GoodReceiptNoteWhereInput[],
+?   NOT?: GoodReceiptNoteWhereInput | GoodReceiptNoteWhereInput[],
+?   order_id?: IntFilter | Int,
+?   received_date?: DateTimeFilter | DateTime,
+?   total_amount?: FloatFilter | Float,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   purchaseOrder?: PurchaseOrderScalarRelationFilter | PurchaseOrderWhereInput,
+?   goodReceiptNoteItems?: GoodReceiptNoteItemListRelationFilter,
+?   PurchaseInvoice?: PurchaseInvoiceListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:05:19.020Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type GoodReceiptNoteWhereUniqueInput needs at least one of `id` or `grn_number` arguments. Available options are marked with ?.
+2025-09-08 14:36:11 [ERROR]: 
+Invalid `prisma.goodReceiptNote.update()` invocation:
+
+{
+  where: {
+    id: {
+      id: 8,
+      grn_number: "GRN-3067517815",
+      order_id: 12,
+      received_date: "2025-09-08T00:00:00.000Z",
+      total_amount: 9,
+      status: "pending",
+      created_at: "2025-09-08T04:21:46.753Z",
+      updated_at: "2025-09-08T09:00:22.141Z",
+      deleted_at: null
+    }
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  },
+  data: {
+    deleted_at: new Date("2025-09-08T09:06:11.252Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `id`: Invalid value provided. Expected Int, provided Object.
+2025-09-08 14:44:40 [ERROR]: Invoice creation blocked: GRN 9 already cancelled
+2025-09-08 14:44:40 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:46:21 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:46:21 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:46:33 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:46:36 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:46:39 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:46:46 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:46:46 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:47:04 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:47:04 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:47:33 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:47:33 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:49:11 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:49:11 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:49:46 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:49:46 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:50:08 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:50:08 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:50:12 [ERROR]: Invoice creation blocked: GRN 7 already completed
+2025-09-08 14:50:12 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:50:39 [INFO]: ✅ Purchase Order fetched | ID: 12
+2025-09-08 14:50:47 [INFO]:  PO with order_id: 12 is founded
+2025-09-08 14:50:47 [INFO]: GRN created successfully with id: 10
+2025-09-08 14:50:53 [INFO]: ✅ Purchase Invoice 3 created successfully for GRN 10
+2025-09-08 14:51:00 [INFO]: 🗑️ Purchase Invoice 1 deleted successfully
+2025-09-08 14:51:38 [ERROR]: Invoice creation blocked: GRN 10 already completed
+2025-09-08 14:51:38 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:53:36 [ERROR]: Invoice creation blocked: GRN 10 already completed
+2025-09-08 14:53:36 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:53:40 [ERROR]: Invoice creation blocked: GRN 10 already completed
+2025-09-08 14:53:40 [ERROR]: Purchase Invoice already created for this GRN
+2025-09-08 14:53:48 [INFO]: ✅ Vendor search completed | Query: mo | Results: 0
+2025-09-08 14:53:53 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-08 14:54:01 [WARN]: ⚠️ No products found for query: az
+2025-09-08 14:54:04 [INFO]: ✅ Found 1 products for query: am
+2025-09-08 14:54:10 [INFO]: ✅ Purchase Order created | Order Number: ORD-4508194133
+2025-09-08 14:54:12 [INFO]: ✅ Purchase Order fetched | ID: 15
+2025-09-08 14:54:20 [INFO]:  PO with order_id: 15 is founded
+2025-09-08 14:54:20 [WARN]: PO cancelled due to invalid received quantities
+2025-09-08 14:54:44 [INFO]: ✅ Vendor search completed | Query: mo | Results: 0
+2025-09-08 14:54:46 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-08 14:54:53 [WARN]: ⚠️ No products found for query: ax
+2025-09-08 14:54:54 [WARN]: ⚠️ No products found for query: a=
+2025-09-08 14:54:55 [WARN]: ⚠️ No products found for query: a=m
+2025-09-08 14:54:57 [INFO]: ✅ Found 1 products for query: am
+2025-09-08 14:55:01 [INFO]: ✅ Purchase Order created | Order Number: ORD-5018853871
+2025-09-08 14:55:02 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-08 14:55:10 [ERROR]: Validation Error: [{"field":"items.0.batch_number","message":"Batch number is required"}]
+2025-09-08 14:55:21 [ERROR]: MRP cannot be less than price for product 10
+2025-09-08 14:55:34 [INFO]:  PO with order_id: 16 is founded
+2025-09-08 14:55:34 [INFO]: GRN created successfully with id: 11
+2025-09-08 14:55:40 [INFO]: ✅ Purchase Invoice 4 created successfully for GRN 11
+2025-09-08 14:57:20 [INFO]: 📄 Purchase Invoice 3 fetched successfully
+2025-09-08 14:58:21 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:59:04 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:59:07 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:59:19 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 14:59:22 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-08 15:23:32 [WARN]: ⚠️ Purchase Invoice not found for ID 16
+2025-09-08 15:23:32 [ERROR]: Purchase Invoice not found
+2025-09-08 15:23:35 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-08 15:23:43 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-08 15:28:35 [INFO]: 📄 Purchase Invoice 4 fetched successfully
+2025-09-08 15:31:27 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-08 15:31:30 [INFO]: 📄 Purchase Invoice 4 fetched successfully
+2025-09-08 15:31:34 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-08 15:31:45 [INFO]: 📄 Purchase Invoice 4 fetched successfully

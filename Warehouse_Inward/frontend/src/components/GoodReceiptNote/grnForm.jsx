@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import {toast} from 'react-toastify'
-import { ALLEndpoint } from "../../constant/endPoints";
+import { toast } from 'react-toastify'
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { ROUTES } from "../../constant/routePath.js";
 
 function GrnForm() {
-   const { id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,30 +22,28 @@ function GrnForm() {
     if (location.pathname.includes("/grn/edit")) {
       setMode("edit");
     } else if (location.pathname.includes("/grn/add")) {
-      setMode("create"); 
+      setMode("create");
     }
   }, [location]);
 
   useEffect(() => {
-    
+
     const fetchData = async () => {
       try {
         let url = "";
         if (mode === "edit") {
-          url = `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`; 
-        } else if(mode === "create") {
+          url = `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`;
+        } else if (mode === "create") {
           url = `${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`;
         }
 
-        console.log(url);
-        
 
         const res = await fetch(url);
         const response = await res.json();
         const data = response.data || response;
 
-        console.log("Fetched data",data);
-        
+        console.log("Fetched data", data);
+
         if (mode === "edit") {
           setFormData({
             grn_id: data.id,
@@ -64,7 +63,7 @@ function GrnForm() {
               totalAmount: i.totalAmount,
             })),
           });
-        } else if(mode === "create"){
+        } else if (mode === "create") {
           setFormData({
             grn_number: "",
             order_id: id,
@@ -130,15 +129,15 @@ function GrnForm() {
           expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
           recevied_qty: Number(i.recevied_qty),
           ordered_qty: Number(i.ordered_qty),
-           damaged_qty:Number(i.damaged_qty),
-           shortage_qty:Number(i. shortage_qty),
+          damaged_qty: Number(i.damaged_qty),
+          shortage_qty: Number(i.shortage_qty),
           item_price: Number(i.item_price),
           item_mrp: Number(i.item_mrp),
         })),
       };
     } else {
       payload = {
-        grn_id: Number(id), 
+        grn_id: Number(id),
         order_id: Number(formData.order_id),
         received_date: formData.received_date,
         status: formData.status,
@@ -149,8 +148,8 @@ function GrnForm() {
           expiry_date: i.expiry_date || new Date().toISOString().split("T")[0],
           recevied_qty: Number(i.recevied_qty),
           ordered_qty: Number(i.ordered_qty),
-          damaged_qty:Number(i.damaged_qty),
-           shortage_qty:Number(i. shortage_qty),
+          damaged_qty: Number(i.damaged_qty),
+          shortage_qty: Number(i.shortage_qty),
           item_price: Number(i.item_price),
           item_mrp: Number(i.item_mrp),
         })),
@@ -166,9 +165,9 @@ function GrnForm() {
         method = `${ALLEndpoint.GRNEndpoints.updateGRN.method}`;
       }
 
-      console.log(url,method);
+      console.log(url, method);
       console.log(payload);
-      
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -176,8 +175,18 @@ function GrnForm() {
       });
 
       if (!response.ok) {
-        const Error = await response.json();
-        toast.error("❌ " + (Error.error || "Something went wrong"));
+        const resData = await response.json();
+        console.log(resData);
+      
+
+        if (Array.isArray(resData.message)) {
+          resData.message.forEach((err) => {
+            toast.error(`${err.field}: ${err.message}`);
+          });
+        } else {
+          toast.error(resData.error || resData.message || "Something went wrong");
+        }
+      
         return;
       }
 
@@ -185,10 +194,10 @@ function GrnForm() {
         mode === "edit" ? "✅ GRN updated successfully!" : "✅ GRN created successfully!"
       );
 
-      navigate(mode === "edit" ? "/grn" : "/purchase-order");
+      navigate(mode === "edit" ? ROUTES.GRN.LIST : ROUTES.PURCHASE_ORDER.LIST);
     } catch (error) {
       console.error("Error saving GRN:", error);
-      toast.error("❌ Failed to save GRN");
+      toast.error(error);
     }
   };
 

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
+import { ROUTES } from "../../constant/routePath.js";
 
 function ProductForm() {
   const navigate = useNavigate();
@@ -143,8 +144,18 @@ function ProductForm() {
       });
 
       if (!response.ok) {
-        const Error = await response.json();
-        toast.error("Error: " + Error.error);
+        const resData = await response.json();
+        console.log(resData);
+
+        if (Array.isArray(resData.message)) {
+          resData.message.forEach((err) => {
+            toast.error(`${err.field}: ${err.message}`);
+          });
+        } else {
+
+          toast.error(resData.error || resData.message || "Something went wrong");
+        }
+
         setLoading(false);
         return;
       }
@@ -153,7 +164,7 @@ function ProductForm() {
       toast.success(id ? "Product updated successfully!" : "Product added successfully!");
       setIsDirty(false);
       setLoading(false);
-      navigate("/product");
+      navigate(ROUTES.PRODUCT.LIST);
     } catch (error) {
       console.error("Error saving product:", error);
       toast.error("Something went wrong!");
@@ -167,7 +178,7 @@ function ProductForm() {
         return;
       }
     }
-    navigate("/product");
+    navigate(ROUTES.PRODUCT.LIST);
   };
 
   return (
@@ -357,8 +368,8 @@ function ProductForm() {
               type="submit"
               disabled={loading}
               className={`px-5 py-2 rounded-lg shadow text-white ${loading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
                 }`}
             >
               {loading ? "Saving..." : id ? "Update Product" : "Add Product"}

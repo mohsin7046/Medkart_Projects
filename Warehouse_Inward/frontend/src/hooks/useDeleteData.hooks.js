@@ -4,6 +4,8 @@ import { useCallback } from "react";
 export const useDeleteData = (endpoint, method = "DELETE") => {
   const deleteItem = useCallback(
     async ({ idField, idValue, setState }) => {
+      console.log("FRpm delerte",endpoint,idField,idValue,setState);
+      
       if (window.confirm("Are you sure you want to delete this item?")) {
         try {
           const response = await fetch(endpoint, {
@@ -14,7 +16,9 @@ export const useDeleteData = (endpoint, method = "DELETE") => {
 
           if (!response.ok) {
             const errorData = await response.json();
-            toast.error(errorData.error || "Failed to delete item");
+            console.log(errorData);
+            
+            toast.error(errorData.message || "Failed to delete item");
             return false;
           }
 

@@ -22,3 +22,5 @@ export const statusFilters = [
     { key: "active", label: "Active" },
     { key: "inactive", label: "InActive" },
   ]
+
+export const LIMITPAGE = 2;
