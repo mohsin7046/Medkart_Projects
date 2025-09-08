@@ -11,7 +11,6 @@ function Product() {
   const limit = 2;
   const navigate = useNavigate();
 
-
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");

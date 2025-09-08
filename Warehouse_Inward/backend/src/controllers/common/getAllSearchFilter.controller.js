@@ -4,7 +4,7 @@ import { errorResponse, successResponse } from "../../utilities/response.js";
 import { buildFilter } from "../../utilities/builderFilter.js";
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
-  console.log(req.query);
+  console.log("Query for get: ",req.query);
 
   const filters = req.query;
   const { name, field } = filters;
@@ -23,14 +23,13 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
     search: { field: "search", type: "exact" },
     page: { field: "page", type: "number" },
     limit: { field: "limit", type: "number" },
-    status: { field: "status", type: "string" },
+    status: { field: "status", type: "exact" },
     sortby: { field: "sortby", type: "exact" },
   });
 
   const { limit = 10, search, page = 1, status, sortby } = where;
 
   let query = {};
-
 
   if (search) {
     if (field) {
@@ -63,9 +62,7 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
     };
   }
 
-  console.log(query);
   
-
   const [items, totalItems] = await Promise.all([
     model.findMany({
       where: whereCondition,
@@ -80,7 +77,6 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
 
   console.log(items);
   
-
   return successResponse(
     res,
     {

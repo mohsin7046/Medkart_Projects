@@ -54,7 +54,6 @@ export const useFetchData = ({
 
         setData(result.data?.data || []);
         setMetadata(result.data?.metadata || {});
-        toast.success(`${name || "Data"} fetched successfully!`);
       } catch (error) {
         console.error("Error fetching data:", error);
         toast.error(`Failed to load ${name || "data"}. Please try again.`);

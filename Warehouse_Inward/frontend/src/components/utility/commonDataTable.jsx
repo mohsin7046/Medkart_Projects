@@ -17,7 +17,8 @@ function CommonDataTable({
   showActions = true,
   setPage,
   searchFields = [], 
-  statusFilters = []
+  statusFilters = [],
+  extraAction,
 }) {
   const totalPages = metadata.totalPages || 1;
   const currentPage = metadata.page || page || 1;
@@ -54,12 +55,11 @@ function CommonDataTable({
     if (onSort) onSort({ field, order });
   };
 
-  return (
+return (
     <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
     
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
-          
           <input
             type="text"
             placeholder="Search..."
@@ -68,7 +68,6 @@ function CommonDataTable({
             className="border px-3 py-1 rounded-md w-52"
           />
 
-          
           {searchFields.length > 0 && (
             <select
               value={searchField}
@@ -83,7 +82,6 @@ function CommonDataTable({
             </select>
           )}
 
-          
           {statusFilters.length > 0 && (
             <select
               value={statusFilter}
@@ -98,7 +96,6 @@ function CommonDataTable({
             </select>
           )}
 
-       
           <select
             value={sortField}
             onChange={(e) => handleSortChange(e.target.value, sortOrder)}
@@ -108,7 +105,6 @@ function CommonDataTable({
             <option value="updated_at">Updated At</option>
           </select>
 
-         
           <select
             value={sortOrder}
             onChange={(e) => handleSortChange(sortField, e.target.value)}
@@ -119,7 +115,6 @@ function CommonDataTable({
           </select>
         </div>
 
-        
         {onAdd && (
           <button
             onClick={onAdd}
@@ -146,6 +141,7 @@ function CommonDataTable({
                 </th>
               ))}
               {showActions && <th className="border px-4 py-2">Action</th>}
+              {extraAction && <th className="border px-4 py-2">Extra</th>}
             </tr>
           </thead>
           <tbody>
@@ -182,12 +178,20 @@ function CommonDataTable({
                       )}
                     </td>
                   )}
+                  {extraAction && ( 
+                    <td className="border px-4 py-2">{extraAction(item)}</td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length + (showActions ? 2 : 1)}
+                  colSpan={
+                    columns.length +
+                    (showActions ? 1 : 0) +
+                    (extraAction ? 1 : 0) +
+                    1
+                  }
                   className="text-center py-4 text-gray-500"
                 >
                   No data found
@@ -198,7 +202,7 @@ function CommonDataTable({
         </table>
       )}
 
-  
+     
       <div className="flex justify-center items-center mt-4 space-x-2">
         <button
           onClick={() => setPage(currentPage - 1)}
