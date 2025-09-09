@@ -11,7 +11,7 @@ const loggerMap = {
   app: appLogger,
 };
 
-export const errorHandler = (err, req, res) => {
+export const errorHandler = (err, req, res,next) => {
   const component = req.component || "app";
   const logger = loggerMap[component] || appLogger;
 

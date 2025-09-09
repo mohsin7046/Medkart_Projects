@@ -35,3 +35,16 @@
 2025-09-08 14:53:53 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
 2025-09-08 14:54:44 [INFO]: ✅ Vendor search completed | Query: mo | Results: 0
 2025-09-08 14:54:46 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-09 11:19:21 [ERROR]: Validation Error: [{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-09 11:19:24 [INFO]: ✅ Vendor created successfully | Code: VC-9647701355
+2025-09-09 11:19:26 [INFO]: ✅ Vendor fetched successfully | ID: 10
+2025-09-09 11:19:31 [ERROR]: Validation Error: [{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-09 11:19:35 [ERROR]: Validation Error: [{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-09 11:19:37 [ERROR]: Validation Error: [{"field":"contact_number","message":"Contact number must be exactly 10 digits"}]
+2025-09-09 11:19:40 [INFO]: ✅ Vendor updated successfully | Code: VC-9647701355
+2025-09-09 11:19:41 [INFO]: ✅ Vendor fetched successfully | ID: 10
+2025-09-09 11:19:44 [INFO]: ✅ Vendor updated successfully | Code: VC-9647701355
+2025-09-09 11:20:18 [INFO]: ✅ Vendor search completed | Query: mo | Results: 0
+2025-09-09 11:20:21 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-09 11:20:46 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
+2025-09-09 11:22:26 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1

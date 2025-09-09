@@ -41,3 +41,13 @@
 2025-09-08 14:54:54 [WARN]: ⚠️ No products found for query: a=
 2025-09-08 14:54:55 [WARN]: ⚠️ No products found for query: a=m
 2025-09-08 14:54:57 [INFO]: ✅ Found 1 products for query: am
+2025-09-09 11:17:33 [INFO]: 📦 Generated product_code: PC-8535053293
+2025-09-09 11:17:33 [INFO]: ✅ Product created successfully: PC-8535053293
+2025-09-09 11:17:40 [INFO]: ✅ Product fetched successfully for id: 7
+2025-09-09 11:18:06 [ERROR]: Validation Error: [{"field":"hsn_code","message":"HSN code must be at least 4 digits"}]
+2025-09-09 11:18:22 [ERROR]: Validation Error: [{"field":"hsn_code","message":"HSN code must be at least 4 digits"}]
+2025-09-09 11:18:31 [INFO]: ✅ Product updated in DB: PC-8190347523
+2025-09-09 11:20:30 [INFO]: ✅ Found 1 products for query: do
+2025-09-09 11:20:46 [INFO]: ✅ Found 1 products for query: DOLO
+2025-09-09 11:22:34 [WARN]: ⚠️ No products found for query: doo
+2025-09-09 11:22:35 [INFO]: ✅ Found 1 products for query: do

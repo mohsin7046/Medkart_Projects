@@ -460,3 +460,12 @@ Argument `id`: Invalid value provided. Expected Int, provided Object.
 2025-09-08 14:59:07 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:19 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
 2025-09-08 14:59:22 [ERROR]: Validation Error: [{"field":"status","message":"Invalid status for grn. Allowed: pending"}]
+2025-09-09 11:21:32 [INFO]:  PO with order_id: 19 is founded
+2025-09-09 11:21:32 [ERROR]: PO cancelled due to invalid received quantities
+2025-09-09 11:21:58 [INFO]:  PO with order_id: 17 is founded
+2025-09-09 11:21:58 [ERROR]: PO cancelled due to invalid received quantities
+2025-09-09 11:23:12 [INFO]:  PO with order_id: 20 is founded
+2025-09-09 11:23:12 [INFO]: GRN created successfully with id: 12
+2025-09-09 11:23:26 [INFO]:  GRN with grn_id: 12 is founded
+2025-09-09 11:23:26 [INFO]:  PO with order_id: 20 is founded
+2025-09-09 11:23:26 [INFO]: GRN updated successfully with id: 12

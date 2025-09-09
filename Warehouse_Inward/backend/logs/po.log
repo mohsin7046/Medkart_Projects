@@ -103,3 +103,14 @@
 2025-09-08 15:23:43 [INFO]: ✅ Purchase Order fetched | ID: 16
 2025-09-08 15:31:27 [INFO]: ✅ Purchase Order fetched | ID: 16
 2025-09-08 15:31:34 [INFO]: ✅ Purchase Order fetched | ID: 16
+2025-09-09 11:20:36 [ERROR]: expected_delivery_date must be greater than order_date
+2025-09-09 11:20:36 [ERROR]: ❌ Failed to create Purchase Order | Error: expected_delivery_date must be greater than order_date
+2025-09-09 11:20:36 [ERROR]: expected_delivery_date must be greater than order_date
+2025-09-09 11:20:40 [INFO]: ✅ Purchase Order created | Order Number: ORD-0409389665
+2025-09-09 11:20:45 [INFO]: ✅ Purchase Order fetched | ID: 19
+2025-09-09 11:20:52 [INFO]: ✅ Purchase Order updated | ID: 19
+2025-09-09 11:20:55 [INFO]: ✅ Purchase Order fetched | ID: 19
+2025-09-09 11:21:48 [INFO]: ✅ Purchase Order fetched | ID: 17
+2025-09-09 11:22:43 [INFO]: ✅ Purchase Order created | Order Number: ORD-1635327858
+2025-09-09 11:22:57 [INFO]: ✅ Purchase Order fetched | ID: 20
+2025-09-09 11:23:42 [INFO]: ✅ Purchase Order fetched | ID: 20
