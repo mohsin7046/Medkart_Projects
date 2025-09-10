@@ -3,6 +3,7 @@ import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { piLogger } from '../utilities/logger.js'
+import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
 
 
 export const createPurchaseInvoiceService = async ({
@@ -97,6 +98,12 @@ export const createPurchaseInvoiceService = async ({
     piLogger.info(
       `✅ Purchase Invoice ${invoice.id} created successfully for GRN ${grn_id}`
     );
+  
+
+    await cacheSet(`purchaseInvoice:id:${invoice.id}`, invoice);
+    await cacheSet(`purchaseInvoice:number:${invoice.invoice_number}`, invoice);
+  
+    await enqueue('purchaseInvoiceQueue', { action: 'create', invoice_id: invoice.id })
     return invoice;
   })
 }
@@ -118,6 +125,12 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
     data: { deleted_at: new Date() },
   });
 
+   await cacheDelete(`purchaseInvoice:id:${invoice_id}`);
+  if (deletedInvoice.invoice_number) {
+    await cacheDelete(`purchaseInvoice:number:${deletedInvoice.invoice_number}`);
+  }
+  await enqueue("purchaseInvoiceQueue", { action: "delete", invoice_id });
+
   piLogger.info(`🗑️ Purchase Invoice ${invoice_id} deleted successfully`);
   return deletedInvoice;
 }
@@ -128,6 +141,13 @@ export const getInvoiceByIdService = async (id) => {
     piLogger.error('Invoice ID is missing while fetching by ID');
     throw new Error('Invoice ID is required');
   }
+
+  // const cacheKey = `purchaseInvoice:id:${id}`;
+  //   const cached = await cacheGet(cacheKey);
+  //   if (cached) {
+  //     grnLogger.info(`✅ Cache hit for GRN ID: ${id}`);
+  //     return cached;
+  //   }
 
   const data = await prisma.purchaseInvoice.findUnique({
     where: { id: parseInt(id) },
@@ -153,6 +173,9 @@ export const getInvoiceByIdService = async (id) => {
     piLogger.warn(`⚠️ Purchase Invoice not found for ID ${id}`);
     throw new Error('Purchase Invoice not found');
   }
+
+  // await cacheSet(cacheKey, data);
+  // await cacheSet(`purchaseInvoice:number:${data.invoice_number}`, data);
 
   piLogger.info(`📄 Purchase Invoice ${id} fetched successfully`);
   return data;

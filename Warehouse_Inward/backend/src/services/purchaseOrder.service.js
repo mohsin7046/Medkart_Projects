@@ -4,6 +4,8 @@ import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
 
+import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
+
 
 export const createPurchaseOrderService = async (data) => {
   try {
@@ -56,6 +58,16 @@ export const createPurchaseOrderService = async (data) => {
       poLogger.error("❌ Error while creating purchase Order");
       throw new Error("Purchase Order not created");
     }
+
+    console.log(createdPO);
+    
+
+    const cacheKeyById = `purchaseOrder:id:${createdPO.id}`;
+    const cacheKeyByNumber = `purchaseOrder:number:${createdPO.order_number}`;
+    await cacheSet(cacheKeyById, createdPO);
+    await cacheSet(cacheKeyByNumber, createdPO);
+
+    await enqueue("purchaseOrderQueue", { action: "create", order_id: createdPO.id });
 
     poLogger.info(`✅ Purchase Order created | Order Number: ${order_number}`);
     return createdPO;
@@ -116,6 +128,13 @@ try {
       throw new Error("Purchase Order not updated");
     }
 
+    const cacheKeyById = `purchaseOrder:id:${updatedPO.id}`;
+    const cacheKeyByNumber = `purchaseOrder:number:${updatedPO.order_number}`;
+    await cacheSet(cacheKeyById, updatedPO);
+    await cacheSet(cacheKeyByNumber, updatedPO);
+
+    await enqueue("purchaseOrderQueue", { action: "update", order_id: updatedPO.id });
+
     poLogger.info(`✅ Purchase Order updated | ID: ${formData.order_id}`);
     return updatedPO;
   } catch (error) {
@@ -151,6 +170,11 @@ try {
       throw new Error("Purchase Order not deleted");
     }
 
+    await cacheDelete(`purchaseOrder:id:${order_id}`);
+    await cacheDelete(`purchaseOrder:number:${deletePO.order_number}`);
+
+    await enqueue("purchaseOrderQueue", { action: "delete", order_id });
+
     poLogger.info(`✅ Purchase Order deleted | ID: ${order_id}`);
     return deletePO;
   } catch (error) {
@@ -160,8 +184,20 @@ try {
 }
 
 
+
 export const getPurchaseOrderByIdService = async (id) => {
   try {
+
+    //  const cacheKey = `purchaseOrder:id:${id}`;
+    // const cached = await cacheGet(cacheKey);
+
+    // if (cached) {
+    //   console.log(cached);
+      
+    //   poLogger.info(`✅ Cache hit for Purchase Order ID: ${id}`);
+    //   return cached;
+    // }
+
     const poData = await prisma.purchaseOrder.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -175,6 +211,9 @@ export const getPurchaseOrderByIdService = async (id) => {
     if (!poData) {
       throw new Error(`Purchase Order not found for ID: ${id}`);
     }
+
+    //  await cacheSet(cacheKey, poData);
+    // await cacheSet(`purchaseOrder:number:${poData.order_number}`, poData);
 
     poLogger.info(`✅ Purchase Order fetched | ID: ${id}`);
     return poData;

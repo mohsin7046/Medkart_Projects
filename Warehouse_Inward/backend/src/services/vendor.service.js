@@ -2,6 +2,7 @@ import { prisma } from '../utilities/import.config.js'
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { vendorLogger } from '../utilities/logger.js';
+import { enqueue, cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 export const createVendorService = async (data) => {
   try {
@@ -15,6 +16,11 @@ export const createVendorService = async (data) => {
     });
 
     vendorLogger.info(`✅ Vendor created successfully | Code: ${vendor_code}`);
+
+    await enqueue('vendorQueue', { action: 'create', vendor_code, data: newVendor });
+    await cacheSet(`vendor:id:${newVendor.id}`, newVendor, 3600);
+    await cacheSet(`vendor:code:${newVendor.vendor_code}`, newVendor, 3600);
+
     return newVendor;
   } catch (error) {
     vendorLogger.error(`❌ Failed to create vendor | Error: ${error.message}`);
@@ -30,6 +36,11 @@ export const updateVendorService = async (data) => {
     });
 
     vendorLogger.info(`✅ Vendor updated successfully | Code: ${data.vendor_code}`);
+
+    await enqueue('vendorQueue', { action: 'update', vendor_code: data.vendor_code, data: updatedVendor });
+    await cacheSet(`vendor:id:${updatedVendor.id}`, updatedVendor, 3600);
+    await cacheSet(`vendor:code:${updatedVendor.vendor_code}`, updatedVendor, 3600);
+
     return updatedVendor;
   } catch (error) {
     vendorLogger.error(`❌ Vendor update failed | Code: ${data.vendor_code} | Error: ${error.message}`);
@@ -39,7 +50,12 @@ export const updateVendorService = async (data) => {
 
 
 export const searchVendorsService = async (q) => {
- try {
+  try {
+
+    const cacheKey = `vendor:search:${q}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) return cached;
+
     const searchVendor = await prisma.vendor.findMany({
       where: {
         deleted_at: null,
@@ -54,6 +70,7 @@ export const searchVendorsService = async (q) => {
     });
 
     vendorLogger.info(`✅ Vendor search completed | Query: ${q} | Results: ${searchVendor.length}`);
+    await cacheSet(cacheKey, searchVendor, 300);
     return searchVendor;
   } catch (error) {
     vendorLogger.error(`❌ Vendor search failed | Query: ${q} | Error: ${error.message}`);
@@ -71,6 +88,11 @@ export const deleteVendorService = async (vendor_code) => {
     });
 
     vendorLogger.info(`✅ Vendor deleted successfully | Code: ${vendor_code}`);
+
+    await enqueue('vendorQueue', { action: 'delete', vendor_code });
+    await cacheDelete(`vendor:code:${vendor_code}`);
+    if (softdeleteVendor?.id) await cacheDelete(`vendor:id:${softdeleteVendor.id}`);
+
     return softdeleteVendor;
   } catch (error) {
     vendorLogger.error(`❌ Vendor delete failed | Code: ${vendor_code} | Error: ${error.message}`);
@@ -79,11 +101,15 @@ export const deleteVendorService = async (vendor_code) => {
 }
 
 
-export const getVendorByIdService = async(id) => {
+export const getVendorByIdService = async (id) => {
   try {
     if (!id) {
       throw new Error("Vendor ID is required");
     }
+
+    const cacheKey = `vendor:id:${id}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) return cached;
 
     const vendor = await prisma.vendor.findUnique({
       where: { id: parseInt(id) },
@@ -92,6 +118,8 @@ export const getVendorByIdService = async(id) => {
     if (!vendor) {
       throw new Error(`Vendor not found for ID: ${id}`);
     }
+
+    cacheSet(cacheKey, vendor, 3600);
 
     vendorLogger.info(`✅ Vendor fetched successfully | ID: ${id}`);
     return vendor;

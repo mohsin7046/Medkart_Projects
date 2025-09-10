@@ -3,6 +3,7 @@ import { FEILD, SEARCHFILTERNAME } from "../../utilities/constant.js";
 import { errorResponse, successResponse } from "../../utilities/response.js";
 import { buildFilter } from "../../utilities/builderFilter.js";
 import { STATUSCODE } from "../../utilities/constant.js";
+// import { cacheGet ,cacheSet} from "../../cache/redisClient.js";
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
  
@@ -62,6 +63,22 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
     };
   }
 
+
+  // const cacheKey = `${name}:search:${JSON.stringify(filters)}`;
+  // console.log(cacheKey);
+  
+  // const cachedData = await cacheGet(cacheKey);
+  // console.log(cachedData);
+  
+  // if (cachedData) {
+  //   return successResponse(
+  //     res,
+  //     cachedData,
+  //     `${name} fetched successfully (from cache)`,
+  //     STATUSCODE.OK
+  //   );
+  // }
+
   
   const [items, totalItems] = await Promise.all([
     model.findMany({
@@ -75,7 +92,13 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
 
   const totalPages = Math.ceil(totalItems / limit);
 
-  
+  // const responseData = {
+  //   data: items,
+  //   metadata: { page, limit, totalPages, totalItems },
+  // };
+
+  // await cacheSet(cacheKey, responseData, 300);
+
   return successResponse(
     res,
     {

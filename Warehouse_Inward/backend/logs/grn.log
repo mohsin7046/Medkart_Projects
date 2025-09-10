@@ -469,3 +469,10 @@ Argument `id`: Invalid value provided. Expected Int, provided Object.
 2025-09-09 11:23:26 [INFO]:  GRN with grn_id: 12 is founded
 2025-09-09 11:23:26 [INFO]:  PO with order_id: 20 is founded
 2025-09-09 11:23:26 [INFO]: GRN updated successfully with id: 12
+2025-09-10 13:38:47 [INFO]:  PO with order_id: 2 is founded
+2025-09-10 13:38:47 [INFO]: GRN created successfully with id: 1
+2025-09-10 13:38:51 [INFO]: ✅ Cache hit for GRN ID: 1
+2025-09-10 13:38:57 [INFO]: ✅ Cache hit for GRN ID: 1
+2025-09-10 13:39:30 [INFO]: ✅ Cache hit for GRN ID: 1
+2025-09-10 13:39:30 [INFO]:  PO with order_id: 2 is founded
+2025-09-10 13:39:30 [INFO]: GRN updated successfully with id: 1

@@ -56,7 +56,7 @@ export const deleteProduct = catchAsync(async (req, res) => {
 
 export const getProductById = catchAsync(async (req, res) => {
     req.component = "product";
-const { id } = req.params;
+    const { id } = req.params;
 
   const productByIdData = await getProductByIdService(id);
 

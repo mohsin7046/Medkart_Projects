@@ -31,7 +31,8 @@ useEffect(() => {
         }
         const response = await res.json();
         const data = response.data; 
-   
+        console.log(data);
+        
         let vendor_name = "";
         let vendor_id = "";
         if (data.vendor && data.vendor.status === "active") {

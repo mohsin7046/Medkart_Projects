@@ -2,6 +2,7 @@ import { prisma } from '../utilities/import.config.js'
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import {productLogger} from '../utilities/logger.js'
+import { enqueue, cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 export const addProductService = async (data) => {
   try {
@@ -27,6 +28,15 @@ export const addProductService = async (data) => {
     }
 
     productLogger.info("✅ Product created successfully: " + product_code);
+
+    await enqueue('productQueue', { action: 'create', product_code, data: product });
+
+    const cacheKeyById = `product:id:${product.id}`;
+    const cacheKeyByCode = `product:code:${product.product_code}`;
+    
+    await cacheSet(cacheKeyById, product, 3600); 
+    await cacheSet(cacheKeyByCode, product, 3600);
+
     return product;
   } catch (err) {
     productLogger.error("❌ Error in addProductService: " + err.message);
@@ -71,6 +81,11 @@ export const updateProductService = async (formData) => {
     }
 
     productLogger.info("✅ Product updated in DB: " + formData.product_code);
+
+    await enqueue('productQueue', { action: 'update', product_code: formData.product_code, data: updatedProduct });
+    await cacheSet(`product:id:${updatedProduct.id}`, updatedProduct, 3600);
+    await cacheSet(`product:code:${updatedProduct.product_code}`, updatedProduct, 3600);
+
     return updatedProduct;
   } catch (err) {
     productLogger.error("❌ Error in updateProductService: " + err.message);
@@ -85,6 +100,10 @@ export const searchProductService = async (q) => {
       productLogger.warn("⚠️ Empty search query received in getProductSearch");
       throw new Error("Search query is required");
     }
+
+    const cacheKey = `product:search:${q}`;
+    const cached = await cacheGet(cacheKey);
+    if (cached) return cached;
 
     const searchProduct = await prisma.product.findMany({
       where: {
@@ -108,6 +127,7 @@ export const searchProductService = async (q) => {
     }
 
     productLogger.info(`✅ Found ${searchProduct.length} products for query: ${q}`);
+    await cacheSet(cacheKey, searchProduct, 300);
     return searchProduct;
   } catch (err) {
     productLogger.error("❌ Error in searchProductService: " + err.message);
@@ -129,6 +149,11 @@ export const deleteProductService = async (product_code) => {
     });
 
     productLogger.info(`✅ Product deleted successfully. Code: ${product_code}`);
+
+     await enqueue('productQueue', { action: 'delete', product_code });
+    await cacheDelete(`product:code:${product_code}`);
+    if (softdeleteProduct?.id) await cacheDelete(`product:id:${softdeleteProduct.id}`);
+
     return softdeleteProduct;
   } catch (error) {
     productLogger.error(`❌ Product delete failed for code: ${product_code} | Error: ${error.message}`);
@@ -136,12 +161,18 @@ export const deleteProductService = async (product_code) => {
   }
 }
 
+
 export const getProductByIdService = async (id) => {
  try {
     if (!id) {
       productLogger.error("❌ Product ID is required");
       throw new Error("Product ID is required");
     }
+
+      const cacheKey = `product:id:${id}`;
+    const cached = await cacheGet(cacheKey);
+    
+    if (cached) return cached;
 
     const data = await prisma.product.findUnique({
       where: { id: parseInt(id) },
@@ -153,6 +184,7 @@ export const getProductByIdService = async (id) => {
     }
 
     productLogger.info(`✅ Product fetched successfully for id: ${id}`);
+    await cacheSet(cacheKey, data, 3600);
     return data;
   } catch (error) {
     productLogger.error(`❌ Error fetching product by id: ${id} | ${error.message}`);

@@ -5,6 +5,7 @@ import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { calculateItemsTotal, determineStatus } from '../helper/grn.helper.js'
 import { checkExpiry } from '../utilities/checkExpiry.js'
 import { grnLogger } from '../utilities/logger.js'
+import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
 
 export const findPOByOrderNumber = async (order_id) => {
 
@@ -21,6 +22,14 @@ export const findPOByOrderNumber = async (order_id) => {
 
 
 export const findGRNByNumber = async (grn_id) => {
+
+  const cacheKey = `grn:id:${grn_id}`;
+  const cached = await cacheGet(cacheKey);
+  if (cached) {
+    grnLogger.info(`✅ Cache hit for GRN ID: ${grn_id}`);
+    return cached;
+  }
+
   const grnfind = await prisma.goodReceiptNote.findFirst({
     where: { id: grn_id, deleted_at: null },
     include: { goodReceiptNoteItems: true }
@@ -28,6 +37,10 @@ export const findGRNByNumber = async (grn_id) => {
   if (!grnfind) {
     grnLogger.error(`Error Finding grn with grn_id: ${grn_id}`);
   }
+
+  await cacheSet(cacheKey, grnfind);
+  await cacheSet(`grn:number:${grnfind.grn_number}`, grnfind);
+
   grnLogger.info(` GRN with grn_id: ${grn_id} is founded`);
   return grnfind
 }
@@ -42,18 +55,18 @@ export const createGRNRecordService = async (data) => {
   }
 
   data.items.forEach(item => {
-    if (item.item_mrp < item.item_price){
+    if (item.item_mrp < item.item_price) {
       grnLogger.error(`MRP cannot be less than price for product ${item.product_id}`)
-      throw new Error(`MRP cannot be less than price for product ${item.product_id}`)  
+      throw new Error(`MRP cannot be less than price for product ${item.product_id}`)
     };
-    if (!checkExpiry(item.expiry_date)){
+    if (!checkExpiry(item.expiry_date)) {
       grnLogger.error(`Expiry date must be at least ${SETEXPIRY.expiryMonth} months`)
       throw new Error(`Expiry date must be at least ${SETEXPIRY.expiryMonth} months`)
     };
   });
 
   const existingPO = await findPOByOrderNumber(data.order_id);
-  if (!existingPO){ 
+  if (!existingPO) {
     grnLogger.error("Purchase Order not found while creating the GRN")
     throw new Error("Purchase order not found")
   };
@@ -99,6 +112,11 @@ export const createGRNRecordService = async (data) => {
       throw new Error("Failed to create GRN")
     }
 
+    await cacheSet(`grn:id:${newGRN.id}`, newGRN);
+    await cacheSet(`grn:number:${newGRN.grn_number}`, newGRN);
+    await enqueue("grnQueue", { action: "create", grn_id: newGRN.id });
+
+
     grnLogger.info(`GRN created successfully with id: ${newGRN.id}`);
     return newGRN;
   })
@@ -121,7 +139,7 @@ export const updateGRNRecordService = async (data) => {
     const { statusPO, statusGRN } = await determineStatus(existingPO.purchaseOrderItems, receivedMap, tx);
 
     if (statusPO === STATUS.CANCELLED && statusGRN === STATUS.CANCELLED) {
-       await tx.purchaseOrder.update({ where: { id: data.order_id }, data: { status: STATUS.CANCELLED } });
+      await tx.purchaseOrder.update({ where: { id: data.order_id }, data: { status: STATUS.CANCELLED } });
       await tx.goodReceiptNote.update({ where: { id: data.grn_id }, data: { status: STATUS.CANCELLED } });
     }
 
@@ -150,6 +168,13 @@ export const updateGRNRecordService = async (data) => {
       });
     }
 
+    if (updatedGRN) {
+      await cacheSet(`grn:id:${updatedGRN.id}`, updatedGRN);
+      await cacheSet(`grn:number:${updatedGRN.grn_number}`, updatedGRN);
+      await enqueue("grnQueue", { action: "update", grn_id: updatedGRN.id });
+
+    }
+
     grnLogger.info(`GRN updated successfully with id: ${data.grn_id}`);
     return updatedGRN;
   })
@@ -167,6 +192,13 @@ export const deleteGRNRecordService = async (grn_id) => {
       status: STATUS.CANCELLED
     }
   })
+
+  await cacheDelete(`grn:id:${grn_id}`);
+  if (deleteGRN.grn_number) {
+    await cacheDelete(`grn:number:${deleteGRN.grn_number}`);
+  }
+  await enqueue("grnQueue", { action: "delete", grn_id });
+
   return deleteGRN
 }
 
@@ -181,6 +213,12 @@ export const deleteGRNItemsById = async (grn_id) => {
 }
 
 export const getGRNByIdService = async (id) => {
+  // const cacheKey = `grn:id:${id}`;
+  // const cached = await cacheGet(cacheKey);
+  // if (cached) {
+  //   grnLogger.info(`✅ Cache hit for GRN ID: ${id}`);
+  //   return cached;
+  // }
   const data = await prisma.goodReceiptNote.findUnique({
     where: { id: parseInt(id) },
     include: {
@@ -192,6 +230,9 @@ export const getGRNByIdService = async (id) => {
       goodReceiptNoteItems: true
     }
   });
+  // await cacheSet(cacheKey, data);
+  // await cacheSet(`grn:number:${data.grn_number}`, data);
+  
   console.log(data);
   return data;
 }

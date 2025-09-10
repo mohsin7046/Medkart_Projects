@@ -48,3 +48,58 @@
 2025-09-09 11:20:21 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
 2025-09-09 11:20:46 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
 2025-09-09 11:22:26 [INFO]: ✅ Vendor search completed | Query: pr | Results: 1
+2025-09-09 14:37:11 [INFO]: ✅ Vendor created successfully | Code: VC-8319375670
+2025-09-09 14:57:41 [INFO]: ✅ Vendor deleted successfully | Code: VC-8319375670
+2025-09-09 14:57:49 [INFO]: ✅ Vendor deleted successfully | Code: VC-8319375670
+2025-09-09 14:58:20 [INFO]: ✅ Vendor deleted successfully | Code: VC-8319375670
+2025-09-09 15:00:32 [INFO]: ✅ Vendor created successfully | Code: VC-2324386239
+2025-09-09 15:00:32 [ERROR]: ❌ Failed to create vendor | Error: product is not defined
+2025-09-09 15:00:32 [ERROR]: product is not defined
+2025-09-09 15:01:10 [ERROR]: ❌ Failed to create vendor | Error: 
+Invalid `prisma.vendor.create()` invocation:
+
+
+Unique constraint failed on the fields: (`email`)
+2025-09-09 15:01:10 [ERROR]: 
+Invalid `prisma.vendor.create()` invocation:
+
+
+Unique constraint failed on the fields: (`email`)
+2025-09-09 15:01:23 [INFO]: ✅ Vendor created successfully | Code: VC-2838988543
+2025-09-09 15:03:07 [INFO]: ✅ Vendor created successfully | Code: VC-3872082382
+2025-09-09 15:03:07 [ERROR]: ❌ Failed to create vendor | Error: vendor is not defined
+2025-09-09 15:03:07 [ERROR]: vendor is not defined
+2025-09-09 15:03:41 [ERROR]: ❌ Failed to create vendor | Error: 
+Invalid `prisma.vendor.create()` invocation:
+
+
+Unique constraint failed on the fields: (`email`)
+2025-09-09 15:03:41 [ERROR]: 
+Invalid `prisma.vendor.create()` invocation:
+
+
+Unique constraint failed on the fields: (`email`)
+2025-09-09 15:03:47 [INFO]: ✅ Vendor created successfully | Code: VC-4279855629
+2025-09-09 15:05:55 [INFO]: ✅ Vendor deleted successfully | Code: VC-2324386239
+2025-09-09 15:05:58 [INFO]: ✅ Vendor deleted successfully | Code: VC-2838988543
+2025-09-10 12:17:55 [INFO]: ✅ Vendor search completed | Query: pra | Results: 0
+2025-09-10 12:17:55 [ERROR]: ❌ Vendor search failed | Query: pra | Error: vendors is not defined
+2025-09-10 12:17:55 [ERROR]: vendors is not defined
+2025-09-10 12:18:07 [INFO]: ✅ Vendor search completed | Query: moh | Results: 2
+2025-09-10 12:18:07 [ERROR]: ❌ Vendor search failed | Query: moh | Error: vendors is not defined
+2025-09-10 12:18:07 [ERROR]: vendors is not defined
+2025-09-10 12:18:09 [INFO]: ✅ Vendor search completed | Query: mohs | Results: 2
+2025-09-10 12:18:09 [ERROR]: ❌ Vendor search failed | Query: mohs | Error: vendors is not defined
+2025-09-10 12:18:09 [ERROR]: vendors is not defined
+2025-09-10 12:19:15 [INFO]: ✅ Vendor search completed | Query: moh | Results: 2
+2025-09-10 12:19:17 [INFO]: ✅ Vendor search completed | Query: mo | Results: 2
+2025-09-10 12:27:45 [INFO]: ✅ Vendor search completed | Query: mo | Results: 2
+2025-09-10 13:19:05 [INFO]: ✅ Vendor search completed | Query: mo | Results: 2
+2025-09-10 13:22:48 [INFO]: ✅ Vendor fetched successfully | ID: 5
+2025-09-10 13:22:55 [INFO]: ✅ Vendor updated successfully | Code: VC-3872082382
+2025-09-10 13:22:55 [ERROR]: ❌ Vendor update failed | Code: VC-3872082382 | Error: formData is not defined
+2025-09-10 13:22:55 [ERROR]: formData is not defined
+2025-09-10 13:23:30 [INFO]: ✅ Vendor updated successfully | Code: VC-3872082382
+2025-09-10 13:30:47 [INFO]: ✅ Vendor fetched successfully | ID: 7
+2025-09-10 13:30:58 [INFO]: ✅ Vendor updated successfully | Code: VC-4279855629
+2025-09-10 13:37:48 [INFO]: ✅ Vendor search completed | Query: Pratik | Results: 1
