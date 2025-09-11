@@ -52,6 +52,9 @@ export const useFetchData = ({
 
         const result = await response.json();
 
+        console.log(result);
+        
+        
         setData(result.data?.data || []);
         setMetadata(result.data?.metadata || {});
       } catch (error) {

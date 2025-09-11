@@ -33,7 +33,15 @@ export const ROUTES = {
    VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
   },
 
+  SALES_ORDER: {
+    LIST: "/sales-order", 
+    ADD: "/sales-order/add",
+    EDIT: (id = ":id") => `/sales-order/edit/${id}`,
+    VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
+  },
+
   COMMON_VIEW:{
     VIEW:'/view/:type/:id'
   }
+  
 };

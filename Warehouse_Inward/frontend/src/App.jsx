@@ -11,10 +11,10 @@ import {
   PurchaseOrderForm,
   GrnForm,
   GRN,
-  GRNView,
   PurchaseInvoice,
   PurchaseInvoiceForm,
-  PurchaseInvoiceView,
+  SalesOrder,
+  SalesOrderForm
 } from "./components/importComponent.js";
 import CommonView from "./components/utility/CommonView.jsx";
 
@@ -51,6 +51,10 @@ function App() {
 
           <Route path={ROUTES.PURCHASE_INVOICE.LIST} element={<PurchaseInvoice />} />
           <Route path={ROUTES.PURCHASE_INVOICE.ADD()} element={<PurchaseInvoiceForm />} />
+
+          <Route path={ROUTES.SALES_ORDER.LIST} element={<SalesOrder />} />
+       <Route path={ROUTES.SALES_ORDER.ADD} element={<SalesOrderForm />} />
+          {/* <Route path={ROUTES.SALES_ORDER.EDIT()} element={<SalesOrderForm />} /> */}
 
           <Route path={ROUTES.COMMON_VIEW.VIEW} element={<CommonView />} />
         </Routes>

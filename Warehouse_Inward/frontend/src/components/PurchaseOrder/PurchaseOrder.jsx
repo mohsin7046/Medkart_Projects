@@ -95,7 +95,6 @@ function PurchaseOrder() {
       }
       }
 
-
       onDelete={(order) => handleDelete(order.id)}
       extraAction={(order) => {
         const isDisabled = ["completed", "cancelled"].includes(order.status);

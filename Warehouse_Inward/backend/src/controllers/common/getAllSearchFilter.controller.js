@@ -1,19 +1,22 @@
 import { catchAsync } from "../../utilities/tryCatchAsyncHandler.js";
-import { FEILD, SEARCHFILTERNAME } from "../../utilities/constant.js";
+import { DETAILSFETCH, FEILD, SEARCHFILTERNAME } from "../../utilities/constant.js";
 import { errorResponse, successResponse } from "../../utilities/response.js";
 import { buildFilter } from "../../utilities/builderFilter.js";
 import { STATUSCODE } from "../../utilities/constant.js";
+import {buildSelect} from '../../utilities/builtSelectForDb.js'
 // import { cacheGet ,cacheSet} from "../../cache/redisClient.js";
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
  
   const filters = req.query;
+
+  
   const { name, field } = filters;
 
  
   if (!SEARCHFILTERNAME[name]) {
     return errorResponse(res, `Invalid name: ${name}`, STATUSCODE.BAD_REQUEST);
-  }
+  } 
 
   const model = SEARCHFILTERNAME[name];
   const allFields = FEILD[name];
@@ -79,13 +82,17 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
   //   );
   // }
 
-  
+
+  const fieldsToFetch = DETAILSFETCH[name] || [];
+const {select} = buildSelect(fieldsToFetch);
+
   const [items, totalItems] = await Promise.all([
     model.findMany({
       where: whereCondition,
       skip,
       take: limit,
       orderBy,
+      select
     }),
     model.count({ where: whereCondition }),
   ]);

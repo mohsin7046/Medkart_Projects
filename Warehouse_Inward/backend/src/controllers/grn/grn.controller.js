@@ -9,12 +9,12 @@ import { errorResponse, successResponse } from '../../utilities/response.js'
 import { updateGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnUpdate.zod.js'
 import { createGoodReceiptNoteSchema } from '../../zodValidation/grnValidation/grnCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
-import { STATUSCODE } from '../../utilities/constant.js'
+import { STATUSCODE,ENTITY } from '../../utilities/constant.js'
 
 
 
 export const createGRN = catchAsync(async (req, res) => {
-  req.component = "grn"; 
+  req.component = ENTITY.grn; 
   const data = createGoodReceiptNoteSchema.parse(req.body);
   const createdGRN = await createGRNRecordService(data);
   return successResponse(res, createdGRN, 'Successfully created GRN', STATUSCODE.OK);
@@ -23,7 +23,7 @@ export const createGRN = catchAsync(async (req, res) => {
 
 
 export const updateGRN = catchAsync(async (req, res) => {
-  req.component = "grn"; 
+  req.component = ENTITY.grn; 
   const data = updateGoodReceiptNoteSchema.parse(req.body);
   const updatedGRN = await updateGRNRecordService(data);
   return successResponse(res, updatedGRN, 'Successfully updated GRN', STATUSCODE.OK);
@@ -32,7 +32,7 @@ export const updateGRN = catchAsync(async (req, res) => {
 
 
 export const deleteGRN = catchAsync(async (req, res) => {
-  req.component = "grn"; 
+  req.component = ENTITY.grn; 
   const { grn_id } = req.body;
   console.log("FROm",grn_id);
   
@@ -42,7 +42,7 @@ export const deleteGRN = catchAsync(async (req, res) => {
 
 
 export const getGRNByID = catchAsync(async (req, res) => {
-  req.component = "grn"; 
+  req.component = ENTITY.grn; 
   const { id } = req.params;
   const grnData = await getGRNByIdService(id);
   if (!grnData) {

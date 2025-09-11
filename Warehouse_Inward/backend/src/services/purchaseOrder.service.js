@@ -61,7 +61,6 @@ export const createPurchaseOrderService = async (data) => {
 
     console.log(createdPO);
     
-
     const cacheKeyById = `purchaseOrder:id:${createdPO.id}`;
     const cacheKeyByNumber = `purchaseOrder:number:${createdPO.order_number}`;
     await cacheSet(cacheKeyById, createdPO);

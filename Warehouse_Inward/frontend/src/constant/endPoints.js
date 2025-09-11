@@ -118,5 +118,43 @@ export const ALLEndpoint = Object.freeze({
       method: "GET",
       endpoint: `${defaultEndPoint}/grn`
     },
+  },
+
+  SalesOrderEndpoints:{
+    getSalesOrder:{
+      method:"GET",
+      endpoint:`${defaultEndPoint}/sales-order`
+    },
+    addSalesOrder: {
+      method: "POST",
+      endpoint: `${defaultEndPoint}/sales-order`
+    },
+    deleteSalesOrder: {
+      method: "DELETE",
+      endpoint: `${defaultEndPoint}/sales-order`
+    },
+    updateSalesOrder: {
+      method: "PUT",
+      endpoint: `${defaultEndPoint}/sales-order`
+    },
+    getSalesOrderById: {
+      method: "GET",
+      endpoint: `${defaultEndPoint}/sales-order`
+    },
+    processSalesOrder:{
+      method: "POST",
+      endpoint: `${defaultEndPoint}/sales-order/process`
+    }
+  },
+
+  SalesIndentEndpoints:{
+    getSalesIndent:{
+      method:"GET",
+      endpoint:`${defaultEndPoint}/sales-indent`
+    },
+    getSalesIndentById: {
+      method: "GET",
+      endpoint: `${defaultEndPoint}/sales-indent`
+    },
   }
 });

@@ -64,4 +64,34 @@ export const VIEW_CONFIG = {
       { label: "GST %", key: "product.gst_percentage" },
     ],
   },
+
+ salesOrder : {
+  title: "Sales Order Details",
+  endpoint: ALLEndpoint.SalesOrderEndpoints.getSalesOrderById.endpoint,
+  headerFields: [
+    { label: "Order Number", key: "sales_order_number" },
+    { label: "Name", key: "name" },
+    { label: "Order Type", key: "order_type" },
+    { label: "Address", key: "address" },
+    { label: "Contact No", key: "contact_number" },
+    { label: "EmailId", key: "email" },
+    { label: "Processed Date", key: "processed_date", isDate: true }, 
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+    { label: "Status", key: "status", isStatus: true },
+  ],
+  itemKey: "products", 
+  itemColumns: [
+    { label: "Product Name", key: "product.name" }, 
+    { label: "Vendor Name", key: "vendor.name" }, 
+    { label: "Ordered Qty", key: "ordered_qty" },
+    { label: "Allocated Qty", key: "allocated_qty" },
+    { label: "Remaining Qty", key: "remaining_qty" },
+    { label: "Price", key: "product.product_price", isCurrency: true },
+    { label: "MRP", key: "product.product_mrp", isCurrency: true },
+    { label: "GST %", key: "product.gst_percentage" },
+    { label: "Combination", key: "product.combination" },
+    { label: "HSN Code", key: "product.hsn_code" },
+    { label: "Total", key: "totalAmount", isCurrency: true }, 
+  ],
+}
 };

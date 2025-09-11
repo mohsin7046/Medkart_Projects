@@ -7,7 +7,6 @@ export function SearchSelect({ type, value, onSelect }) {
   const isSelecting = useRef(false);
 
   useEffect(() => {
-
     if (value) {
       setQuery(value);
     }else {
@@ -32,6 +31,8 @@ export function SearchSelect({ type, value, onSelect }) {
     const delayDebounce = setTimeout(async () => {
       const res = await fetch(`http://localhost:3000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
+      console.log(data);
+      
        setResults(data.data || []);
       setShowDropdown(true);
     }, 300);

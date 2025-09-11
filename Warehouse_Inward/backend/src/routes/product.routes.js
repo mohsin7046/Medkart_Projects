@@ -10,7 +10,7 @@ import {getAllOrFiltered} from '../controllers/common/getAllSearchFilter.control
 
 const router = Router()
 
-router.get('/products', getAllOrFiltered)
+router.get('/products', getAllOrFiltered);
 router.post('/products', addProduct);
 router.get('/products/search/:q', getProductSearch)
 router.put('/products', updateProduct)

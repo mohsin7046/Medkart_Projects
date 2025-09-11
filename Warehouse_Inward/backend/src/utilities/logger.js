@@ -32,6 +32,7 @@ export const vendorLogger = createModuleLogger("vendor");
 export const poLogger = createModuleLogger("po");
 export const grnLogger = createModuleLogger("grn");
 export const piLogger = createModuleLogger("pi");
-
+export const saleLogger = createModuleLogger("sale");
+export const indentLogger = createModuleLogger("indent");
 export const appLogger = createModuleLogger("app");
 

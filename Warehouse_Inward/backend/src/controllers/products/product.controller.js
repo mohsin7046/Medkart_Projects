@@ -9,11 +9,11 @@ import { successResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
 import { updateProductSchema } from '../../zodValidation/productValidation/productUpdate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
-import { STATUSCODE } from '../../utilities/constant.js'
+import { STATUSCODE,ENTITY } from '../../utilities/constant.js'
 
 
 export const addProduct = catchAsync(async (req, res) => {
-  req.component = "product";
+  req.component = ENTITY.product;
 const data = createProductSchema.parse(req.body);
 
   const newProduct = await addProductService(data);
@@ -24,7 +24,7 @@ const data = createProductSchema.parse(req.body);
 
 
 export const updateProduct = catchAsync(async (req, res) => {
-  req.component = "product";
+  req.component =  ENTITY.product;
   const formData = updateProductSchema.parse(req.body);
 
   const updatedProduct = await updateProductService(formData);
@@ -35,7 +35,7 @@ export const updateProduct = catchAsync(async (req, res) => {
 
 
 export const getProductSearch = catchAsync(async (req, res) => {
-  req.component = "product";
+  req.component =  ENTITY.product;
   const { q } = req.params;
 
   const products = await searchProductService(q);
@@ -45,7 +45,7 @@ export const getProductSearch = catchAsync(async (req, res) => {
 
 
 export const deleteProduct = catchAsync(async (req, res) => {
-    req.component = "product";
+    req.component =  ENTITY.product;
   const { product_code } = req.body
 
   const deletedProduct = await deleteProductService(product_code)
@@ -55,7 +55,7 @@ export const deleteProduct = catchAsync(async (req, res) => {
 
 
 export const getProductById = catchAsync(async (req, res) => {
-    req.component = "product";
+    req.component =  ENTITY.product;
     const { id } = req.params;
 
   const productByIdData = await getProductByIdService(id);

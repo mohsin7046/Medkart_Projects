@@ -7,7 +7,15 @@ export const STATUS = Object.freeze({
   CANCELLED: 'cancelled',
   ACTIVE: 'active',
   INACTIVE: 'inactive',
-  PARTIAL_RECEVIED: 'partial received'
+  PARTIAL_RECEVIED: 'partial received',
+  ALLOCATED:'allocated',
+  PROCESSING:"processing",
+  PAID:"paid",
+  UNPAID:"unpaid",
+  DISPATCHED:"dispatched",
+  NOT_DISPATCHED:"not dispatched",
+  OPEN:'open',
+  CLOSED:'closed'
 })
 
 export const EACHSTATUS = Object.freeze({
@@ -27,12 +35,24 @@ export const EACHSTATUS = Object.freeze({
 //   VENDOR: 'VC-'
 // })
 
+export const DETAILSFETCH = Object.freeze({
+  product: ['product_code', 'name', 'category', 'product_price','product_mrp',"unit_of_measure","hsn_code","gst_percentage","status",{ purchaseOrderItems: { select: { order_id: true } } }  ],
+  vendor: ['vendor_code','name', 'email', 'contact_person','contact_number', 'address','status'],
+  order: ['order_number','vendor_id','order_date','total_amount','expected_delivery_date','status'],
+  grn: ['grn_number','order_id','received_date','total_amount','status'],
+  invoice: ['invoice_number','invoice_date','total_amount','status'],
+  saleorder:['id','sales_order_number','name','totalOrderQty','status','processed','order_type','created_at'],
+  saleindent:['indent_number','total_sales_order','total_remain_product','status','created_at',{product:{select:{name:true}}}]
+})
+
 export const PREFIX = Object.freeze({
   ORDER: 'ORD-',
   PRODUCT: 'PC-',
-  INVOICE: 'INV-',
-  GRN: 'GRN-',
-  VENDOR: 'VC-'
+  INVOICE: 'INV-', 
+  GRN: 'GRN-', 
+  VENDOR: 'VC-',
+  SALE:'SO-',
+  INDENT:'IN-'
 })
 
 export const LIMIT = Object.freeze({
@@ -45,7 +65,9 @@ export const FEILD = Object.freeze({
   vendor: ['name', 'email', 'vendor_code', 'contact_person', 'address'],
   order: ['order_number'],
   grn: ['grn_number'],
-  invoice: ['invoice_number']
+  invoice: ['invoice_number'],
+  saleorder:['sales_order_number'],
+  saleindent:['indent_number']
 })
  
 export const SEARCHFILTERNAME = Object.freeze({
@@ -53,7 +75,9 @@ export const SEARCHFILTERNAME = Object.freeze({
   product: prisma.product,
   invoice: prisma.purchaseInvoice,
   grn: prisma.goodReceiptNote,
-  vendor: prisma.vendor
+  vendor: prisma.vendor,
+  saleorder:prisma.salesOrder,
+  saleindent:prisma.salesIndent
 })
 
 export const SETEXPIRY = Object.freeze({
@@ -66,7 +90,12 @@ export const ENTITY = Object.freeze({
   po: "po",
   grn: "grn",
   pi: "pi",
+  so:"so",
+  si:"si",
+  so:"sale-order",
+  si:"sale-indent"
 });
+
 
 export const STATUSCODE = Object.freeze({
   OK: 200,
@@ -85,3 +114,9 @@ export const STATUSCODE = Object.freeze({
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
 });
+
+
+export const PRIORITY = Object.freeze({
+  NORMAL:"normal",
+  HIGH:"high"
+})

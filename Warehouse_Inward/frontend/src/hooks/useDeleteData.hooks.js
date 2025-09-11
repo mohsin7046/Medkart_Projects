@@ -4,7 +4,7 @@ import { useCallback } from "react";
 export const useDeleteData = (endpoint, method = "DELETE") => {
   const deleteItem = useCallback(
     async ({ idField, idValue, setState }) => {
-      console.log("FRpm delerte",endpoint,idField,idValue,setState);
+     
       
       if (window.confirm("Are you sure you want to delete this item?")) {
         try {

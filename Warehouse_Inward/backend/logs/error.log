@@ -628,3 +628,3601 @@ Unique constraint failed on the fields: (`email`)
 2025-09-10 13:22:55 [ERROR]: formData is not defined
 2025-09-10 13:36:25 [ERROR]: cachedData is not defined
 2025-09-10 13:39:37 [ERROR]: grnLogger is not defined
+2025-09-11 09:10:00 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:00 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:00 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:00 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:01 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:01 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:01 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:02 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:02 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:02 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:03 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:04 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:04 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:05 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:06 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:06 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:07 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:08 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:09 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:10 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:11 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:12 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:13 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:14 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:15 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:17 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:18 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:19 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:21 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:22 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:24 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:25 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:27 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:29 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:30 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:32 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:34 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:36 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:38 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:40 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:42 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:44 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:46 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:48 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:50 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:52 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:54 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:56 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:10:58 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:11:00 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:11:02 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:11:04 [ERROR]: ❌ Redis error: connect ECONNREFUSED 127.0.0.1:6379
+2025-09-11 09:34:25 [ERROR]: ❌ Failed to create Sales Order | Error: Cannot read properties of undefined (reading 'map')
+2025-09-11 09:34:25 [ERROR]: Cannot read properties of undefined (reading 'map')
+2025-09-11 09:35:02 [ERROR]: Validation Error: [{"field":"products","message":"Invalid input: expected array, received undefined"},{"field":"","message":"Unrecognized key: \"items\""}]
+2025-09-11 09:36:09 [ERROR]: ❌ Failed to create Sales Order | Error: items is not defined
+2025-09-11 09:36:09 [ERROR]: items is not defined
+2025-09-11 09:37:05 [ERROR]: ❌ Failed to create Sales Order | Error: items is not defined
+2025-09-11 09:37:05 [ERROR]: items is not defined
+2025-09-11 09:37:45 [ERROR]: ❌ Failed to create Sales Order | Error: items is not defined
+2025-09-11 09:37:45 [ERROR]: items is not defined
+2025-09-11 09:38:01 [ERROR]: ❌ Failed to create Sales Order | Error: priority is not defined
+2025-09-11 09:38:01 [ERROR]: priority is not defined
+2025-09-11 09:40:01 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041001439",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   contact_number: String
+  }
+}
+
+Argument `contact_number` is missing.
+2025-09-11 09:40:01 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041001439",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   contact_number: String
+  }
+}
+
+Argument `contact_number` is missing.
+2025-09-11 09:40:35 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041035535",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   contact_number: String
+  }
+}
+
+Argument `contact_number` is missing.
+2025-09-11 09:40:35 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041035535",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   contact_number: String
+  }
+}
+
+Argument `contact_number` is missing.
+2025-09-11 09:41:24 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041124717",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   payment_status: String
+  }
+}
+
+Argument `payment_status` is missing.
+2025-09-11 09:41:24 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041124717",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: null,
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   payment_status: String
+  }
+}
+
+Argument `payment_status` is missing.
+2025-09-11 09:44:36 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041436351",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:44:36 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041436351",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:46:06 [ERROR]: Validation Error: [{"field":"items.0","message":"Unrecognized keys: \"item_price\", \"item_mrp\""},{"field":"items.1","message":"Unrecognized keys: \"item_price\", \"item_mrp\""}]
+2025-09-11 09:46:47 [ERROR]: Validation Error: [{"field":"items.0","message":"Unrecognized keys: \"item_price\", \"item_mrp\""},{"field":"items.1","message":"Unrecognized keys: \"item_price\", \"item_mrp\""}]
+2025-09-11 09:48:33 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041833893",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product_name` is missing.
+2025-09-11 09:48:33 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911041833893",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product_name` is missing.
+2025-09-11 09:50:00 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042000402",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product` is missing.
+2025-09-11 09:50:00 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042000402",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product` is missing.
+2025-09-11 09:50:11 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042011288",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product` is missing.
+2025-09-11 09:50:11 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042011288",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: undefined,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: undefined,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `product` is missing.
+2025-09-11 09:51:03 [ERROR]: Validation Error: [{"field":"items.0","message":"Unrecognized key: \"vendor_id\""},{"field":"items.1","message":"Unrecognized key: \"vendor_id\""}]
+2025-09-11 09:51:52 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042152684",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Unknown argument `totalAmount`. Available options are marked with ?.
+2025-09-11 09:51:52 [ERROR]: 
+Invalid `prisma.salesOrder.create()` invocation:
+
+{
+  data: {
+    sales_order_number: "20250911042152684",
+    name: "John Doe",
+    email: "johndoe@example.com",
+    contact_number: "9876543210",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    delivery_status: "not dispatched",
+    payment_status: "unpaid",
+    status: "pending",
+    products: {
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: 0,
+          remaining_qty: 2,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: 0,
+          remaining_qty: 1,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Unknown argument `totalAmount`. Available options are marked with ?.
+2025-09-11 09:55:50 [ERROR]: Validation Error: [{"field":"","message":"Unrecognized key: \"products\""}]
+2025-09-11 09:56:03 [ERROR]: Validation Error: [{"field":"items.0","message":"Unrecognized key: \"vendor_id\""}]
+2025-09-11 09:56:21 [ERROR]: ❌ Failed to create Sales Order | Error: items is not defined
+2025-09-11 09:56:21 [ERROR]: items is not defined
+2025-09-11 09:57:02 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Michael Johnson",
+    email: undefined,
+    address: null,
+    order_type: undefined,
+    priority: "normal",
+    processed: false,
+    totalOrderQty: 2,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:57:02 [ERROR]: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Michael Johnson",
+    email: undefined,
+    address: null,
+    order_type: undefined,
+    priority: "normal",
+    processed: false,
+    totalOrderQty: 2,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:57:49 [ERROR]: Validation Error: [{"field":"items.0","message":"Unrecognized keys: \"product_price\", \"product_mrp\""},{"field":"items.1","message":"Unrecognized keys: \"product_price\", \"product_mrp\""}]
+2025-09-11 09:58:24 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Ali",
+    email: "ali@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:58:24 [ERROR]: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Ali",
+    email: "ali@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: null
+        }
+      ]
+    },
++   total_amount: Float
+  }
+}
+
+Argument `total_amount` must not be null.
+2025-09-11 09:58:47 [ERROR]: ❌ Failed to create Sales Order | Error: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Ali",
+    email: "ali@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `allocated_qty` is missing.
+2025-09-11 09:58:47 [ERROR]: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: 1
+  },
+  data: {
+    name: "Ali",
+    email: "ali@example.com",
+    address: "123 Main Street, New York, USA",
+    order_type: "B2B",
+    priority: "high",
+    processed: false,
+    totalOrderQty: 3,
+    total_amount: 37.392,
+    status: "pending",
+    products: {
+      deleteMany: {
+        sales_order_id: 1
+      },
+      create: [
+        {
+          product_id: 1,
+          vendor_id: 1,
+          ordered_qty: 2,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: 24.928
+        },
+        {
+          product_id: 2,
+          vendor_id: 1,
+          ordered_qty: 1,
+          allocated_qty: undefined,
+          remaining_qty: undefined,
+          totalAmount: 12.464
+        }
+      ]
+    }
+  }
+}
+
+Argument `allocated_qty` is missing.
+2025-09-11 10:04:37 [ERROR]: ❌ Failed to delete sales Order | ID: 1 | Error: order_id is not defined
+2025-09-11 10:04:37 [ERROR]: order_id is not defined
+2025-09-11 10:05:42 [ERROR]: ❌ Failed to delete sales Order | ID: 1 | Error: order_id is not defined
+2025-09-11 10:05:42 [ERROR]: order_id is not defined
+2025-09-11 10:16:13 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:16:36 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:17:23 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:18:08 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:18:28 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:19:00 [ERROR]: 
+Invalid `prisma.salesOrder.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    email: true,
+    contact_number: true,
+    address: true,
+    order_type: true,
+    priority: true,
+    processed_date: true,
+    delivery_date: true,
+    status: true,
+    processed: true,
+    payment_status: true,
+    delivery_status: true,
+    totalOrderQty: true,
+    total_amount: true,
+    products: {
+      select: {
+        ordered_qty: true,
+        allocated_qty: true,
+        remaining_qty: true,
+        updated_at: true,
+        product: {
+          select: {
+            name: true,
+            category: true,
+            combination: true,
+            product_mrp: true,
+            product_price: true,
+            description: true,
+            hsn_code: true,
+            gst_percentage: true,
+            status: true
+          }
+        },
+        vendor: {
+          select: {
+            name: true
+          }
+        }
+      }
+    }
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 10:26:14 [ERROR]: orderStatus is not defined
+2025-09-11 10:26:44 [ERROR]: orderStatus is not defined
+2025-09-11 10:27:21 [ERROR]: orderStatus is not defined
+2025-09-11 10:27:39 [ERROR]: orderStatus is not defined
+2025-09-11 10:28:02 [ERROR]: orderStatus is not defined
+2025-09-11 10:29:33 [ERROR]: orderStatus is not defined
+2025-09-11 10:30:08 [ERROR]: orderStatus is not defined
+2025-09-11 10:30:45 [ERROR]: orderStatus is not defined
+2025-09-11 10:31:09 [ERROR]: orderStatus is not defined
+2025-09-11 10:33:52 [ERROR]: orderStatus is not defined
+2025-09-11 11:11:13 [ERROR]: Cannot read properties of undefined (reading 'set')
+2025-09-11 11:18:07 [ERROR]: 
+Invalid `prisma.salesIndent.create()` invocation:
+
+
+Unique constraint failed on the fields: (`indent_number`)
+2025-09-11 11:18:38 [ERROR]: 
+Invalid `prisma.salesIndent.create()` invocation:
+
+
+Unique constraint failed on the fields: (`indent_number`)
+2025-09-11 11:21:11 [ERROR]: processedOrdersPerIndent is not defined
+2025-09-11 11:21:41 [ERROR]: processedOrdersPerIndent is not defined
+2025-09-11 11:27:45 [ERROR]: Unexpected token ']', ..."  },
+    ]
+}" is not valid JSON
+2025-09-11 11:48:07 [ERROR]: All elements of the array need to be Prisma Client promises. Hint: Please make sure you are not awaiting the Prisma client calls you intended to pass in the $transaction function.
+2025-09-11 12:08:40 [ERROR]: allProducts is not defined
+2025-09-11 12:34:04 [ERROR]: salesIndentData is not defined
+2025-09-11 14:07:04 [ERROR]: Sales Order not found for ID: 8
+2025-09-11 14:07:04 [ERROR]: Sales Order not found for ID: 8
+2025-09-11 14:33:07 [ERROR]: DETAILSFETCH is not defined
+2025-09-11 14:33:30 [ERROR]: buildSelect is not defined
+2025-09-11 14:35:58 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    purchaseOrderItems: {
+      select: {
+        purchaseOrderItems: {
+        ~~~~~~~~~~~~~~~~~~
+          select: {
+             order_id: true
+          }
+        },
+?       id?: true,
+?       order_id?: true,
+?       product_id?: true,
+?       quantity?: true,
+?       item_price?: true,
+?       item_mrp?: true,
+?       totalAmount?: true,
+?       created_at?: true,
+?       updated_at?: true,
+?       deleted_at?: true,
+?       purchaseOrder?: true,
+?       product?: true
+      }
+    }
+  }
+}
+
+Unknown field `purchaseOrderItems` for select statement on model `PurchaseOrderItem`. Available options are marked with ?.
+2025-09-11 14:36:11 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    purchaseOrderItems: {
+      select: {
+        purchaseOrderItems: {
+        ~~~~~~~~~~~~~~~~~~
+          select: {
+            order_id: true
+          }
+        },
+?       id?: true,
+?       order_id?: true,
+?       product_id?: true,
+?       quantity?: true,
+?       item_price?: true,
+?       item_mrp?: true,
+?       totalAmount?: true,
+?       created_at?: true,
+?       updated_at?: true,
+?       deleted_at?: true,
+?       purchaseOrder?: true,
+?       product?: true
+      }
+    }
+  }
+}
+
+Unknown field `purchaseOrderItems` for select statement on model `PurchaseOrderItem`. Available options are marked with ?.
+2025-09-11 14:38:54 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    purchaseOrderItems: {
+      select: {
+        purchaseOrderItems: {
+        ~~~~~~~~~~~~~~~~~~
+          select: {
+            order_id: true
+          }
+        },
+?       id?: true,
+?       order_id?: true,
+?       product_id?: true,
+?       quantity?: true,
+?       item_price?: true,
+?       item_mrp?: true,
+?       totalAmount?: true,
+?       created_at?: true,
+?       updated_at?: true,
+?       deleted_at?: true,
+?       purchaseOrder?: true,
+?       product?: true
+      }
+    }
+  }
+}
+
+Unknown field `purchaseOrderItems` for select statement on model `PurchaseOrderItem`. Available options are marked with ?.
+2025-09-11 14:43:27 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    undefined: {
+    ~~~~~~~~~
+      select: {
+        {select: true
+      }
+    },
+?   id?: true,
+?   combination?: true,
+?   last_purchase_price?: true,
+?   description?: true,
+?   created_at?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   inventory_qty?: true,
+?   purchaseOrderItems?: true,
+?   GoodReceiptNoteItem?: true,
+?   PurchaseInvoiceItem?: true,
+?   salesOrderProducts?: true,
+?   SalesIndent?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `undefined` for select statement on model `Product`. Available options are marked with ?.
+2025-09-11 14:44:16 [ERROR]: field.includes is not a function
+2025-09-11 14:45:20 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    [object Object]: true,
+    ~~~~~~~~~~~~~~~
+?   id?: true,
+?   combination?: true,
+?   last_purchase_price?: true,
+?   description?: true,
+?   created_at?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   inventory_qty?: true,
+?   purchaseOrderItems?: true,
+?   GoodReceiptNoteItem?: true,
+?   PurchaseInvoiceItem?: true,
+?   salesOrderProducts?: true,
+?   SalesIndent?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `[object Object]` for select statement on model `Product`. Available options are marked with ?.
+2025-09-11 14:46:09 [ERROR]: 
+Invalid `prisma.product.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 2,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    product_code: true,
+    name: true,
+    category: true,
+    product_price: true,
+    product_mrp: true,
+    unit_of_measure: true,
+    hsn_code: true,
+    gst_percentage: true,
+    status: true,
+    PurchaseInvoiceItem: {
+      select: {
+        order_id: true,
+        ~~~~~~~~
+?       id?: true,
+?       invoice_id?: true,
+?       product_id?: true,
+?       quantity?: true,
+?       item_price?: true,
+?       item_mrp?: true,
+?       totalAmount?: true,
+?       created_at?: true,
+?       updated_at?: true,
+?       deleted_at?: true,
+?       purchaseInvoice?: true,
+?       product?: true
+      }
+    }
+  }
+}
+
+Unknown field `order_id` for select statement on model `PurchaseInvoiceItem`. Available options are marked with ?.
+2025-09-11 15:00:24 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    product: {
+    ~~~~~~~
+      select: {
+        name: true
+      }
+    },
+?   id?: true,
+?   email?: true,
+?   contact_number?: true,
+?   address?: true,
+?   priority?: true,
+?   processed_date?: true,
+?   delivery_date?: true,
+?   payment_status?: true,
+?   delivery_status?: true,
+?   total_amount?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   products?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `product` for select statement on model `SalesOrder`. Available options are marked with ?.
+2025-09-11 15:01:07 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    product: {
+    ~~~~~~~
+      select: {
+        name: true
+      }
+    },
+?   id?: true,
+?   email?: true,
+?   contact_number?: true,
+?   address?: true,
+?   priority?: true,
+?   processed_date?: true,
+?   delivery_date?: true,
+?   payment_status?: true,
+?   delivery_status?: true,
+?   total_amount?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   products?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `product` for select statement on model `SalesOrder`. Available options are marked with ?.
+2025-09-11 15:02:12 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    include: {
+    ~~~~~~~
+      product: {
+        select: {
+          name: true
+        }
+      }
+    },
+?   id?: true,
+?   email?: true,
+?   contact_number?: true,
+?   address?: true,
+?   priority?: true,
+?   processed_date?: true,
+?   delivery_date?: true,
+?   payment_status?: true,
+?   delivery_status?: true,
+?   total_amount?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   products?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `include` for select statement on model `SalesOrder`. Available options are marked with ?.
+2025-09-11 15:03:44 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+  ~~~~~~
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  },
+  include: {
+  ~~~~~~~
+    product: {
+      select: {
+        name: true
+      }
+    }
+  }
+}
+
+Please either use `include` or `select`, but not both at the same time.
+2025-09-11 15:05:03 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+  ~~~~~~
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    product: {
+      select: {
+        name: true
+      }
+    }
+  },
+  include: {}
+  ~~~~~~~
+}
+
+Please either use `include` or `select`, but not both at the same time.
+2025-09-11 15:05:29 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    product: {
+    ~~~~~~~
+      select: {
+        name: true
+      }
+    },
+?   id?: true,
+?   email?: true,
+?   contact_number?: true,
+?   address?: true,
+?   priority?: true,
+?   processed_date?: true,
+?   delivery_date?: true,
+?   payment_status?: true,
+?   delivery_status?: true,
+?   total_amount?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   products?: true,
+?   _count?: true
+  }
+}
+
+Unknown field `product` for select statement on model `SalesOrder`. Available options are marked with ?.
+2025-09-11 15:07:49 [ERROR]: 
+Invalid `prisma.salesOrderProduct.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    sales_order_number: true,
+    ~~~~~~~~~~~~~~~~~~
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true,
+    products: {
+      select: {
+        name: true
+      }
+    },
+?   id?: true,
+?   sales_order_id?: true,
+?   product_id?: true,
+?   vendor_id?: true,
+?   ordered_qty?: true,
+?   allocated_qty?: true,
+?   remaining_qty?: true,
+?   totalAmount?: true,
+?   updated_at?: true,
+?   deleted_at?: true,
+?   salesOrder?: true,
+?   product?: true,
+?   vendor?: true
+  }
+}
+
+Unknown field `sales_order_number` for select statement on model `SalesOrderProduct`. Available options are marked with ?.
+2025-09-11 15:10:34 [ERROR]: 
+Invalid `prisma.salesIndent.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    ~~~~~~~~~~
+?   AND?: SalesIndentWhereInput | SalesIndentWhereInput[],
+?   OR?: SalesIndentWhereInput[],
+?   NOT?: SalesIndentWhereInput | SalesIndentWhereInput[],
+?   id?: IntFilter | Int,
+?   indent_number?: StringFilter | String,
+?   product_id?: IntFilter | Int,
+?   total_sales_order?: IntFilter | Int,
+?   total_remain_product?: IntFilter | Int,
+?   sale_order_IDs?: JsonFilter,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   expired_at?: DateTimeNullableFilter | DateTime | Null,
+?   product?: ProductScalarRelationFilter | ProductWhereInput
+  },
+  skip: 0,
+  take: 10,
+  orderBy: {
+    created_at: "desc"
+  },
+  select: {
+    indent_number: true,
+    total_sales_order: true,
+    total_remain_product: true,
+    status: true,
+    created_at: true,
+    product: {
+      select: {
+        name: true
+      }
+    }
+  }
+}
+
+Unknown argument `deleted_at`. Available options are marked with ?.
+2025-09-11 15:11:53 [ERROR]: 
+Invalid `prisma.salesIndent.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    ~~~~~~~~~~
+?   AND?: SalesIndentWhereInput | SalesIndentWhereInput[],
+?   OR?: SalesIndentWhereInput[],
+?   NOT?: SalesIndentWhereInput | SalesIndentWhereInput[],
+?   id?: IntFilter | Int,
+?   indent_number?: StringFilter | String,
+?   product_id?: IntFilter | Int,
+?   total_sales_order?: IntFilter | Int,
+?   total_remain_product?: IntFilter | Int,
+?   sale_order_IDs?: JsonFilter,
+?   status?: StringFilter | String,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   expired_at?: DateTimeNullableFilter | DateTime | Null,
+?   product?: ProductScalarRelationFilter | ProductWhereInput
+  }
+}
+
+Unknown argument `deleted_at`. Available options are marked with ?.
+2025-09-11 15:46:03 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "k",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:46:05 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:46:09 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:48:03 [ERROR]: ❌ Failed to delete sales Order | ID: undefined | Error: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   sales_order_number?: String,
+?   AND?: SalesOrderWhereInput | SalesOrderWhereInput[],
+?   OR?: SalesOrderWhereInput[],
+?   NOT?: SalesOrderWhereInput | SalesOrderWhereInput[],
+?   name?: StringFilter | String,
+?   email?: StringFilter | String,
+?   contact_number?: StringFilter | String,
+?   address?: StringNullableFilter | String | Null,
+?   order_type?: StringFilter | String,
+?   priority?: StringFilter | String,
+?   processed_date?: DateTimeNullableFilter | DateTime | Null,
+?   delivery_date?: DateTimeNullableFilter | DateTime | Null,
+?   status?: StringFilter | String,
+?   processed?: BoolFilter | Boolean,
+?   payment_status?: StringFilter | String,
+?   delivery_status?: StringFilter | String,
+?   totalOrderQty?: IntFilter | Int,
+?   total_amount?: FloatFilter | Float,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   products?: SalesOrderProductListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-11T10:18:03.408Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type SalesOrderWhereUniqueInput needs at least one of `id` or `sales_order_number` arguments. Available options are marked with ?.
+2025-09-11 15:48:03 [ERROR]: 
+Invalid `prisma.salesOrder.update()` invocation:
+
+{
+  where: {
+    id: undefined,
+?   sales_order_number?: String,
+?   AND?: SalesOrderWhereInput | SalesOrderWhereInput[],
+?   OR?: SalesOrderWhereInput[],
+?   NOT?: SalesOrderWhereInput | SalesOrderWhereInput[],
+?   name?: StringFilter | String,
+?   email?: StringFilter | String,
+?   contact_number?: StringFilter | String,
+?   address?: StringNullableFilter | String | Null,
+?   order_type?: StringFilter | String,
+?   priority?: StringFilter | String,
+?   processed_date?: DateTimeNullableFilter | DateTime | Null,
+?   delivery_date?: DateTimeNullableFilter | DateTime | Null,
+?   status?: StringFilter | String,
+?   processed?: BoolFilter | Boolean,
+?   payment_status?: StringFilter | String,
+?   delivery_status?: StringFilter | String,
+?   totalOrderQty?: IntFilter | Int,
+?   total_amount?: FloatFilter | Float,
+?   created_at?: DateTimeFilter | DateTime,
+?   updated_at?: DateTimeFilter | DateTime,
+?   deleted_at?: DateTimeNullableFilter | DateTime | Null,
+?   products?: SalesOrderProductListRelationFilter
+  },
+  data: {
+    deleted_at: new Date("2025-09-11T10:18:03.408Z"),
+    status: "cancelled"
+  }
+}
+
+Argument `where` of type SalesOrderWhereUniqueInput needs at least one of `id` or `sales_order_number` arguments. Available options are marked with ?.
+2025-09-11 15:52:47 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "k",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:52:49 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:54:55 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:54:59 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:55:00 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Customer Name: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Customer Name`. Available options are marked with ?.
+2025-09-11 15:55:02 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Name: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Name`. Did you mean `name`? Available options are marked with ?.
+2025-09-11 15:55:04 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kr",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:55:06 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "k",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:55:08 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:55:52 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:34 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:38 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:41 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:44 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:47 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:51 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:54 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:57:59 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:13 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:14 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:20 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:25 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:28 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:31 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:34 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:36 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:41 [ERROR]: 
+Invalid `prisma.salesOrder.count()` invocation:
+
+{
+  select: {
+    _count: {
+      select: {
+        _all: true
+      }
+    }
+  },
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:44 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 15:58:45 [ERROR]: 
+Invalid `prisma.salesOrder.findMany()` invocation:
+
+{
+  where: {
+    deleted_at: null,
+    OR: [
+      {
+        Order No: {
+          contains: "kru",
+          mode: "insensitive"
+        }
+      }
+    ]
+  },
+  skip: 0,
+  take: 3,
+  orderBy: {
+    created_at: "asc"
+  },
+  select: {
+    id: true,
+    sales_order_number: true,
+    name: true,
+    totalOrderQty: true,
+    status: true,
+    processed: true,
+    order_type: true,
+    created_at: true
+  }
+}
+
+Unknown argument `Order No`. Available options are marked with ?.
+2025-09-11 16:23:47 [ERROR]: Cannot destructure property 'sales_order_ids' of 'data' as it is undefined.
+2025-09-11 16:24:05 [ERROR]: Cannot destructure property 'sales_order_ids' of 'data' as it is undefined.
+2025-09-11 16:25:27 [ERROR]: rreq is not defined
+2025-09-11 16:30:59 [ERROR]: Cannot destructure property 'sales_order_ids' of 'data' as it is undefined.
+2025-09-11 16:35:55 [ERROR]: rreq is not defined
+2025-09-11 16:53:31 [ERROR]: Expected ',' or ']' after array element in JSON at position 421 (line 16 column 9)
+2025-09-11 17:32:01 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:01 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:01 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:01 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:24 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:24 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:24 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:24 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:25 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:25 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:25 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:32:25 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:31 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:31 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:36 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:36 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:36 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:34:36 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:12 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:12 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:12 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:12 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:16 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:16 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:16 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:16 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:18 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:18 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:18 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:18 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:27 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:27 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:27 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:35:27 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:58 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:58 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:58 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:58 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:59 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:59 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:59 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:40:59 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:20 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:20 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:26 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:26 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:30 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:30 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:30 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:45:30 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:19 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:19 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:19 [ERROR]: ❌ Error fetching product by id: search | 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:19 [ERROR]: 
+Invalid `prisma.product.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:21 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:21 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:21 [ERROR]: ❌ Fetch vendor failed | ID: search | Error: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.
+2025-09-11 17:47:21 [ERROR]: 
+Invalid `prisma.vendor.findUnique()` invocation:
+
+{
+  where: {
++   id: Int
+  }
+}
+
+Argument `id` is missing.

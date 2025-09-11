@@ -15,11 +15,11 @@ function CommonView() {
   useEffect(() => {
     if (!config) return;
     const fetchData = async () => {
-      try {
-        
-        
+      try {    
         const res = await fetch(`${config.endpoint}/${id}`);
         const response = await res.json();
+        console.log(response);
+        
         setData(response.data);
       } catch (err) {
         console.error("❌ Fetch failed", err);

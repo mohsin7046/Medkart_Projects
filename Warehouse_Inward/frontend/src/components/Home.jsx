@@ -11,6 +11,7 @@ function Home() {
     else if (location.pathname.includes("purchase-order")) setSelected("purchase-order")
     else if (location.pathname.includes("grn")) setSelected("grn")
     else if (location.pathname.includes("purchase-invoice")) setSelected("purchase-invoice")
+    else if (location.pathname.includes("sales-order")) setSelected("sales-order")
   }, [location.pathname])
 
   return (
@@ -68,6 +69,16 @@ function Home() {
               }`}
             >
               Purchase Invoice
+            </Link>
+
+            <Link
+              to="/sales-order"
+              onClick={() => setSelected("sales-order")}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                selected === "sales-order" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Sales Order
             </Link>
 
           </div>

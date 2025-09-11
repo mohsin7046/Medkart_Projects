@@ -1,14 +1,16 @@
 import { errorResponse } from "../utilities/response.js";
-import { productLogger, vendorLogger, poLogger, grnLogger, piLogger, appLogger } from "../utilities/logger.js";
+import { productLogger, vendorLogger, poLogger, grnLogger, piLogger, appLogger,saleLogger,indentLogger } from "../utilities/logger.js";
 import { STATUSCODE } from "../utilities/constant.js";
 
 const loggerMap = {
-  product: productLogger,
-  vendor: vendorLogger,
-  po: poLogger,
-  grn: grnLogger,
-  pi: piLogger,
-  app: appLogger,
+  "product": productLogger,
+  "vendor": vendorLogger,
+  "po": poLogger,
+  "grn": grnLogger,
+  "pi": piLogger,
+  "app": appLogger,
+  "so": saleLogger,
+  "si":indentLogger
 };
 
 export const errorHandler = (err, req, res,next) => {

@@ -12,6 +12,8 @@ import GRNView from "./GoodReceiptNote/grnView";
 import PurchaseInvoice from "./PurchaseInvoice/PurchaseInvoice";
 import PurchaseInvoiceForm from "./PurchaseInvoice/PurchaseInvoiceForm";
 import PurchaseInvoiceView from "./PurchaseInvoice/PurchaseInvoiceView";
+import SalesOrder from "./SalesOrder/salesOrder";
+import SalesOrderForm from "./SalesOrder/SalesOrderForm";
 
 export {
   Home,
@@ -27,4 +29,6 @@ export {
   PurchaseInvoice,
   PurchaseInvoiceForm,
   PurchaseInvoiceView,
+  SalesOrder,
+  SalesOrderForm
 };

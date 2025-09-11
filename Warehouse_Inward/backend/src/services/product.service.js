@@ -101,9 +101,12 @@ export const searchProductService = async (q) => {
       throw new Error("Search query is required");
     }
 
-    const cacheKey = `product:search:${q}`;
-    const cached = await cacheGet(cacheKey);
-    if (cached) return cached;
+    // const cacheKey = `product:search:${q}`;
+    // const cached = await cacheGet(cacheKey);
+    // if (cached) return cached;
+
+    console.log(q);
+    
 
     const searchProduct = await prisma.product.findMany({
       where: {
@@ -117,6 +120,8 @@ export const searchProductService = async (q) => {
       select: {
         id: true,
         name: true,
+        product_mrp:true,
+        product_price:true
       },
       take: LIMIT.PRODUCT_LIMIT,
     });
@@ -127,7 +132,7 @@ export const searchProductService = async (q) => {
     }
 
     productLogger.info(`✅ Found ${searchProduct.length} products for query: ${q}`);
-    await cacheSet(cacheKey, searchProduct, 300);
+    // await cacheSet(cacheKey, searchProduct, 300);
     return searchProduct;
   } catch (err) {
     productLogger.error("❌ Error in searchProductService: " + err.message);
