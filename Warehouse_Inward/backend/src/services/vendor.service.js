@@ -2,7 +2,7 @@ import { prisma } from '../utilities/import.config.js'
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { vendorLogger } from '../utilities/logger.js';
-import { enqueue, cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
+import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 export const createVendorService = async (data) => {
   try {
@@ -17,7 +17,7 @@ export const createVendorService = async (data) => {
 
     vendorLogger.info(`✅ Vendor created successfully | Code: ${vendor_code}`);
 
-    await enqueue('vendorQueue', { action: 'create', vendor_code, data: newVendor });
+   
     await cacheSet(`vendor:id:${newVendor.id}`, newVendor, 3600);
     await cacheSet(`vendor:code:${newVendor.vendor_code}`, newVendor, 3600);
 
@@ -37,7 +37,6 @@ export const updateVendorService = async (data) => {
 
     vendorLogger.info(`✅ Vendor updated successfully | Code: ${data.vendor_code}`);
 
-    await enqueue('vendorQueue', { action: 'update', vendor_code: data.vendor_code, data: updatedVendor });
     await cacheSet(`vendor:id:${updatedVendor.id}`, updatedVendor, 3600);
     await cacheSet(`vendor:code:${updatedVendor.vendor_code}`, updatedVendor, 3600);
 
@@ -89,7 +88,6 @@ export const deleteVendorService = async (vendor_code) => {
 
     vendorLogger.info(`✅ Vendor deleted successfully | Code: ${vendor_code}`);
 
-    await enqueue('vendorQueue', { action: 'delete', vendor_code });
     await cacheDelete(`vendor:code:${vendor_code}`);
     if (softdeleteVendor?.id) await cacheDelete(`vendor:id:${softdeleteVendor.id}`);
 

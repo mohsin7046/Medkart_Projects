@@ -14,6 +14,7 @@ import PurchaseInvoiceForm from "./PurchaseInvoice/PurchaseInvoiceForm";
 import PurchaseInvoiceView from "./PurchaseInvoice/PurchaseInvoiceView";
 import SalesOrder from "./SalesOrder/salesOrder";
 import SalesOrderForm from "./SalesOrder/SalesOrderForm";
+import { SalesIndent } from "./SalesIndent/SalesIndent";
 
 export {
   Home,
@@ -30,5 +31,6 @@ export {
   PurchaseInvoiceForm,
   PurchaseInvoiceView,
   SalesOrder,
-  SalesOrderForm
+  SalesOrderForm,
+  SalesIndent
 };

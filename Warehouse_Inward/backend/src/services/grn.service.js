@@ -5,7 +5,7 @@ import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { calculateItemsTotal, determineStatus } from '../helper/grn.helper.js'
 import { checkExpiry } from '../utilities/checkExpiry.js'
 import { grnLogger } from '../utilities/logger.js'
-import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
+import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 export const findPOByOrderNumber = async (order_id) => {
 
@@ -114,8 +114,6 @@ export const createGRNRecordService = async (data) => {
 
     await cacheSet(`grn:id:${newGRN.id}`, newGRN);
     await cacheSet(`grn:number:${newGRN.grn_number}`, newGRN);
-    await enqueue("grnQueue", { action: "create", grn_id: newGRN.id });
-
 
     grnLogger.info(`GRN created successfully with id: ${newGRN.id}`);
     return newGRN;
@@ -171,7 +169,6 @@ export const updateGRNRecordService = async (data) => {
     if (updatedGRN) {
       await cacheSet(`grn:id:${updatedGRN.id}`, updatedGRN);
       await cacheSet(`grn:number:${updatedGRN.grn_number}`, updatedGRN);
-      await enqueue("grnQueue", { action: "update", grn_id: updatedGRN.id });
 
     }
 
@@ -197,8 +194,6 @@ export const deleteGRNRecordService = async (grn_id) => {
   if (deleteGRN.grn_number) {
     await cacheDelete(`grn:number:${deleteGRN.grn_number}`);
   }
-  await enqueue("grnQueue", { action: "delete", grn_id });
-
   return deleteGRN
 }
 

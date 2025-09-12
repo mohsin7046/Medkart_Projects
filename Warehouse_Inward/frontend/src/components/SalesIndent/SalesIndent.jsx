@@ -5,27 +5,26 @@ import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
 import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 import { ROUTES } from "../../constant/routePath.js";
-import { LIMITPAGE, salesOrderColumns, salesOrderSearchFields, salesOrderStatusFilters } from "../../constant/salesOrderConstant.js";
+import { LIMITPAGE, salesIndentColumns, salesIndentSearchFields, salesIndentStatusFilters } from "../../constant/salesIndentConstant.js";
 import { toast } from "react-toastify";
 import { STATUS } from "../../constant/constant.js";
 
 
-export const SalesOrder = () => {
+export const SalesIndent = () => {
   const [page, setPage] = useState(1);
   const limit = LIMITPAGE;
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchField, setSearchField] = useState("sales_order_number");
+  const [searchField, setSearchField] = useState("indent_number");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("d");
-  const [selectedIds, setSelectedIds] = useState([]);
+  const [sortOrder, setSortOrder] = useState("a");
 
-  const { data: salesOrders, metadata, loading, setData: setSalesOrders } =
+  const { data: salesOrders, metadata, loading, setData: setSalesIndents } =
     useFetchData({
-      endpoint: ALLEndpoint.SalesOrderEndpoints.getSalesOrder.endpoint,
-      name: "saleorder",
+      endpoint: ALLEndpoint.SalesIndentEndpoints.getSalesIndent.endpoint,
+      name: "saleindent",
       page,
       limit,
       debounceDelay: 500,
@@ -35,21 +34,6 @@ export const SalesOrder = () => {
       sortField,
       sortOrder,
     });
-
-  const { deleteItem } = useDeleteData(
-    ALLEndpoint.SalesOrderEndpoints.deleteSalesOrder.endpoint,
-    ALLEndpoint.SalesOrderEndpoints.deleteSalesOrder.method
-  );
-
-  const handleDelete = (sales_order_id) => {
-    console.log(sales_order_id);
-
-    deleteItem({
-      idField: "sales_order_id",
-      idValue: sales_order_id,
-      setState: setSalesOrders,
-    });
-  };
 
 
   const handleSearch = ({ field, value }) => {
@@ -101,55 +85,24 @@ export const SalesOrder = () => {
   return (
     <div>
       <CommonDataTable
-        columns={salesOrderColumns}
+        columns={salesIndentColumns}
         data={salesOrders}
         page={page}
         limit={limit}
         metadata={metadata}
         loading={loading}
         setPage={setPage}
-        searchFields={salesOrderSearchFields}
-        statusFilters={salesOrderStatusFilters}
+        searchFields={salesIndentSearchFields}
+        statusFilters={salesIndentStatusFilters}
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
-        isCheckbox={true}
-        onAdd={() => navigate(ROUTES.SALES_ORDER.ADD)}
-        onEdit={(order) => [STATUS.PENDING].includes(order.status) ? navigate(ROUTES.SALES_ORDER.EDIT(order.id)) : toast.error("Edit is not persibble without pending")}
-        onDelete={(order) => handleDelete(order.id)}
         onView={(order) => {
-          navigate(ROUTES.PURCHASE_ORDER.VIEW('salesOrder', order.id))
+          navigate(ROUTES.SALES_INDENT.VIEW('salesIndent', order.id))
         }
         }
-        
-        extraAction={(order) => {
-          const isDisabled = [STATUS.PENDING].includes(order.status);
-          console.log(isDisabled);
-          
-          return (
-            <button
-              disabled={!isDisabled}
-              onClick={() =>
-                handleSubmit(order.id)
-              }
-              className={`bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition-colors ${!isDisabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-            >
-              Process Order
-            </button>
-          );
-        }}
-        onSelectionChange={(ids) => setSelectedIds(ids)}
       />
-      <button
-        onClick={() => handleSubmit(selectedIds)}
-        disabled={selectedIds.length === 0}
-        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md"
-      >
-        Process Selected Orders
-      </button>
     </div>
   );
 };
 
-export default SalesOrder;

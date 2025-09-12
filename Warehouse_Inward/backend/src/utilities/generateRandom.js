@@ -1,7 +1,7 @@
 import { PREFIX } from "./constant.js"
 
 export const generateRandom = (status)=>{
-  const prefix = PREFIX[status.toUpperCase()] || "";
+  const prefix = status|| "";
   const now = new Date();
   const dateStr = now
     .toISOString()

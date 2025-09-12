@@ -48,7 +48,7 @@ model Product{
   description String
   hsn_code   String
   gst_percentage Float
-  status      String   @default("active") // active, inactive, discontinued
+  status      String   @default("active") 
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   deleted_at DateTime?
@@ -61,7 +61,9 @@ model Product{
   PurchaseInvoiceItem PurchaseInvoiceItem[]
   salesOrderProducts SalesOrderProduct[]
   SalesIndent  SalesIndent[]
+
 }
+
 
 model PurchaseOrder{
   id          Int      @id @default(autoincrement())

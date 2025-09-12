@@ -144,6 +144,10 @@ export const ALLEndpoint = Object.freeze({
     processSalesOrder:{
       method: "POST",
       endpoint: `${defaultEndPoint}/sales-order/process`
+    },
+    getSalesOrderEdit:{
+       method: "GET",
+      endpoint: `${defaultEndPoint}/sales-order/edit`
     }
   },
 

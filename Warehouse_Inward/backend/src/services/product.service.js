@@ -2,7 +2,7 @@ import { prisma } from '../utilities/import.config.js'
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import {productLogger} from '../utilities/logger.js'
-import { enqueue, cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
+import {  cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 export const addProductService = async (data) => {
   try {
@@ -18,6 +18,7 @@ export const addProductService = async (data) => {
     const product = await prisma.product.create({
       data: {
         ...data,
+        inventory_qty:10,
         product_code,
       },
     });
@@ -28,8 +29,6 @@ export const addProductService = async (data) => {
     }
 
     productLogger.info("✅ Product created successfully: " + product_code);
-
-    await enqueue('productQueue', { action: 'create', product_code, data: product });
 
     const cacheKeyById = `product:id:${product.id}`;
     const cacheKeyByCode = `product:code:${product.product_code}`;
@@ -82,7 +81,6 @@ export const updateProductService = async (formData) => {
 
     productLogger.info("✅ Product updated in DB: " + formData.product_code);
 
-    await enqueue('productQueue', { action: 'update', product_code: formData.product_code, data: updatedProduct });
     await cacheSet(`product:id:${updatedProduct.id}`, updatedProduct, 3600);
     await cacheSet(`product:code:${updatedProduct.product_code}`, updatedProduct, 3600);
 
@@ -107,7 +105,6 @@ export const searchProductService = async (q) => {
 
     console.log(q);
     
-
     const searchProduct = await prisma.product.findMany({
       where: {
         deleted_at: null,
@@ -155,7 +152,6 @@ export const deleteProductService = async (product_code) => {
 
     productLogger.info(`✅ Product deleted successfully. Code: ${product_code}`);
 
-     await enqueue('productQueue', { action: 'delete', product_code });
     await cacheDelete(`product:code:${product_code}`);
     if (softdeleteProduct?.id) await cacheDelete(`product:id:${softdeleteProduct.id}`);
 

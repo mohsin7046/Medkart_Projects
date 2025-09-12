@@ -6,7 +6,8 @@ const salesOrderProductSchema = z.object({
     .number()
     .min(1, 'Product id is required').optional(),
 
-  vendor_id: z.number().min(1, 'Vendor id is required'),
+    vendor_id:z.number()
+    .min(1, 'Vendor id is required').optional(),
 
   product_name: z
     .string()

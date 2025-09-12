@@ -3,7 +3,7 @@ import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { piLogger } from '../utilities/logger.js'
-import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
+import { cacheSet, cacheDelete } from '../cache/redisClient.js';
 
 
 export const createPurchaseInvoiceService = async ({
@@ -103,7 +103,6 @@ export const createPurchaseInvoiceService = async ({
     await cacheSet(`purchaseInvoice:id:${invoice.id}`, invoice);
     await cacheSet(`purchaseInvoice:number:${invoice.invoice_number}`, invoice);
   
-    await enqueue('purchaseInvoiceQueue', { action: 'create', invoice_id: invoice.id })
     return invoice;
   })
 }
@@ -129,7 +128,7 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
   if (deletedInvoice.invoice_number) {
     await cacheDelete(`purchaseInvoice:number:${deletedInvoice.invoice_number}`);
   }
-  await enqueue("purchaseInvoiceQueue", { action: "delete", invoice_id });
+
 
   piLogger.info(`🗑️ Purchase Invoice ${invoice_id} deleted successfully`);
   return deletedInvoice;

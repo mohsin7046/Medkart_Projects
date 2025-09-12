@@ -32,7 +32,7 @@ function CommonDataTable({
   const [searchField, setSearchField] = useState(searchFields[0]?.key || "");
   const [statusFilter, setStatusFilter] = useState(statusFilters[0]?.key || "");
   const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("a");
+  const [sortOrder, setSortOrder] = useState("d");
   const [selectedIds, setSelectedIds] = useState([]);
 
 

@@ -1,6 +1,6 @@
 export const invoiceColumns = [
   { key: "invoice_number", label: "Invoice Number" },
-  { key: "grn_id", label: "GRN ID" },
+  { key: "goodReceiptNote", label: "GRN ID",render: (goodReceiptNote) => goodReceiptNote?.id || "-"  },
   {
     key: "invoice_date",
     label: "Invoice Date",

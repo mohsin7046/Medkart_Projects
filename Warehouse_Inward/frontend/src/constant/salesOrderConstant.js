@@ -4,7 +4,7 @@ export const salesOrderColumns = [
   { key: "totalOrderQty", label: "Total Qty" },
   { key: "status", label: "Status" },
   { key: "order_type", label: "Order Type" },
-  { key: "created_at", label: "Created At" },
+  { key: "created_at", label: "Created At",render: (val) => (val ? new Date(val).toLocaleDateString("en-GB") : "-") },
 ];
 
 

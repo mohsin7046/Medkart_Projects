@@ -8,11 +8,14 @@ import { SearchSelect } from "../utility/SearchSelect.jsx";
 function SalesOrderForm() {
   const navigate = useNavigate();
   const { id } = useParams();
+  console.log(id);
+
 
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
   const [formData, setFormData] = useState({
+    sales_order_id: "",
     name: "",
     email: "",
     contact_number: "",
@@ -24,38 +27,43 @@ function SalesOrderForm() {
   });
 
   useEffect(() => {
-    if (id){
-    const fetchSalesOrder = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getById}/${id}`);
-        const data = await res.json();
-        const order = data?.data;
-        if (!order) return;
+    if (id) {
+      const fetchSalesOrder = async () => {
+        setLoading(true);
+        try {
+          console.log(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
 
-        setFormData({
-          name: order.name || "",
-          email: order.email || "",
-          contact_number: order.contact_number || "",
-          address: order.address || "",
-          order_type: order.order_type || "B2C",
-          items: order.items?.map((i) => ({
-            product_id: i.product_id || "",
-            vendor_id: i.vendor_id || "",
-            product_name: i.product_name || "",
-            ordered_qty: i.ordered_qty?.toString() || "",
-            product_mrp: i.product_mrp?.toString() || "",
-            product_price: i.product_price?.toString() || "",
-          })) || [],
-        });
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load sales order");
-      }
-      setLoading(false);
-    };
-    fetchSalesOrder();
-}
+          const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
+          const data = await res.json();
+          console.log(data);
+
+          const order = data?.data;
+          if (!order) return;
+
+          setFormData({
+            sales_order_id: order.id,
+            name: order.name || "",
+            email: order.email || "",
+            contact_number: order.contact_number || "",
+            address: order.address || "",
+            order_type: order.order_type || "B2C",
+            items: order.items?.map((i) => ({
+              product_id: i.product_id || "",
+              vendor_id: i.vendor_id || ""
+              , product_name: i.product_name || "",
+              ordered_qty: i.ordered_qty?.toString() || "",
+              product_mrp: i?.product_mrp?.toString() || "",
+              product_price: i?.product_price?.toString() || "",
+            })) || [],
+          });
+        } catch (err) {
+          console.error(err);
+          toast.error("Failed to load sales order");
+        }
+        setLoading(false);
+      };
+      fetchSalesOrder();
+    }
   }, [id]);
 
   const handleChange = (e) => {
@@ -74,7 +82,7 @@ function SalesOrderForm() {
   const addItem = () => {
     setFormData({
       ...formData,
-      items: [...formData.items, { product_id: "", vendor_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+      items: [...formData.items, { product_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" }],
     });
   };
 
@@ -95,15 +103,45 @@ function SalesOrderForm() {
         method = ALLEndpoint.SalesOrderEndpoints.updateSalesOrder.method;
       }
 
-      const payload = {
-        ...formData,
-        items: formData.items.map((i) => ({
-          ...i,
-          ordered_qty: parseFloat(i.ordered_qty) || 0,
-          product_mrp: parseFloat(i.product_mrp) || 0,
-          product_price: parseFloat(i.product_price) || 0,
-        })),
-      };
+      let payload;
+      if (!id) {
+        payload = {
+          name: formData.name,
+          email: formData.email,
+          contact_number: formData.contact_number,
+          address: formData.address,
+          order_type: formData.order_type,
+          items: formData.items.map((i) => ({
+            product_id: parseInt(i.product_id),
+            product_name: i.product_name,
+            ordered_qty: parseFloat(i.ordered_qty) || 0,
+            product_mrp: parseFloat(i.product_mrp) || 0,
+            product_price: parseFloat(i.product_price) || 0,
+          })),
+        };
+      }
+
+      if (id) {
+        payload = {
+          sales_order_id: formData.sales_order_id,
+          name: formData.name,
+          email: formData.email,
+          contact_number: formData.contact_number,
+          address: formData.address,
+          order_type: formData.order_type,
+          items: formData.items.map((i) => ({
+            product_id: parseInt(i.product_id),
+            product_name: i.product_name,
+            vendor_id: parseInt(i.vendor_id),
+            ordered_qty: parseFloat(i.ordered_qty) || 0,
+            product_mrp: parseFloat(i.product_mrp) || 0,
+            product_price: parseFloat(i.product_price) || 0,
+          })),
+        };
+      }
+
+      console.log("payload", payload);
+
 
       const res = await fetch(url, {
         method,
@@ -140,7 +178,7 @@ function SalesOrderForm() {
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{id ? "Edit Sales Order" : "Add Sales Order"}</h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
+
           <div>
             <label>Name</label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg" required />
@@ -165,30 +203,20 @@ function SalesOrderForm() {
             </select>
           </div>
 
-        
+
           <div className="md:col-span-2">
             <h3 className="text-xl font-semibold mb-2">Products</h3>
             {formData.items.map((item, idx) => (
               <div key={idx} className="border p-4 rounded mb-4 grid grid-cols-1 md:grid-cols-6 gap-4 relative">
-                
-                <div>
-                  <label>Vendor</label>
-                  <SearchSelect
-                    type="vendor"
-                    value={item.vendor_id ? item.vendor_name : ""}
-                    onSelect={(v) => handleItemChange(idx, "vendor_id", v.id)}
-                  />
-                </div>
 
-              
                 <div>
                   <label>Product</label>
                   <SearchSelect
                     type="product"
                     value={item.product_name || ""}
                     onSelect={(p) => {
-                        console.log(p);
-                        
+                      console.log(p);
+
                       handleItemChange(idx, "product_id", p.id);
                       handleItemChange(idx, "product_name", p.name);
                       handleItemChange(idx, "product_mrp", p.product_mrp);
@@ -197,7 +225,7 @@ function SalesOrderForm() {
                   />
                 </div>
 
-               
+
                 <div>
                   <label>Ordered Qty</label>
                   <input
@@ -208,13 +236,13 @@ function SalesOrderForm() {
                   />
                 </div>
 
-               
+
                 <div>
                   <label>MRP</label>
                   <input type="number" value={item.product_mrp} readOnly disabled={!item.product_id} className="w-full border px-2 py-1 rounded bg-gray-100" />
                 </div>
 
-            
+
                 <div>
                   <label>Price</label>
                   <input type="number" value={item.product_price} readOnly disabled={!item.product_id} className="w-full border px-2 py-1 rounded bg-gray-100" />

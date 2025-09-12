@@ -4,7 +4,7 @@ import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
 
-import { cacheSet, cacheGet, cacheDelete, enqueue } from '../cache/redisClient.js';
+import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
 
 export const createPurchaseOrderService = async (data) => {
@@ -66,7 +66,6 @@ export const createPurchaseOrderService = async (data) => {
     await cacheSet(cacheKeyById, createdPO);
     await cacheSet(cacheKeyByNumber, createdPO);
 
-    await enqueue("purchaseOrderQueue", { action: "create", order_id: createdPO.id });
 
     poLogger.info(`✅ Purchase Order created | Order Number: ${order_number}`);
     return createdPO;
@@ -132,7 +131,7 @@ try {
     await cacheSet(cacheKeyById, updatedPO);
     await cacheSet(cacheKeyByNumber, updatedPO);
 
-    await enqueue("purchaseOrderQueue", { action: "update", order_id: updatedPO.id });
+
 
     poLogger.info(`✅ Purchase Order updated | ID: ${formData.order_id}`);
     return updatedPO;
@@ -172,7 +171,6 @@ try {
     await cacheDelete(`purchaseOrder:id:${order_id}`);
     await cacheDelete(`purchaseOrder:number:${deletePO.order_number}`);
 
-    await enqueue("purchaseOrderQueue", { action: "delete", order_id });
 
     poLogger.info(`✅ Purchase Order deleted | ID: ${order_id}`);
     return deletePO;

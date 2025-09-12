@@ -1,5 +1,5 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS, PRIORITY,PREFIX } from '../utilities/constant.js'
+import { STATUS, PRIORITY, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { saleLogger } from '../utilities/logger.js'
@@ -9,42 +9,46 @@ export const createSaleOrderService = async (data) => {
         const sales_order_number = generateRandom(PREFIX.SALE);
 
         console.log(sales_order_number);
-        
+
         const itemsWithTotal = data.items.map((item) => ({
             ...item,
             totalAmount: decimalConversion(item.ordered_qty * item.product_price)
         }))
 
-        console.log(itemsWithTotal);
-        
 
         const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
-        console.log(total_amount);
-        
 
         const totalOrderQty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
 
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
+
+
+        const vendor = await prisma.vendor.findFirstOrThrow({
+            orderBy: {
+                id: 'desc',
+            },
+        });
+
 
         const createdSalesOrder = await prisma.salesOrder.create({
             data: {
                 sales_order_number,
                 name: data.name,
                 email: data.email,
-                contact_number:data.contact_number,
+                contact_number: data.contact_number,
                 address: data?.address || null,
                 order_type: data.order_type,
                 priority,
                 processed: false,
                 totalOrderQty,
                 total_amount,
-                delivery_status:STATUS.NOT_DISPATCHED,
-                payment_status:STATUS.UNPAID,
+                delivery_status: STATUS.NOT_DISPATCHED,
+                payment_status: STATUS.UNPAID,
                 status: STATUS.PENDING,
                 products: {
                     create: data.items.map((item, idx) => ({
                         product_id: item.product_id,
-                        vendor_id: item.vendor_id,
+                        vendor_id: vendor.id,
                         ordered_qty: item.ordered_qty,
                         allocated_qty: 0,
                         remaining_qty: item.ordered_qty,
@@ -53,6 +57,7 @@ export const createSaleOrderService = async (data) => {
                 }
             },
         });
+
 
         if (!createdSalesOrder) {
             saleLogger.error("❌ Error while creating sales Order");
@@ -79,7 +84,7 @@ export const updateSaleOrderService = async (data) => {
         const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
 
         const totalOrderQty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
-         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
+        const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
 
         const updatedSalesOrder = await prisma.salesOrder.update({
             where: { id: data.sales_order_id },
@@ -157,63 +162,127 @@ export const deleteSalesOrderService = async (sales_order_id) => {
 
 export const getSalesOrderByIdService = async (id) => {
     const salesOrderData = await prisma.salesOrder.findUnique({
-    where: { id: parseInt(id) },
-    select: {
-      sales_order_number: true,
-      name: true,
-      email: true,
-      contact_number: true,
-      address: true,
-      order_type: true,
-      priority: true,
-      processed_date: true,
-      delivery_date: true,
-      status: true,
-      processed: true,
-      payment_status: true,
-      delivery_status: true,
-      totalOrderQty: true,
-      total_amount: true,
-      products: {
+        where: { id: parseInt(id) },
         select: {
-          ordered_qty: true,
-          allocated_qty: true,
-          remaining_qty: true,
-          updated_at: true,
-          totalAmount:true,
-          product: {
-            select: {
-              name: true,
-              category: true,
-              combination: true,
-              product_mrp: true,
-              product_price: true,
-              description: true,
-              hsn_code: true,
-              gst_percentage: true,
-              status: true
+            sales_order_number: true,
+            name: true,
+            email: true,
+            contact_number: true,
+            address: true,
+            order_type: true,
+            priority: true,
+            processed_date: true,
+            delivery_date: true,
+            status: true,
+            processed: true,
+            payment_status: true,
+            delivery_status: true,
+            totalOrderQty: true,
+            total_amount: true,
+            products: {
+                select: {
+                    ordered_qty: true,
+                    allocated_qty: true,
+                    remaining_qty: true,
+                    updated_at: true,
+                    totalAmount: true,
+                    product: {
+                        select: {
+                            name: true,
+                            category: true,
+                            combination: true,
+                            product_mrp: true,
+                            product_price: true,
+                            description: true,
+                            hsn_code: true,
+                            gst_percentage: true,
+                            status: true
+                        }
+                    },
+                    vendor: {
+                        select: {
+                            name: true
+                        }
+                    }
+                }
             }
-          },
-          vendor: {
-            select: {
-              name: true
-            }
-          }
         }
-      }
-    }
-  });
+    });
 
     if (!salesOrderData) {
         saleLogger.error(`Sales Order not found for ID: ${id}`)
         throw new Error(`Sales Order not found for ID: ${id}`);
     }
 
-    return salesOrderData;
+   const productsWithCombinationString = salesOrderData.products.map(p => ({
+        ...p,
+        product: {
+            ...p.product,
+            combination: Array.isArray(p.product.combination) ? p.product.combination.join(', ') : p.product.combination
+        }
+    }));
+
+    return {
+        ...salesOrderData,
+        products: productsWithCombinationString
+    };
 
 }
 
 
+
+export const getSalesOrderForEditByIdService = async (id) => {
+    try {
+        const fetchSalesOrder = await prisma.salesOrder.findUnique({
+            where: { id: parseInt(id) },
+            select: {
+                id:true,
+                name: true,
+                email: true,
+                contact_number: true,
+                address: true,
+                order_type: true,
+                products: {
+                    select: {
+                        product_id: true,
+                        vendor_id: true,
+                        ordered_qty: true,
+                        product: {
+                            select: {
+                                name: true,
+                                product_mrp: true,
+                                product_price: true
+                            }
+                        }
+                    }
+                }
+            }
+        })
+
+
+        if (!fetchSalesOrder) {
+            saleLogger.error(`Sales Order not found for ID: ${id}`)
+            throw new Error(`Sales Order not found for ID: ${id}`);
+        }
+        const formattedData = {
+            ...fetchSalesOrder,
+            items: fetchSalesOrder.products.map((p) => ({
+                product_id: p.product_id,
+                vendor_id: p.vendor_id,
+                ordered_qty: p.ordered_qty,
+                product_name: p.product?.name || "",
+                product_mrp: p.product?.product_mrp || 0,
+                product_price: p.product?.product_price || 0
+            }))
+        };
+
+        return formattedData;
+
+    } catch (error) {
+        saleLogger.error(`❌ Failed to fetch sales Order | ID: ${id} | Error: ${error.message}`);
+        throw error;
+    }
+}
 
 
 
@@ -229,15 +298,15 @@ export const processSalesOrderService = async (data) => {
     if (!salesOrders.length) throw new Error('Sales order(s) not found')
 
     salesOrders.sort((a, b) => {
-       if (a.priority === 'high' && b.priority !== 'high') return -1
+        if (a.priority === 'high' && b.priority !== 'high') return -1
         if (a.priority !== 'high' && b.priority === 'high') return 1
         return 0
     })
 
     console.log(salesOrders);
-    
+
     const productIds = [...new Set(salesOrders.flatMap(o => o.products.map(p => p.product_id)))]
-      const allProducts = await prisma.product.findMany({
+    const allProducts = await prisma.product.findMany({
         where: { id: { in: productIds } }
     })
 
@@ -253,7 +322,7 @@ export const processSalesOrderService = async (data) => {
     const indentMap = new Map(existingIndents.map(i => [i.product_id, i]))
 
     const operations = []
-   
+
 
     for (const order of salesOrders) {
         let orderStatus = STATUS.ALLOCATED
@@ -263,7 +332,7 @@ export const processSalesOrderService = async (data) => {
             const { product: dbProduct } = product
 
             console.log(dbProduct);
-            
+
 
             if (!dbProduct) throw new Error(`Product ${product.product_id} not found`)
 
@@ -271,19 +340,23 @@ export const processSalesOrderService = async (data) => {
             const shortage = product.ordered_qty - currentInventoryQty
             const canFullyAllocate = shortage <= 0
 
-            let allocatedQty, remainingQty , newInventory
+            let allocatedQty, remainingQty, newInventory
 
             if (isB2B) {
                 allocatedQty = Math.max(0, Math.min(currentInventoryQty, product.ordered_qty))
                 remainingQty = Math.max(0, shortage)
                 newInventory = Math.max(0, currentInventoryQty - allocatedQty)
-                
-                if (shortage > 0) {
+
+                if (shortage > 0 && allocatedQty > 0) {
                     orderStatus = STATUS.PARTIAL_RECEVIED
-                     handleIndent(product, order, shortage, indentMap, operations)
+                    handleIndent(product, order, shortage, indentMap, operations)
+                }
+                else if(shortage > 0 && allocatedQty <= 0){
+                     orderStatus = STATUS.PROCESSING
+                    handleIndent(product, order, shortage, indentMap, operations)
                 }
             } else {
-                
+
                 if (canFullyAllocate) {
                     allocatedQty = product.ordered_qty
                     remainingQty = 0
@@ -293,30 +366,30 @@ export const processSalesOrderService = async (data) => {
                     remainingQty = product.ordered_qty
                     newInventory = currentInventoryQty
                     orderStatus = STATUS.PROCESSING
-                     handleIndent(product, order, product.ordered_qty, indentMap, operations)
+                    handleIndent(product, order, product.ordered_qty, indentMap, operations)
                 }
             }
 
-            
+
             currentInventory.set(dbProduct.id, newInventory)
-            console.log("Invetory remain",newInventory);
+            console.log("Invetory remain", newInventory);
 
             operations.push(
-                 prisma.salesOrderProduct.update({
+                prisma.salesOrderProduct.update({
                     where: { id: product.id },
                     data: { allocated_qty: allocatedQty, remaining_qty: remainingQty }
                 }),
-                 prisma.product.update({
+                prisma.product.update({
                     where: { id: dbProduct.id },
                     data: { inventory_qty: newInventory }
                 })
             )
         }
 
-        console.log("Order Status",orderStatus);
-    
+        console.log("Order Status", orderStatus);
+
         operations.push(
-             prisma.salesOrder.update({
+            prisma.salesOrder.update({
                 where: { id: order.id },
                 data: {
                     processed: true,
@@ -334,29 +407,27 @@ export const processSalesOrderService = async (data) => {
 
 let processedOrders = new Set();
 
-const handleIndent = async(product, order, quantity, indentMap, operations) => {
+const handleIndent = async (product, order, quantity, indentMap, operations) => {
     const existingIndent = indentMap.get(product.product_id)
-    
     const isOrderAlreadyProcessed = processedOrders.has(order.id)
-    
     if (existingIndent) {
-    
+
         operations.push(
             await prisma.salesIndent.update({
                 where: { id: existingIndent.id },
                 data: {
                     total_sales_order: existingIndent.total_sales_order + (isOrderAlreadyProcessed ? 0 : 1),
-                    sale_order_IDs: isOrderAlreadyProcessed ? 
-                        existingIndent.sale_order_IDs : 
+                    sale_order_IDs: isOrderAlreadyProcessed ?
+                        existingIndent.sale_order_IDs :
                         [...existingIndent.sale_order_IDs, order.id],
                     total_remain_product: existingIndent.total_remain_product + quantity
                 }
             })
         )
-        
-    
+
+
     } else {
-        
+
         operations.push(
             await prisma.salesIndent.create({
                 data: {
@@ -368,8 +439,8 @@ const handleIndent = async(product, order, quantity, indentMap, operations) => {
                     status: 'open'
                 }
             })
-        ) 
-         
+        )
+
     }
 
     processedOrders.add(order.id)
@@ -377,192 +448,3 @@ const handleIndent = async(product, order, quantity, indentMap, operations) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// export const processSalesOrderService = async (data) => {
-//     const { sales_order_number } = data
-
-//     const orderNumbers = Array.isArray(sales_order_number)
-//         ? sales_order_number
-//         : [sales_order_number]
-
-//     let salesOrders = await prisma.salesOrder.findMany({
-//         where: { sales_order_number: { in: orderNumbers } },
-//         include: { products: true }
-//     })
-
-//     if (!salesOrders.length) {
-//         throw new Error('Sales order(s) not found')
-//     }
-
-//     salesOrders = salesOrders.sort((a, b) => {
-//         if (a.priority === 'high' && b.priority !== 'high') return -1
-//         if (a.priority !== 'high' && b.priority === 'high') return 1
-//         return 0
-//     })
-
- 
-//     for (const order of salesOrders) {
-//         let total_sales_order_status=false;
-//         for (const product of order.products) {
-            
-//             const dbProduct = await prisma.product.findUnique({
-//                 where: { id: product.product_id }
-//             })
-
-//             const shortage = product.ordered_qty - dbProduct.inventory_qty
-
-//             if (shortage <= 0) {
-                
-//                 await prisma.salesOrderProduct.update({
-//                     where: { id: product.id },
-//                     data: {
-//                         allocated_qty: product.ordered_qty,
-//                         remaining_qty: 0
-//                     }
-//                 })
-
-//                 await prisma.salesOrder.update({
-//                     where: { id: order.id },
-//                     data: {
-//                         processed: true,
-//                         status: STATUS.ALLOCATED,
-//                         processed_date: new Date()
-//                     }
-//                 })
-
-//                 await prisma.product.update({
-//                     where: { id: dbProduct.id },
-//                     data: { inventory_qty: Math.min(0,shortage) }
-//                 })
-
-//             } else {
-                
-//                 if(order.order_type === 'B2B' && shortage > 0){
-                    
-//                     await prisma.salesOrderProduct.update({
-//                     where: { id: product.id },
-//                     data: {
-//                         allocated_qty: Math.min(dbProduct.inventory_qty,product.ordered_qty),
-//                         remaining_qty: shortage
-//                     }
-//                 })
-
-//                 await prisma.salesOrder.update({
-//                     where: { id: order.id },
-//                     data: {
-//                         processed: true,
-//                         status: STATUS.PARTIAL_RECEVIED,
-//                         processed_date: new Date()
-//                     }
-//                 })
-
-//                 await prisma.product.update({
-//                     where: { id: dbProduct.id },
-//                     data: { inventory_qty: Math.min(0,shortage) }
-//                  })
-
-//                 }
-
-//                 let indent = await prisma.salesIndent.findFirst({
-//                     where: {
-//                         product_id: product.product_id,
-//                         status: 'open'
-//                     }
-//                 })
-
-//                 if (indent && order.order_type === 'B2B') {
-//                     await prisma.salesIndent.update({
-//                         where: { id: indent.id },
-//                         data: {
-//                             total_sales_order: total_sales_order_status == false ? indent.total_sales_order++ : indent.total_sales_order,
-//                             sale_order_IDs: [indent.sale_order_IDs,order.id],
-//                             total_remain_product:indent.total_remain_product+shortage
-//                         }
-//                     })
-//                 }else if(indent && order.order_type === 'B2C'){
-//                      await prisma.salesIndent.update({
-//                         where: { id: indent.id },
-//                         data: {
-//                             total_sales_order: total_sales_order_status == false ? indent.total_sales_order++ : indent.total_sales_order,
-//                             sale_order_IDs: [indent.sale_order_IDs,order.id],
-//                             total_remain_product:indent.total_remain_product+product.remaining_qty
-//                         }
-//                     })
-//                 }
-//                 else {
-//                     if(order.order_type === 'B2B'){
-//                     await prisma.salesIndent.create({
-//                         data: {
-//                             indent_number: generateRandom('IN-'),
-//                             product_id: product.product_id,
-//                             total_sales_order: 1,
-//                             total_remain_product: shortage,
-//                             sale_order_IDs: [order.id],
-//                             status: 'open'
-//                         }
-//                     })
-//                 }else if(order.order_type === 'B2C'){
-//                     await prisma.salesIndent.create({
-//                         data: {
-//                             indent_number: generateRandom('IN-'),
-//                             product_id: product.product_id,
-//                             total_sales_order: 1,
-//                             total_remain_product: product.remaining_qty,
-//                             sale_order_IDs: [order.id],
-//                             status: 'open'
-//                         }
-//                     })
-//                 }
-//             }
-//             }
-//         }
-//     }
-
-//     return { message: 'Sales order(s) processed successfully' }
-// }
-
-
-//Optimize Code

@@ -12,6 +12,7 @@ function Home() {
     else if (location.pathname.includes("grn")) setSelected("grn")
     else if (location.pathname.includes("purchase-invoice")) setSelected("purchase-invoice")
     else if (location.pathname.includes("sales-order")) setSelected("sales-order")
+    else if (location.pathname.includes("sales-indent")) setSelected("sales-indent")
   }, [location.pathname])
 
   return (
@@ -79,6 +80,15 @@ function Home() {
               }`}
             >
               Sales Order
+            </Link>
+            <Link
+              to="sales-indent"
+              onClick={() => setSelected("sales-indent")}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                selected === "sales-indent" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Sales Indent
             </Link>
 
           </div>

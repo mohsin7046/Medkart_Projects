@@ -50,27 +50,4 @@ export const cacheDelete = async (key) => {
   }
 };
 
-
-export const enqueue = async (queueName, data) => {
-  try {
-    await redisClient.lpush(queueName, JSON.stringify(data));
-    productLogger.info(`✅ Data enqueued to ${queueName}`);
-  } catch (err) {
-    productLogger.error(`❌ Queue push failed for ${queueName} | ${err.message}`);
-  }
-};
-
-export const dequeue = async (queueName) => {
-  try {
-    const data = await redisClient.rpop(queueName);
-    if (!data) return null;
-    productLogger.info(`✅ Data dequeued from ${queueName}`);
-    return JSON.parse(data);
-  } catch (err) {
-    productLogger.error(`❌ Queue pop failed for ${queueName} | ${err.message}`);
-    return null;
-  }
-};
-
-
 export { redisClient };

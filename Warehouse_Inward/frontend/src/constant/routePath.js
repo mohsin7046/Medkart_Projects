@@ -40,6 +40,11 @@ export const ROUTES = {
     VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
   },
 
+  SALES_INDENT: {
+    LIST: "/sales-indent", 
+    VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
+  },
+
   COMMON_VIEW:{
     VIEW:'/view/:type/:id'
   }
