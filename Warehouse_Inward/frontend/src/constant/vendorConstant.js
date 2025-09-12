@@ -3,7 +3,6 @@ export const columns = [
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
     { key: "contact_number", label: "Contact" },
-    { key: "gst_number", label: "GST" },
     { key: "address", label: "Address" },
     { key: "status", label: "Status" },
   ];
@@ -12,7 +11,6 @@ export const searchFields = [
     { key: "name", label: "Name" },
     { key: "vendor_code", label: "Vendor Code" },
     { key: "email", label: "Email" },
-    { key: "gst_number", label: "GST" },
     { key: "contact_number", label: "Contact Number" },
     { key: "address", label: "Address" },
   ];

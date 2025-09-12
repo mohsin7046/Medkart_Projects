@@ -3,17 +3,34 @@ import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { vendorLogger } from '../utilities/logger.js';
 import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
+import { appQueue, appQueueEvents } from '../cache/queueManager.js'
 
 export const createVendorService = async (data) => {
   try {
     const vendor_code = generateRandom("VENDOR");
 
-    const newVendor = await prisma.vendor.create({
-      data: {
+     const module = 'vendor';
+    const operation = 'create';
+
+    const result = await appQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: {
         ...data,
-        vendor_code,
+       vendor_code,
       },
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
+
+    const newVendor = await result.waitUntilFinished(appQueueEvents);
+    if(!newVendor){
+      throw new Error('vendor not created')
+    }
+
+    console.log("FRom the vendor service",newVendor);
 
     vendorLogger.info(`✅ Vendor created successfully | Code: ${vendor_code}`);
 
@@ -30,10 +47,28 @@ export const createVendorService = async (data) => {
 
 export const updateVendorService = async (data) => {
   try {
-    const updatedVendor = await prisma.vendor.update({
-      where: { vendor_code: data.vendor_code },
-      data: { ...data },
+    
+    const module = 'vendor';
+    const operation = 'update';
+
+    const result = await appQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: {
+        ...data,
+      },
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
+
+    const updatedVendor = await result.waitUntilFinished(appQueueEvents);
+    if(!updatedVendor){
+      throw new Error('vendor not created')
+    }
+
+    console.log("FRom the vendor service",updatedVendor);
 
     vendorLogger.info(`✅ Vendor updated successfully | Code: ${data.vendor_code}`);
 
@@ -81,10 +116,28 @@ export const searchVendorsService = async (q) => {
 
 export const deleteVendorService = async (vendor_code) => {
   try {
-    const softdeleteVendor = await prisma.vendor.update({
-      where: { vendor_code },
-      data: { deleted_at: new Date() },
+   
+    const module = 'vendor';
+    const operation = 'delete';
+
+    const result = await appQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: {
+        vendor_code
+      },
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
+
+    const softdeleteVendor = await result.waitUntilFinished(appQueueEvents);
+    if(!softdeleteVendor){
+      throw new Error('vendor not delete')
+    }
+
+    console.log("FRom the vendor service",softdeleteVendor);
 
     vendorLogger.info(`✅ Vendor deleted successfully | Code: ${vendor_code}`);
 
@@ -105,9 +158,9 @@ export const getVendorByIdService = async (id) => {
       throw new Error("Vendor ID is required");
     }
 
-    const cacheKey = `vendor:id:${id}`;
-    const cached = await cacheGet(cacheKey);
-    if (cached) return cached;
+    // const cacheKey = `vendor:id:${id}`;
+    // const cached = await cacheGet(cacheKey);
+    // if (cached) return cached;
 
     const vendor = await prisma.vendor.findUnique({
       where: { id: parseInt(id) },
@@ -117,7 +170,7 @@ export const getVendorByIdService = async (id) => {
       throw new Error(`Vendor not found for ID: ${id}`);
     }
 
-    cacheSet(cacheKey, vendor, 3600);
+    // cacheSet(cacheKey, vendor, 3600);
 
     vendorLogger.info(`✅ Vendor fetched successfully | ID: ${id}`);
     return vendor;

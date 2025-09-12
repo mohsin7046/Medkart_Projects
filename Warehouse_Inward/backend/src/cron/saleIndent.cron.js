@@ -23,9 +23,6 @@ const processExpiredIndents = async () => {
             }
         })
 
-        console.log(openIndents);
-        
-
         if (!openIndents.length) {
             console.log('No open indents found')
             return
