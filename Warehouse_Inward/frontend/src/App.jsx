@@ -1,42 +1,65 @@
-import React from "react";
+import { ToastContainer } from "react-toastify";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./components/Home";
-import Product from "./components/ProductMaster/Product";
-import Vendor from "./components/VendorMaster/Vendor";
-import PurchaseOrder from "./components/PurchaseOrder/PurchaseOrder";
-import PurchaseOrderForm from "./components/PurchaseOrder/PurchaseForm";
-import ProductForm from "./components/ProductMaster/productForm";
-import VendorForm from "./components/VendorMaster/vendorForm";
-import GrnForm from "./components/GoodReceiptNote/grnForm";
-import GRN from "./components/GoodReceiptNote/grn"; 
-import GRNView from "./components/GoodReceiptNote/grnView";
-import PurchaseInvoice from "./components/PurchaseInvoice/PurchaseInvoice";
-import PurchaseInvoiceForm from "./components/PurchaseInvoice/PurchaseInvoiceForm";
-import PurchaseInvoiceView from "./components/PurchaseInvoice/PurchaseInvoiceView";
+import { ROUTES } from "./constant/routePath.js";
+import {
+  Home,
+  Product,
+  ProductForm,
+  Vendor,
+  VendorForm,
+  PurchaseOrder,
+  PurchaseOrderForm,
+  GrnForm,
+  GRN,
+  PurchaseInvoice,
+  PurchaseInvoiceForm,
+  SalesOrder,
+  SalesOrderForm,
+  SalesIndent
+} from "./components/importComponent.js";
+import CommonView from "./components/utility/CommonView.jsx";
 
 function App() {
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={1000} />
       <Home />
-      <div className=""> 
+      <div className="">
         <Routes>
-          <Route path="/" element={<div className="flex justify-center mt-10 text-7xl font-bold font-serif">WareHouse Inward System</div>} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/product/add" element={<ProductForm />} />
-          <Route path="/product/edit/:id" element={<ProductForm />} />
-          <Route path="/vendor" element={<Vendor />} />
-          <Route path="/vendor/add" element={<VendorForm />} />
-          <Route path="/vendor/edit/:id" element={<VendorForm />} />
-          <Route path="/purchase-order" element={<PurchaseOrder />} />
-          <Route path="/purchase-order/add" element={<PurchaseOrderForm />} />
-          <Route path="/purchase-order/edit/:id" element={<PurchaseOrderForm />} />
-          <Route path="/grn/add" element={<GrnForm />} />
-          <Route path="/grn" element={<GRN />} />
-          <Route path="/grn/view/:id" element={<GRNView />} />
-          <Route path="/grn/edit/:id" element={<GrnForm />} />
-          <Route path="/purchase-invoice" element={<PurchaseInvoice />} />
-          <Route path="/purchase-invoice/add" element={<PurchaseInvoiceForm />} />
-          <Route path="/purchase-invoice/view/:id" element={<PurchaseInvoiceView />} />
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <div className="flex justify-center mt-10 text-7xl font-bold font-serif">
+                WareHouse Inward System
+              </div>
+            }
+          />
+          <Route path={ROUTES.PRODUCT.LIST} element={<Product />} />
+          <Route path={ROUTES.PRODUCT.ADD} element={<ProductForm />} />
+          <Route path={ROUTES.PRODUCT.EDIT()} element={<ProductForm />} />
+
+          <Route path={ROUTES.VENDOR.LIST} element={<Vendor />} />
+          <Route path={ROUTES.VENDOR.ADD} element={<VendorForm />} />
+          <Route path={ROUTES.VENDOR.EDIT()} element={<VendorForm />} />
+
+          <Route path={ROUTES.PURCHASE_ORDER.LIST} element={<PurchaseOrder />} />
+          <Route path={ROUTES.PURCHASE_ORDER.ADD} element={<PurchaseOrderForm />} />
+          <Route path={ROUTES.PURCHASE_ORDER.EDIT()} element={<PurchaseOrderForm />} />
+
+          <Route path={ROUTES.GRN.LIST} element={<GRN />} />
+          <Route path={ROUTES.GRN.ADD()} element={<GrnForm />} />
+          <Route path={ROUTES.GRN.EDIT()} element={<GrnForm />} />
+
+          <Route path={ROUTES.PURCHASE_INVOICE.LIST} element={<PurchaseInvoice />} />
+          <Route path={ROUTES.PURCHASE_INVOICE.ADD()} element={<PurchaseInvoiceForm />} />
+
+          <Route path={ROUTES.SALES_ORDER.LIST} element={<SalesOrder />} />
+       <Route path={ROUTES.SALES_ORDER.ADD} element={<SalesOrderForm />} />
+          <Route path={ROUTES.SALES_ORDER.EDIT()} element={<SalesOrderForm />} />
+
+          <Route path={ROUTES.SALES_INDENT.LIST} element={<SalesIndent />} />
+
+          <Route path={ROUTES.COMMON_VIEW.VIEW} element={<CommonView />} />
         </Routes>
       </div>
     </Router>
@@ -44,4 +67,3 @@ function App() {
 }
 
 export default App;
-

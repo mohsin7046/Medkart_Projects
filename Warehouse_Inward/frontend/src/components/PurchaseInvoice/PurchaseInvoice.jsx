@@ -1,104 +1,96 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEye, FiTrash2 } from "react-icons/fi";
+import CommonDataTable from "../utility/commonDataTable.jsx";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
+import {
+  invoiceColumns,
+  invoiceSearchFields,
+  invoiceStatusFilters,
+} from "../../constant/purchaseInvoiceConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/purchaseInvoiceConstant.js";
 
 function PurchaseInvoiceList() {
-  const [invoices, setInvoices] = useState([]);
+  const [page, setPage] = useState(1);
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("invoice_number");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("d");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/purchase-invoice/get-pi");
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        setInvoices(data);
-      } catch (error) {
-        console.error("Error fetching purchase invoices:", error);
-      }
-    };
-    fetchData();
-  }, []);
+  const {
+    data: invoices,
+    metadata,
+    loading,
+    setData: setInvoices,
+  } = useFetchData({
+    endpoint: ALLEndpoint.PurchaseInvoiceEndpoints.getPurchaseInvoice.endpoint,
+    name: "invoice",
+    page,
+    limit,
+    debounceDelay: 500,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+  });
 
-  const handleDelete = async (invoice_number) => {
-    if (window.confirm("Are you sure you want to delete this Purchase Invoice?")) {
-      try {
-        const response = await fetch(`http://localhost:3000/purchase-invoice/delete-pi`, {
-          method: "DELETE",
-           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({invoice_number})
-        });
-        if (!response.ok) {
-          const errorData = await response.json();
-          alert(errorData.error || "Failed to delete Invoice");
-          return;
-        }
-        setInvoices((prev) => prev.filter((inv) => inv.invoice_number !== invoice_number));
-      } catch (error) {
-        console.error("Error deleting Invoice:", error);
-      }
-    }
+  const { deleteItem } = useDeleteData(
+    ALLEndpoint.PurchaseInvoiceEndpoints.deletePurchaseInvoice.endpoint,
+    ALLEndpoint.PurchaseInvoiceEndpoints.deletePurchaseInvoice.method
+  );
+
+  const handleDelete = (invoice_id) => {
+    deleteItem({
+      idField: "invoice_id",
+      idValue: invoice_id,
+      setState: setInvoices,
+    });
   };
 
+  const handleSearch = ({ field, value }) => {
+    setSearchField(field);
+    setSearchTerm(value);
+    setPage(1);
+  };
 
+  const handleFilter = ({ status }) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  const handleSort = ({ field, order }) => {
+    setSortField(field);
+    setSortOrder(order);
+    setPage(1);
+  };
 
   return (
     <div>
-      
-      <div className="bg-white shadow-md p-4 rounded-md">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">ID</th>
-              <th className="border px-4 py-2">Invoice Number</th>
-              <th className="border px-4 py-2">GRN Number</th>
-              <th className="border px-4 py-2">Invoice Date</th>
-              <th className="border px-4 py-2">Total Amount</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoices.length > 0 ? (
-              invoices.map((inv, idx) => (
-                <tr key={inv.id} className="text-center">
-                  <td className="border px-4 py-2">{idx + 1}</td>
-                  <td className="border px-4 py-2">{inv.invoice_number}</td>
-                  <td className="border px-4 py-2">{inv.grn_number}</td>
-                  <td className="border px-4 py-2">
-                    {new Date(inv.invoice_date).toLocaleDateString()}
-                  </td>
-                  <td className="border px-4 py-2">₹{inv.total_amount}</td>
-                  <td className="border px-4 py-2">{inv.status}</td>
-                  <td className="border px-4 py-2 flex justify-center gap-2">
-                    <button
-                      onClick={() =>
-                        navigate(`/purchase-invoice/view/${inv.id}`, { state: { invoice: inv } })
-                      }
-                      className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <FiEye className="text-blue-600" size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(inv.invoice_number)}
-                      className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <FiTrash2 className="text-red-700" size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center py-4 text-gray-500">
-                  No Purchase Invoices found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <CommonDataTable
+        columns={invoiceColumns}
+        data={invoices}
+        page={page}
+        limit={limit}
+        metadata={metadata}
+        loading={loading}
+        setPage={setPage}
+        searchFields={invoiceSearchFields}
+        statusFilters={invoiceStatusFilters}
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        onSort={handleSort}
+        onView={(invoice) =>
+        navigate(ROUTES.PURCHASE_INVOICE.VIEW('invoice',invoice.id))
+        }
+        onDelete={(invoice) => handleDelete(invoice.id)}
+      />
     </div>
   );
 }

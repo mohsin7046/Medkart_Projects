@@ -1,155 +1,92 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import CommonDataTable from "../utility/commonDataTable.jsx";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
+import { columns,searchFields,statusFilters } from "../../constant/vendorConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/vendorConstant.js";
 
 function Vendor() {
-  const [vendors, setVendors] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
+  const [page, setPage] = useState(1);
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:3000/vendors/getAllvendor"
-        );
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        setVendors(data);
-      } catch (error) {
-        console.error("Error fetching vendors:", error);
-      }
-    };
-    fetchData();
-  }, []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("name");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("d");
 
-  const filteredVendors = vendors.filter((v) => {
-    const matchesSearch =
-      v.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.vendor_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.gst_number?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus =
-      statusFilter === "all"
-        ? true
-        : v.status?.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
+  const { data: vendors, metadata, loading, setData: setVendors } = useFetchData({
+    endpoint: ALLEndpoint.VendorEndpoints.getVendor.endpoint,
+    name: "vendor",
+    page,
+    limit,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+    debounceDelay: 500,
   });
 
-  const handleDelete = async (vendor_code) => {
-    if (window.confirm("Are you sure you want to delete this vendor?")) {
-      try {
-        const response = await fetch(
-          `http://localhost:3000/vendors/deleteVendor`,
-          {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ vendor_code }),
-          }
-        );
 
-        if (!response.ok) throw new Error("Network response was not ok");
+  const { deleteItem } = useDeleteData(
+    ALLEndpoint.VendorEndpoints.deleteVendor.endpoint,
+    ALLEndpoint.VendorEndpoints.deleteVendor.method
+  );
 
-        setVendors(vendors.filter((v) => v.vendor_code !== vendor_code));
-      } catch (error) {
-        console.error("Error deleting vendor:", error);
-      }
-    }
+  const handleDelete = (vendor_code) => {
+    deleteItem({
+      idField: "vendor_code",
+      idValue: vendor_code,
+      setState: setVendors,
+    });
   };
+
+  const handleSearch = ({ field, value }) => {
+    setSearchField(field);
+    setSearchTerm(value);
+    setPage(1);
+  };
+
+  const handleFilter = ({ status }) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  const handleSort = ({ field, order }) => {
+    setSortField(field);
+    setSortOrder(order);
+    setPage(1);
+  };
+
+
 
   return (
     <div>
-      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Search by name, code, email, or GST..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-64"
-          />
-
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
-
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded-md"
-          onClick={() => navigate("/vendor/add")}
-        >
-          Add Vendor +
-        </button>
-      </div>
-
-      <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
-        <table className="w-full border-collapse min-w-[800px]">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">ID</th>
-              <th className="border px-4 py-2">Vendor Code</th>
-              <th className="border px-4 py-2">Name</th>
-              <th className="border px-4 py-2">Email</th>
-              <th className="border px-4 py-2">Contact</th>
-              <th className="border px-4 py-2">GST</th>
-              <th className="border px-4 py-2">Address</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredVendors.length > 0 ? (
-              filteredVendors.map((v, idx) => (
-                <tr key={v.id} className="text-center">
-                  <td className="border px-4 py-2">{idx + 1}</td>
-                  <td className="border px-4 py-2 break-words">{v.vendor_code}</td>
-                  <td className="border px-4 py-2 break-words">{v.name}</td>
-                  <td className="border px-4 py-2 break-words">{v.email}</td>
-                  <td className="border px-4 py-2 break-words">
-                    {v.contact_person} ({v.contact_number})
-                  </td>
-                  <td className="border px-4 py-2 break-words">{v.gst_number}</td>
-                  <td className="border px-4 py-2 break-words">{v.address}</td>
-                  <td className="border px-4 py-2">{v.status}</td>
-                  <td className="border px-4 py-2" >
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => navigate(`/vendor/edit/${v.id}`, { state: v })}
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        <FiEdit className="text-green-600" size={18} />
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(v.vendor_code)}
-                        className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                      >
-                        <FiTrash2 className="text-red-500" size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="9" className="text-center py-4 text-gray-500">
-                  No vendors found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <CommonDataTable
+        columns={columns}
+        data={vendors}
+        page={page}
+        limit={limit}
+        metadata={metadata}
+        loading={loading}
+        setPage={setPage}
+        searchFields={searchFields}
+        statusFilters={statusFilters}
+        onSearch={handleSearch}
+        onFilter={handleFilter}
+        onSort={handleSort}
+        onAdd={() => navigate(ROUTES.VENDOR.ADD)}
+        onEdit={(vendor) =>
+          navigate(ROUTES.VENDOR.EDIT(vendor.id))
+        }
+        onDelete={(vendor) => handleDelete(vendor.vendor_code)}
+      />
     </div>
   );
 }

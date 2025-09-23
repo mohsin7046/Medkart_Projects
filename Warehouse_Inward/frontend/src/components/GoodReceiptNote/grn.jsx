@@ -1,159 +1,106 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FiEdit, FiTrash2,FiEye } from "react-icons/fi";
+import { ALLEndpoint } from "../../constant/endPoints.js";
+import { useFetchData } from "../../hooks/useFetchData.hooks.js";
+import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
+import CommonDataTable from "../../components/utility/commonDataTable.jsx";
+import {
+  grnColumns,
+  grnSearchFields,
+  grnStatusFilters,
+} from "../../constant/grnConstant.js";
+import { ROUTES } from "../../constant/routePath.js";
+import { LIMITPAGE } from "../../constant/grnConstant.js";
 
 function GRNList() {
-  const [grns, setGrns] = useState([]);
+  const [page, setPage] = useState(1);
+  const limit = LIMITPAGE;
   const navigate = useNavigate();
-    const [searchTerm, setSearchTerm] = useState("");
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchField, setSearchField] = useState("grn_number");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [sortField, setSortField] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState("d");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/grn/get-grn");
-        if (!response.ok) throw new Error("Network response was not ok");
-        const data = await response.json();
-        setGrns(data);
-      } catch (error) {
-        console.error("Error fetching GRN:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleDelete = async (grn_number) => {
-    if (window.confirm("Are you sure you want to delete this GRN?")) {
-      try {
-        const response = await fetch(`http://localhost:3000/grn/delete-grn`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ grn_number:grn_number}),
-        });
-        if (!response.ok){
-          const errorData = await response.json();
-          alert(errorData.error || "Failed to delete GRN");
-          return;
-        }
-        setGrns((prev) => prev.filter((g) => g.grn_number !== grn_number));
-      } catch (error) {
-        console.error("Error deleting GRN:", error);
-      }
-    }
-  };
-
-  const filteredGrns = grns.filter((g) => {
-    const matchesSearch =
-      g.grn_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      g.order_number?.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesStatus =
-      statusFilter === "all"
-        ? true
-        : g.status?.toLowerCase() === statusFilter.toLowerCase();
-
-    return matchesSearch && matchesStatus;
+  const {
+    data: grns,
+    metadata,
+    loading,
+    setData: setGrns,
+  } = useFetchData({
+    endpoint: ALLEndpoint.GRNEndpoints.getGRN.endpoint,
+    name: "grn",
+    page,
+    limit,
+    searchTerm,
+    searchField,
+    statusFilter,
+    sortField,
+    sortOrder,
+    debounceDelay: 500,
   });
 
+  const { deleteItem } = useDeleteData(
+    ALLEndpoint.GRNEndpoints.deleteGRN.endpoint,
+    ALLEndpoint.GRNEndpoints.deleteGRN.method
+  );
+
+  const handleDelete = (grn_id) => {
+    deleteItem({
+      idField: "grn_id",
+      idValue: grn_id,
+      setState: setGrns,
+    });
+  };
+
+  const handleSearch = ({ field, value }) => {
+    setSearchField(field);
+    setSearchTerm(value);
+    setPage(1);
+  };
+
+  const handleFilter = ({ status }) => {
+    setStatusFilter(status);
+    setPage(1);
+  };
+
+  const handleSort = ({ field, order }) => {
+    setSortField(field);
+    setSortOrder(order);
+    setPage(1);
+  };
 
   return (
-    <div>
-      <div className="bg-white shadow-md p-4 rounded-md mb-6 flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <input
-            type="text"
-            placeholder="Search by GRN No. or Order No..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="border px-3 py-1 rounded-md w-64"
-          />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border px-3 py-1 rounded-md"
-          >
-            <option value="all">All Status</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-      </div>
-
-      <div className="bg-white shadow-md p-4 rounded-md">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border px-4 py-2">ID</th>
-              <th className="border px-4 py-2">GRN Number</th>
-              <th className="border px-4 py-2">Order Number</th>
-              <th className="border px-4 py-2">Received Date</th>
-              <th className="border px-4 py-2">Total Amount</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Action</th>
-              <th className="border px-4 py-2">Create Invoice</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredGrns.length > 0 ? (
-              filteredGrns.map((grn, idx) => (
-                <tr key={grn.id} className="text-center">
-                  <td className="border px-4 py-2">{idx + 1}</td>
-                  <td className="border px-4 py-2">{grn.grn_number}</td>
-                  <td className="border px-4 py-2">{grn.order_number}</td>
-                  <td className="border px-4 py-2">
-                    {new Date(grn.received_date).toLocaleDateString()}
-                  </td>
-                  <td className="border px-4 py-2">₹{grn.total_amount}</td>
-                  <td className="border px-4 py-2">{grn.status}</td>
-                  <td className="border px-4 py-2">
-                    <button
-                      onClick={() =>
-                        navigate(`/grn/edit/${grn.id}`, { state: { grn: grn } })
-                      }
-                      className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <FiEdit className="text-green-600" size={18} />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(grn.grn_number)}
-                      className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <FiTrash2 className="text-red-700" size={18} />
-                    </button>
-                    <button
-                      onClick={() =>
-                        navigate(`/grn/view/${grn.id}`, { state: { grn } })
-                      }
-                      className="p-2 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      <FiEye className="text-blue-600" size={18} />
-                    </button>
-                  </td>
-                  <td className="border px-4 py-2">
-                    <button
-                      onClick={() =>
-                        navigate(`/purchase-invoice/add`, { state: { grn } })
-                      }
-                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
-                    >
-                      Create Invoice
-                    </button>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="text-center py-4 text-gray-500">
-                  No GRNs found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <CommonDataTable
+      columns={grnColumns}
+      data={grns}
+      page={page}
+      limit={limit}
+      metadata={metadata}
+      loading={loading}
+      setPage={setPage}
+      searchFields={grnSearchFields}
+      statusFilters={grnStatusFilters}
+      onSearch={handleSearch}
+      onFilter={handleFilter}
+      onSort={handleSort}
+      onEdit={(grn) =>
+        navigate(ROUTES.GRN.EDIT(grn.id))
+      }
+      onView={(grn) =>
+        navigate(ROUTES.GRN.VIEW('grn',grn.id))
+      }
+      onDelete={(grn) => handleDelete(grn.id)}
+      extraAction={(grn) => (
+        <button
+          onClick={() => navigate(ROUTES.PURCHASE_INVOICE.ADD(grn.id))}
+          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
+        >
+          Create Invoice
+        </button>
+      )}
+    />
   );
 }
 

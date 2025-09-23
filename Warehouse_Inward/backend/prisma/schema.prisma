@@ -25,10 +25,12 @@ model Vendor{
   gst_number String
   address   String
   status    String   @default("active") // active, inactive, blocked
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
 
   purchaseOrders PurchaseOrder[]
+  salesOrderProducts SalesOrderProduct[]
 
   @@map("vendors")
 }
@@ -44,30 +46,37 @@ model Product{
   last_purchase_price Float
   unit_of_measure String
   description String
-  hsn_code   Int
+  hsn_code   String
   gst_percentage Float
-  status      String   @default("active") // active, inactive, discontinued
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String   @default("active") 
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
+  inventory_qty     Int?
 
   purchaseOrderItems PurchaseOrderItem[]
 
   @@map("products")
   GoodReceiptNoteItem GoodReceiptNoteItem[]
   PurchaseInvoiceItem PurchaseInvoiceItem[]
+  salesOrderProducts SalesOrderProduct[]
+  SalesIndent  SalesIndent[]
+
 }
+
 
 model PurchaseOrder{
   id          Int      @id @default(autoincrement())
   order_number String   @unique
-  vendor_code   String
-  vendor      Vendor   @relation(fields: [vendor_code], references: [vendor_code])
+  vendor_id   Int
+  vendor      Vendor   @relation(fields: [vendor_id], references: [id])
   order_date  DateTime
   total_amount Float
   expected_delivery_date DateTime
   status      String   @default("pending") // pending, partially received, completed, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   purchaseOrderItems PurchaseOrderItem[]
 
@@ -78,16 +87,17 @@ model PurchaseOrder{
 
 model PurchaseOrderItem{
   id          Int      @id @default(autoincrement())
-  order_number String
-  purchaseOrder PurchaseOrder @relation(fields: [order_number], references: [order_number])
-  product_code  String
-  product     Product   @relation(fields: [product_code], references: [product_code])
+  order_id   Int
+  purchaseOrder PurchaseOrder @relation(fields: [order_id], references: [id])
+  product_id  Int
+  product     Product   @relation(fields: [product_id], references: [id])
   quantity    Int
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("purchase_order_items")
 }
@@ -95,15 +105,14 @@ model PurchaseOrderItem{
 model GoodReceiptNote{
   id          Int      @id @default(autoincrement())
   grn_number   String   @unique
-  order_number String
-  purchaseOrder PurchaseOrder @relation(fields: [order_number], references: [order_number])
+  order_id   Int
+  purchaseOrder PurchaseOrder @relation(fields: [order_id], references: [id])
   received_date DateTime
   total_amount Float
-  damaged_qty Int?
-  shortage_qty Int?
   status      String   @default("pending") // pending, completed, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   goodReceiptNoteItems GoodReceiptNoteItem[]
 
@@ -115,17 +124,20 @@ model GoodReceiptNoteItem{
   id          Int      @id @default(autoincrement())
   grn_id      Int
   goodReceiptNote GoodReceiptNote @relation(fields: [grn_id], references: [id])
-  product_code  String
-  product     Product   @relation(fields: [product_code], references: [product_code])
+  product_id  Int
+  product     Product   @relation(fields: [product_id], references: [id])
   batch_number String
   expiry_date DateTime
   recevied_qty    Int
   ordered_qty  Int
+  damaged_qty Int?
+  shortage_qty Int?
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("good_receipt_note_items")
 }
@@ -133,13 +145,14 @@ model GoodReceiptNoteItem{
 model PurchaseInvoice{
   id          Int      @id @default(autoincrement())
   invoice_number String   @unique
-  grn_number      String  
-  goodReceiptNote GoodReceiptNote @relation(fields: [grn_number], references: [grn_number])
+  grn_id      Int  
+  goodReceiptNote GoodReceiptNote @relation(fields: [grn_id], references: [id])
   invoice_date DateTime
   total_amount Float
   status      String   @default("pending") // pending, paid, cancelled
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at   DateTime?
 
   @@map("purchase_invoices")
   PurchaseInvoiceItem PurchaseInvoiceItem[]
@@ -147,16 +160,80 @@ model PurchaseInvoice{
 
 model PurchaseInvoiceItem{
   id         Int      @id @default(autoincrement())
-  invoice_number  String  
-  purchaseInvoice PurchaseInvoice @relation(fields: [invoice_number], references: [invoice_number])
-  product_code  String
-  product     Product   @relation(fields: [product_code], references: [product_code])
+  invoice_id  Int  
+  purchaseInvoice PurchaseInvoice @relation(fields: [invoice_id], references: [id])
+  product_id  Int
+  product     Product   @relation(fields: [product_id], references: [id])
   quantity    Int
   item_price       Float
   item_mrp        Float
   totalAmount       Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  deleted_at DateTime?
 
   @@map("purchase_invoice_items")
 }
+
+model SalesOrder {
+  id                Int                  @id @default(autoincrement())
+  sales_order_number String              @unique
+  name      String
+  email              String
+  contact_number     String
+  address            String?
+  order_type         String              // B2C | B2B
+  priority           String              // auto: high for B2B, normal for B2C
+  processed_date     DateTime?
+  delivery_date      DateTime?
+  status             String              // pending | partial | processing | allocated | cancelled
+  processed          Boolean    
+  payment_status     String              // unpaid | paid | partial
+  delivery_status    String              // not dispatched | dispatched | delivered
+  totalOrderQty      Int
+  total_amount       Float
+  products           SalesOrderProduct[]
+  created_at         DateTime            @default(now())
+  updated_at         DateTime            @updatedAt
+  deleted_at         DateTime?
+
+  @@map("sales_orders")
+}
+
+model SalesOrderProduct {
+  id             Int        @id @default(autoincrement())
+  sales_order_id Int
+  product_id     Int
+  vendor_id      Int
+  ordered_qty    Int
+  allocated_qty  Int      
+  remaining_qty  Int
+  totalAmount    Int
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  deleted_at         DateTime?
+
+  salesOrder     SalesOrder @relation(fields: [sales_order_id], references: [id])
+  product        Product    @relation(fields: [product_id], references: [id])
+  vendor      Vendor   @relation(fields: [vendor_id], references: [id])
+
+  @@map("sales_order_products")
+}
+
+model SalesIndent {
+  id                  Int        @id @default(autoincrement())
+  indent_number       String     @unique
+  product_id          Int
+  total_sales_order   Int       
+  total_remain_product Int      
+  sale_order_IDs      Json       
+  status              String   
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  expired_at          DateTime?
+  deleted_at         DateTime?
+  product             Product    @relation(fields: [product_id], references: [id])
+
+  @@map("sales_indents")
+}
+
