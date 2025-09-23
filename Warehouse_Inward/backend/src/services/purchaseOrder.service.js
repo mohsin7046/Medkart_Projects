@@ -3,10 +3,12 @@ import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
+import { purchaseOrderQueue,purchaseOrderQueueEvents } from '../cache/queueManager.js'
+import { PurchaseOrderRepository } from '../repository/purchaseOrder.repository.js'
 
-import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
 
-
+const PurchaseOrderRepo = new PurchaseOrderRepository();
+   
 export const createPurchaseOrderService = async (data) => {
   try {
     const { vendor_id, order_date, expected_delivery_date, items } = data;
@@ -34,8 +36,9 @@ export const createPurchaseOrderService = async (data) => {
       itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0)
     );
 
-    const createdPO = await prisma.purchaseOrder.create({
-      data: {
+    const module = 'purchaseOrder';
+    const operation = 'create';
+    const changeddata =  {
         vendor_id,
         order_date: new Date(order_date),
         order_number,
@@ -51,8 +54,24 @@ export const createPurchaseOrderService = async (data) => {
             totalAmount: itemsWithTotal[idx].totalAmount,
           })),
         },
-      },
+      }
+      
+    const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: changeddata,
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
+
+    const createdPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+    if (!createdPO || createdPO.status !== 'success') {
+      throw new Error('Purchase Order not created');
+    }
+
+    console.log('ob result:', createdPO.data);
 
     if (!createdPO) {
       poLogger.error("❌ Error while creating purchase Order");
@@ -60,12 +79,6 @@ export const createPurchaseOrderService = async (data) => {
     }
 
     console.log(createdPO);
-    
-    const cacheKeyById = `purchaseOrder:id:${createdPO.id}`;
-    const cacheKeyByNumber = `purchaseOrder:number:${createdPO.order_number}`;
-    await cacheSet(cacheKeyById, createdPO);
-    await cacheSet(cacheKeyByNumber, createdPO);
-
 
     poLogger.info(`✅ Purchase Order created | Order Number: ${order_number}`);
     return createdPO;
@@ -78,14 +91,14 @@ export const createPurchaseOrderService = async (data) => {
 
 
 export const updatePurchaseOrderService = async (formData) => {
-try {
+  try {
 
-  if (formData.expected_delivery_date <= formData.order_date) {
+    if (formData.expected_delivery_date <= formData.order_date) {
       poLogger.error("expected_delivery_date must be greater than order_date");
       throw new Error("expected_delivery_date must be greater than order_date");
     }
 
-  formData.items.forEach(item => {
+    formData.items.forEach(item => {
       if (item.item_mrp < item.item_price) {
         poLogger.error(`MRP cannot be less than price for product ${item.product_id}`);
         throw new Error(`MRP cannot be less than price for product `);
@@ -101,10 +114,11 @@ try {
       itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0)
     );
 
-    const updatedPO = await prisma.purchaseOrder.update({
-      where: { id: formData.order_id },
-      data: {
-        order_date: new Date(formData.order_date),
+     const module = 'purchaseOrder';
+    const operation = 'update';
+    const data =  {
+       id: formData.order_id,
+       order_date: new Date(formData.order_date),
         expected_delivery_date: new Date(formData.expected_delivery_date),
         total_amount,
         purchaseOrderItems: {
@@ -117,22 +131,31 @@ try {
             totalAmount: itemsWithTotal[idx].totalAmount,
           })),
         },
-      },
-      include: { purchaseOrderItems: true },
+      }
+
+    const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: data,
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
+
+    const updatedPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+    if (!updatedPO || updatedPO.status !== 'success') {
+      throw new Error('Purchase Order not created');
+    }
+
+    console.log('ob result:', updatedPO.data);
+
 
     if (!updatedPO) {
       poLogger.error("❌ Error while updating purchase Order");
       throw new Error("Purchase Order not updated");
     }
-
-    const cacheKeyById = `purchaseOrder:id:${updatedPO.id}`;
-    const cacheKeyByNumber = `purchaseOrder:number:${updatedPO.order_number}`;
-    await cacheSet(cacheKeyById, updatedPO);
-    await cacheSet(cacheKeyByNumber, updatedPO);
-
-
-
+  
     poLogger.info(`✅ Purchase Order updated | ID: ${formData.order_id}`);
     return updatedPO;
   } catch (error) {
@@ -144,33 +167,37 @@ try {
 
 
 export const deletePurchaseOrderService = async (order_id) => {
-try {
-    const existingPO = await prisma.purchaseOrder.findFirst({
-      where: { id: order_id, deleted_at: null },
-    });
+  try {
+    console.log(order_id);
+    
+    const existingPO = await PurchaseOrderRepo.findExistingPO(order_id);
 
     if (existingPO && (existingPO.status === STATUS.COMPLETED || existingPO.status === STATUS.CANCELLED)) {
       throw new Error('Cannot delete completed or cancelled Purchase Order');
     }
 
-    await prisma.purchaseOrderItem.updateMany({
-      where: { order_id },
-      data: { deleted_at: new Date() },
+    const module = 'purchaseOrder';
+    const operation = 'delete';
+
+     const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: {order_id},
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
 
-    const deletePO = await prisma.purchaseOrder.update({
-      where: { id: order_id },
-      data: { deleted_at: new Date(), status: STATUS.CANCELLED },
-    });
+    const deletePO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+    if (!deletePO || deletePO.status !== 'success') {
+      throw new Error('Purchase Order not created');
+    }
 
     if (!deletePO) {
       poLogger.error(`❌ Error while deleting purchase Order  ${order_id}`);
       throw new Error("Purchase Order not deleted");
     }
-
-    await cacheDelete(`purchaseOrder:id:${order_id}`);
-    await cacheDelete(`purchaseOrder:number:${deletePO.order_number}`);
-
 
     poLogger.info(`✅ Purchase Order deleted | ID: ${order_id}`);
     return deletePO;
@@ -181,38 +208,18 @@ try {
 }
 
 
-
 export const getPurchaseOrderByIdService = async (id) => {
   try {
 
-    //  const cacheKey = `purchaseOrder:id:${id}`;
-    // const cached = await cacheGet(cacheKey);
-
-    // if (cached) {
-    //   console.log(cached);
-      
-    //   poLogger.info(`✅ Cache hit for Purchase Order ID: ${id}`);
-    //   return cached;
-    // }
-
-    const poData = await prisma.purchaseOrder.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        vendor: { select: { id: true, name: true,status:true } },
-        purchaseOrderItems: {
-          include: { product: { select: { id: true, name: true,status:true } } },
-        },
-      },
-    });
+    const poData = await PurchaseOrderRepo.getPurchaseOrderById(id)
 
     if (!poData) {
       throw new Error(`Purchase Order not found for ID: ${id}`);
     }
 
-    //  await cacheSet(cacheKey, poData);
-    // await cacheSet(`purchaseOrder:number:${poData.order_number}`, poData);
-
     poLogger.info(`✅ Purchase Order fetched | ID: ${id}`);
+    console.log(poData);
+    
     return poData;
   } catch (error) {
     poLogger.error(`❌ Failed to fetch Purchase Order | ID: ${id} | Error: ${error.message}`);

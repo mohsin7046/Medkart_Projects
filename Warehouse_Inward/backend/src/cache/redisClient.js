@@ -1,4 +1,4 @@
-//sudo service redis-server start
+
 import Redis from 'ioredis';
 import { productLogger } from '../utilities/logger.js';
 
@@ -18,6 +18,12 @@ redisClient.on('connect', () => {
 redisClient.on('error', (err) => {
   productLogger.error('❌ Redis error: ' + err.message);
 });
+
+
+
+
+
+
 
 
 export const cacheSet = async (key, value, ttl = 3600) => {

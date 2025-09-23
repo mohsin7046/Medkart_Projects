@@ -2,20 +2,20 @@ import { prisma } from '../utilities/import.config.js'
 import { getSalesOrderByIdService } from './salesOrder.service.js';
 import { indentLogger } from '../utilities/logger.js';
 import { STATUS } from '../utilities/constant.js';
+import { SalesIndentRepository } from '../repository/salesIndent.repository.js';
+
+const indentRepo = new SalesIndentRepository();
 
 export const getSalesIndentByIdService = async (id) => {
 
-    const salesIndentData = await prisma.salesIndent.findUnique({
-        where: { id: parseInt(id) },
-        select: {
+    const salesIndentData = await indentRepo.findIndentById(id, {
             indent_number: true,
             total_sales_order: true,
             total_remain_product: true,
             status: true,
             sale_order_IDs: true,
             created_at:true
-        }
-    });
+        });
 
     if (!salesIndentData) {
         indentLogger.error(`Sales Order not found for ID: ${id}`)

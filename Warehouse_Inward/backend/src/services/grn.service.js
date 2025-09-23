@@ -6,45 +6,12 @@ import { calculateItemsTotal, determineStatus } from '../helper/grn.helper.js'
 import { checkExpiry } from '../utilities/checkExpiry.js'
 import { grnLogger } from '../utilities/logger.js'
 import { cacheSet, cacheGet, cacheDelete } from '../cache/redisClient.js';
+import { grnQueue, grnQueueEvents } from '../cache/queueManager.js'
+import { PurchaseOrderRepository } from '../repository/purchaseOrder.repository.js'
+import { GRNRepository } from '../repository/grn.repository.js'
 
-export const findPOByOrderNumber = async (order_id) => {
-
-  const POOrderNumber = await prisma.purchaseOrder.findFirst({
-    where: { id: order_id, deleted_at: null },
-    include: { purchaseOrderItems: true }
-  })
-  if (!POOrderNumber) {
-    grnLogger.error(`Error Finding PO with order_id: ${order_id}`);
-  }
-  grnLogger.info(` PO with order_id: ${order_id} is founded`);
-  return POOrderNumber
-}
-
-
-export const findGRNByNumber = async (grn_id) => {
-
-  const cacheKey = `grn:id:${grn_id}`;
-  const cached = await cacheGet(cacheKey);
-  if (cached) {
-    grnLogger.info(`✅ Cache hit for GRN ID: ${grn_id}`);
-    return cached;
-  }
-
-  const grnfind = await prisma.goodReceiptNote.findFirst({
-    where: { id: grn_id, deleted_at: null },
-    include: { goodReceiptNoteItems: true }
-  })
-  if (!grnfind) {
-    grnLogger.error(`Error Finding grn with grn_id: ${grn_id}`);
-  }
-
-  await cacheSet(cacheKey, grnfind);
-  await cacheSet(`grn:number:${grnfind.grn_number}`, grnfind);
-
-  grnLogger.info(` GRN with grn_id: ${grn_id} is founded`);
-  return grnfind
-}
-
+const purchaseOrderRepo = new PurchaseOrderRepository();
+const grnRepo = new GRNRepository();
 
 
 export const createGRNRecordService = async (data) => {
@@ -65,11 +32,13 @@ export const createGRNRecordService = async (data) => {
     };
   });
 
-  const existingPO = await findPOByOrderNumber(data.order_id);
+  const existingPO = await purchaseOrderRepo.findPOByOrderId(data.order_id);
+
   if (!existingPO) {
     grnLogger.error("Purchase Order not found while creating the GRN")
     throw new Error("Purchase order not found")
   };
+
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingPO.status)) {
     grnLogger.error("GRN already created for this order");
     throw new Error("GRN already created for this order")
@@ -89,22 +58,38 @@ export const createGRNRecordService = async (data) => {
     const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
 
     let newGRN;
+
     if (statusGRN !== STATUS.CANCELLED) {
-      newGRN = await tx.goodReceiptNote.create({
-        data: {
-          grn_number,
-          order_id: data.order_id,
-          received_date: new Date(data.received_date),
-          goodReceiptNoteItems: { create: itemsWithTotal },
-          total_amount,
-          status: STATUS.PENDING
-        }
+
+      const module = 'grn';
+      const operation = 'create';
+      const changedData = {
+        grn_number,
+        order_id: data.order_id,
+        received_date: new Date(data.received_date),
+        goodReceiptNoteItems: itemsWithTotal,
+        total_amount,
+        status: STATUS.PENDING
+      }
+
+      const job = await grnQueue.add(`${module}:${operation}`, {
+        module,
+        operation,
+        payload: { data: changedData }
+      }, {
+        attempts: 3,
+        backoff: { type: 'fixed', delay: 2000 },
+        removeOnComplete: true,
       });
 
-      await tx.purchaseOrder.update({
-        where: { id: data.order_id },
-        data: { status: statusPO || STATUS.COMPLETED }
-      });
+      newGRN = await job.waitUntilFinished(grnQueueEvents);
+
+      if (!newGRN || newGRN.status !== 'success') {
+        grnLogger.error('❌ Failed to create GRN via queue');
+        throw new Error(newGRN?.message || 'GRN creation failed');
+      }
+
+      await purchaseOrderRepo.updatePOStatus(data.order_id, statusPO || STATUS.COMPLETED);
     }
 
     if (!newGRN) {
@@ -112,10 +97,7 @@ export const createGRNRecordService = async (data) => {
       throw new Error("Failed to create GRN")
     }
 
-    await cacheSet(`grn:id:${newGRN.id}`, newGRN);
-    await cacheSet(`grn:number:${newGRN.grn_number}`, newGRN);
-
-    grnLogger.info(`GRN created successfully with id: ${newGRN.id}`);
+    grnLogger.info(`GRN created successfully with id: ${newGRN.data.id}`);
     return newGRN;
   })
 }
@@ -123,14 +105,12 @@ export const createGRNRecordService = async (data) => {
 
 export const updateGRNRecordService = async (data) => {
 
-  console.log(data);
-
-  const existingGRN = await findGRNByNumber(data.grn_id);
+  const existingGRN = await grnRepo.getGRNById(data.grn_id);
   if (!existingGRN) throw new Error('GRN not found');
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) throw new Error('Cannot update a completed or cancelled GRN');
 
   return await prisma.$transaction(async (tx) => {
-    const existingPO = await findPOByOrderNumber(data.order_id);
+    const existingPO = await purchaseOrderRepo.findPOByOrderId(data.order_id);
     if (!existingPO) throw new Error('Purchase order not found');
 
     const receivedMap = data.items.reduce((map, item) => (map[item.product_id] = item, map), {});
@@ -147,29 +127,34 @@ export const updateGRNRecordService = async (data) => {
     let updatedGRN;
 
     if (statusGRN !== STATUS.CANCELLED) {
-      updatedGRN = await tx.goodReceiptNote.update({
-        where: { id: data.grn_id },
-        data: {
-          received_date: new Date(data.received_date),
-          total_amount,
-          status: statusGRN || STATUS.PENDING,
-          goodReceiptNoteItems: {
-            deleteMany: { grn_id: data.grn_id },
-            create: itemsWithTotal
-          }
-        }
+      const changeddata = {
+        grn_id: data.grn_id,
+        received_date: new Date(data.received_date),
+        total_amount,
+        status: statusGRN || STATUS.PENDING,
+        goodReceiptNoteItems: itemsWithTotal
+      }
+
+      const module = 'grn';
+      const operation = 'update';
+      const job = await grnQueue.add(`${module}:${operation}`, {
+        module,
+        operation,
+        payload: { data: changeddata }
+      }, {
+        attempts: 3,
+        backoff: { type: 'fixed', delay: 2000 },
+        removeOnComplete: true,
       });
 
-      await tx.purchaseOrder.update({
-        where: { id: data.order_id },
-        data: { status: statusPO || STATUS.COMPLETED }
-      });
-    }
+      updatedGRN = await job.waitUntilFinished(grnQueueEvents);
 
-    if (updatedGRN) {
-      await cacheSet(`grn:id:${updatedGRN.id}`, updatedGRN);
-      await cacheSet(`grn:number:${updatedGRN.grn_number}`, updatedGRN);
+      if (!updatedGRN || updatedGRN.status !== 'success') {
+        grnLogger.error('❌ Failed to create GRN via queue');
+        throw new Error(updatedGRN?.message || 'GRN creation failed');
+      }
 
+      await purchaseOrderRepo.updatePOStatus(data.order_id, statusPO || STATUS.COMPLETED);
     }
 
     grnLogger.info(`GRN updated successfully with id: ${data.grn_id}`);
@@ -180,54 +165,34 @@ export const updateGRNRecordService = async (data) => {
 
 
 export const deleteGRNRecordService = async (grn_id) => {
-  console.log(grn_id);
+  
+   const module = 'grn';
+      const operation = 'delete';
+      const job = await grnQueue.add(`${module}:${operation}`, {
+        module,
+        operation,
+        payload: { grn_id }
+      }, {
+        attempts: 3,
+        backoff: { type: 'fixed', delay: 2000 },
+        removeOnComplete: true,
+      });
 
-  const deleteGRN = await prisma.goodReceiptNote.update({
-    where: { id: grn_id },
-    data: {
-      deleted_at: new Date(),
-      status: STATUS.CANCELLED
-    }
-  })
+      const deleteGRN = await job.waitUntilFinished(grnQueueEvents);
 
-  await cacheDelete(`grn:id:${grn_id}`);
-  if (deleteGRN.grn_number) {
-    await cacheDelete(`grn:number:${deleteGRN.grn_number}`);
-  }
+      if (!deleteGRN || deleteGRN.status !== 'success') {
+        grnLogger.error('❌ Failed to create GRN via queue');
+        throw new Error(deleteGRN?.message || 'GRN creation failed');
+      }
+
   return deleteGRN
 }
 
-export const deleteGRNItemsById = async (grn_id) => {
-  const deleteAllItem = await prisma.goodReceiptNoteItem.updateMany({
-    where: { grn_id },
-    data: {
-      deleted_at: new Date()
-    }
-  })
-  return deleteAllItem
-}
 
 export const getGRNByIdService = async (id) => {
-  // const cacheKey = `grn:id:${id}`;
-  // const cached = await cacheGet(cacheKey);
-  // if (cached) {
-  //   grnLogger.info(`✅ Cache hit for GRN ID: ${id}`);
-  //   return cached;
-  // }
-  const data = await prisma.goodReceiptNote.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      purchaseOrder: {
-        select: {
-          order_number: true,
-        }
-      },
-      goodReceiptNoteItems: true
-    }
-  });
-  // await cacheSet(cacheKey, data);
-  // await cacheSet(`grn:number:${data.grn_number}`, data);
-  
+
+  const data = await grnRepo.getGRNById(id);
+  if (!data) throw new Error('GRN not found');
   console.log(data);
   return data;
 }

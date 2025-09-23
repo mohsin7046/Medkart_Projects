@@ -3,13 +3,19 @@ import { STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { piLogger } from '../utilities/logger.js'
-import { cacheSet, cacheDelete } from '../cache/redisClient.js';
+import { purchaseInvoiceQueue, purchaseInvoiceQueueEvents } from '../cache/queueManager.js'
+import { GRNRepository } from '../repository/grn.repository.js'
+import { ProductRepository } from '../repository/product.repository.js'
+import { PurchaseInvoiceRepository } from '../repository/purchaseInvoice.repository.js'
 
+const grnRepo = new GRNRepository();
+const productRepo = new ProductRepository();
+const invoiceRepo = new PurchaseInvoiceRepository();
 
 export const createPurchaseInvoiceService = async ({
   grn_id,
   invoice_date,
-  items
+  items  
 }) => {
 
   if (!grn_id || !invoice_date || !items?.length) {
@@ -29,9 +35,8 @@ export const createPurchaseInvoiceService = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
-    const existingGRN = await tx.goodReceiptNote.findUnique({
-      where: { id: grn_id },
-    });
+
+    const existingGRN = await grnRepo.existingGRNById(grn_id);
 
     if (!existingGRN) {
       piLogger.error('GRN does not exist for invoice creation');
@@ -46,10 +51,8 @@ export const createPurchaseInvoiceService = async ({
     }
 
     const productIds = items.map((item) => item.product_id);
-    const products = await tx.product.findMany({
-      where: { id: { in: productIds }, deleted_at: null },
-      select: { id: true, gst_percentage: true },
-    });
+
+    const products = await productRepo.findProductsByIds(productIds,{ id: true, gst_percentage: true });
 
     const productMap = products.reduce((obj, p) => {
       obj[p.id] = p.gst_percentage || 0;
@@ -71,38 +74,38 @@ export const createPurchaseInvoiceService = async ({
     total_amount = decimalConversion(total_amount);
     const invoice_number = generateRandom('INVOICE');
 
-    const invoice = await tx.purchaseInvoice.create({
-      data: {
-        grn_id,
-        invoice_number,
-        invoice_date: new Date(invoice_date),
-        total_amount,
-        status: STATUS.PENDING,
-        PurchaseInvoiceItem: {
-          create: itemsWithTotal.map((item) => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            item_price: item.item_price,
-            item_mrp: item.item_mrp,
-            totalAmount: item.totalAmount,
-          })),
-        },
-      },
+    const module = 'invoice';
+    const operation = 'create';
+    const changeddata = {
+      grn_id,
+      invoice_number,
+      invoice_date: new Date(invoice_date),
+      total_amount,
+      status: STATUS.PENDING,
+      PurchaseInvoiceItem: itemsWithTotal
+    }
+
+    const job = await purchaseInvoiceQueue.add(`${module}:${operation}`, {
+      module,
+      operation,
+      payload: { data: changeddata },
+    }, {
+      attempts: 3,
+      backoff: { type: 'fixed', delay: 2000 },
+      removeOnComplete: true,
     });
 
-    await tx.goodReceiptNote.update({
-      where: { id: grn_id },
-      data: { status: STATUS.COMPLETED },
-    });
+    const invoice = await job.waitUntilFinished(purchaseInvoiceQueueEvents);
+    if (!invoice || invoice.status !== 'success') {
+      throw new Error('Purchase Order not created');
+    }
+
+    await grnRepo.updateGRNStatus(grn_id, STATUS.COMPLETED);
 
     piLogger.info(
       `✅ Purchase Invoice ${invoice.id} created successfully for GRN ${grn_id}`
     );
-  
 
-    await cacheSet(`purchaseInvoice:id:${invoice.id}`, invoice);
-    await cacheSet(`purchaseInvoice:number:${invoice.invoice_number}`, invoice);
-  
     return invoice;
   })
 }
@@ -114,21 +117,23 @@ export const deletePurchaseInvoiceService = async (invoice_id) => {
     throw new Error('Invoice ID is required');
   }
 
-  await prisma.purchaseInvoiceItem.updateMany({
-    where: { invoice_id },
-    data: { deleted_at: new Date() },
+  const module = 'invoice';
+  const operation = 'delete';
+
+  const job = await purchaseInvoiceQueue.add(`${module}:${operation}`, {
+    module,
+    operation,
+    payload: { invoice_id },
+  }, {
+    attempts: 3,
+    backoff: { type: 'fixed', delay: 2000 },
+    removeOnComplete: true,
   });
 
-  const deletedInvoice = await prisma.purchaseInvoice.update({
-    where: { id: invoice_id },
-    data: { deleted_at: new Date() },
-  });
-
-   await cacheDelete(`purchaseInvoice:id:${invoice_id}`);
-  if (deletedInvoice.invoice_number) {
-    await cacheDelete(`purchaseInvoice:number:${deletedInvoice.invoice_number}`);
+  const deletedInvoice = await job.waitUntilFinished(purchaseInvoiceQueueEvents);
+  if (!deletedInvoice || deletedInvoice.status !== 'success') {
+    throw new Error('Purchase Order not deleted');
   }
-
 
   piLogger.info(`🗑️ Purchase Invoice ${invoice_id} deleted successfully`);
   return deletedInvoice;
@@ -141,43 +146,14 @@ export const getInvoiceByIdService = async (id) => {
     throw new Error('Invoice ID is required');
   }
 
-  // const cacheKey = `purchaseInvoice:id:${id}`;
-  //   const cached = await cacheGet(cacheKey);
-  //   if (cached) {
-  //     grnLogger.info(`✅ Cache hit for GRN ID: ${id}`);
-  //     return cached;
-  //   }
-
-  const data = await prisma.purchaseInvoice.findUnique({
-    where: { id: parseInt(id) },
-    include: {
-      goodReceiptNote: { select: { grn_number: true } },
-      PurchaseInvoiceItem: {
-        select: {
-          id: true,
-          quantity: true,
-          item_price: true,
-          item_mrp: true,
-          totalAmount: true,
-          product_id: true,
-          product: {
-            select: { id: true, gst_percentage: true, name: true },
-          },
-        },
-      },
-    },
-  });
+  const data = await invoiceRepo.getInvoiceById(id);
 
   if (!data) {
     piLogger.warn(`⚠️ Purchase Invoice not found for ID ${id}`);
     throw new Error('Purchase Invoice not found');
   }
 
-  // await cacheSet(cacheKey, data);
-  // await cacheSet(`purchaseInvoice:number:${data.invoice_number}`, data);
-
   piLogger.info(`📄 Purchase Invoice ${id} fetched successfully`);
   return data;
 };
-
 
