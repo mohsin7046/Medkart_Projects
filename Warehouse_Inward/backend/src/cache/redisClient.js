@@ -21,11 +21,6 @@ redisClient.on('error', (err) => {
 
 
 
-
-
-
-
-
 export const cacheSet = async (key, value, ttl = 3600) => {
   try {
     const val = JSON.stringify(value);

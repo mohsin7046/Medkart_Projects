@@ -15,12 +15,13 @@ export class PurchaseOrderRepository {
     }
   }
 
-  async updatePurchaseOrder(order_id, data) {
+  async updatePurchaseOrder({id, data, select = null, include = null}) {
     try {
       return await prisma.purchaseOrder.update({
-        where: { id: order_id },
+        where: { id },
         data,
-        include: { purchaseOrderItems: true },
+        ...(select ? { select } : {}),
+        ...(include ? { include } : {}),
       });
     } catch (error) {
       poLogger.error("Error updating Purchase Order: " + error.message);
@@ -30,17 +31,11 @@ export class PurchaseOrderRepository {
 
   async deletePurchaseOrder(order_id) {
     try {
-      await prisma.purchaseOrderItem.updateMany({
-        where: { order_id },
-        data: { deleted_at: new Date() },
-      });
-
-      const deletePO = await prisma.purchaseOrder.update({
+       return await prisma.purchaseOrder.update({
         where: { id: order_id },
         data: { deleted_at: new Date(), status: STATUS.CANCELLED },
       });
-
-      return deletePO;
+     
     } catch (error) {
       poLogger.error("Error deleting Purchase Order: " + error.message);
       throw error;
@@ -50,7 +45,7 @@ export class PurchaseOrderRepository {
   async deletePurchaseOrderItems(order_id) {
     try {
       return await prisma.purchaseOrderItem.updateMany({
-        where: { order_id },
+        where: { order_id , deleted_at: null },
         data: { deleted_at: new Date() },
       });
     } catch (error) {
@@ -77,22 +72,12 @@ export class PurchaseOrderRepository {
     }
   }
 
-  async findExistingPO(order_id) {
+  async findPOByOrderId({id = null, select = null, include = null}) {
     try {
       return await prisma.purchaseOrder.findFirst({
-        where: { id: order_id, deleted_at: null },
-      });
-    } catch (error) {
-      poLogger.error("Error finding Purchase Order: " + error.message);
-      throw error;
-    }
-  }
-
-  async findPOByOrderId(order_id) {
-    try {
-      return await prisma.purchaseOrder.findFirst({
-        where: { id: order_id, deleted_at: null },
-        include: { purchaseOrderItems: true },
+        where: { id, deleted_at: null },
+        ...(select ? { select } : {}),
+        ...(include ? { include } : {}),
       });
     } catch (error) {
       grnLogger.error(`Error finding PO (order_id: ${order_id}) | ${error.message}`);
@@ -100,15 +85,4 @@ export class PurchaseOrderRepository {
     }
   }
 
-  async updatePOStatus( order_id, status) {
-    try {
-      return await prisma.purchaseOrder.update({
-        where: { id: order_id },
-        data: { status },
-      });
-    } catch (error) {
-      grnLogger.error("Error updating Purchase Order status: " + error.message);
-      throw error;
-    }
-  }
-} 
+}

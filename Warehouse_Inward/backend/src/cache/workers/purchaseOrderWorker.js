@@ -11,8 +11,6 @@ createWorker('purchaseOrderQueue', async job => {
         return { status: 'error', message: 'Unknown module' };
     }
 
-    console.log(job.data);
-
     switch (operation) {
         case 'create':
             poLogger.info(`📦 Creating Purchase Order: ${payload.order_number}`);
@@ -24,7 +22,7 @@ createWorker('purchaseOrderQueue', async job => {
         case 'update':
             poLogger.info(`✏️ Updating Purchase Order: ${payload.id}`);
 
-            const updatedPO = await PurchaseOrderRepo.updatePurchaseOrder( payload.id, payload );
+            const updatedPO = await PurchaseOrderRepo.updatePurchaseOrder({ id:payload.id, data:payload,include:{ purchaseOrderItems: true } });
 
             return { status: 'success', data: updatedPO };
 

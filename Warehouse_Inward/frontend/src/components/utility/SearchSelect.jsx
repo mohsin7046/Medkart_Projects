@@ -29,6 +29,10 @@ export function SearchSelect({ type, value, onSelect }) {
 
 
     const delayDebounce = setTimeout(async () => {
+       if (value && query === value) {
+      setShowDropdown(false);
+      return;
+    }
       const res = await fetch(`http://localhost:3000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
       console.log(data);

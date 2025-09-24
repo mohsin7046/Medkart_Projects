@@ -1,4 +1,3 @@
-import './appWorker.js'
 import './purchaseOrderWorker.js'
 import './grnWorker.js'
 import './invoiceWorker.js'

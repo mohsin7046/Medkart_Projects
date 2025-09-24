@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
 
 function PurchaseInvoiceForm() {
   const { id } = useParams();
@@ -11,15 +11,14 @@ function PurchaseInvoiceForm() {
   const [formData, setFormData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
     const fetchGRN = async () => {
       try {
-        const response = await fetch(`${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`);
+        const response = await fetch(
+          `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`
+        );
         if (!response.ok) throw new Error("Failed to fetch GRN");
         const data = await response.json();
-        console.log("Fetched GRN:", data);
-
         const grn = data.data;
 
         setFormData({
@@ -27,7 +26,6 @@ function PurchaseInvoiceForm() {
           order_id: grn.order_id,
           invoice_date: new Date().toISOString().slice(0, 10),
           total_amount: grn.total_amount,
-
           status: grn.status,
           items:
             grn.goodReceiptNoteItems?.map((item) => ({
@@ -55,7 +53,7 @@ function PurchaseInvoiceForm() {
   }, [id]);
 
   const handleSubmit = async (e) => {
-    setLoading(true)
+    setLoading(true);
     e.preventDefault();
 
     const payload = {
@@ -69,12 +67,10 @@ function PurchaseInvoiceForm() {
       })),
     };
 
-    console.log(payload);
-
     try {
-      const url =  `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.endpoint}`;
+      const url = `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.endpoint}`;
       const response = await fetch(url, {
-        method:  `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.method}`,
+        method: `${ALLEndpoint.PurchaseInvoiceEndpoints.addPurchaseInvoice.method}`,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -85,7 +81,7 @@ function PurchaseInvoiceForm() {
         if (Array.isArray(resData.message)) {
           resData.message.forEach((err) => {
             toast.error(`${err.field}: ${err.message}`);
-          })
+          });
         } else {
           toast.error(resData.error || resData.message || "Something went wrong");
         }
@@ -93,184 +89,101 @@ function PurchaseInvoiceForm() {
         return;
       }
 
-      alert("Invoice created successfully!");
+      toast.success("Invoice created successfully!");
       navigate(ROUTES.PURCHASE_INVOICE.LIST);
     } catch (err) {
       console.error("Error saving invoice:", err);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
   if (loading || !formData) {
-    return <p className="text-center">Loading...</p>;
+    return <p className="text-center text-lg font-medium">Loading...</p>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-4">Create Invoice</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+      <div className="w-full max-w-5xl bg-white shadow-lg rounded-2xl p-8">
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">
+          Create Purchase Invoice
+        </h2>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block font-medium">GRN Number</label>
-            <input
-              type="text"
-              value={formData.grn_number}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField label="GRN Number" value={formData.grn_number} />
+            <InputField label="Order ID" value={formData.order_id} />
+            <InputField label="Invoice Date" value={formData.invoice_date} />
+            <InputField label="Status" value={formData.status} />
           </div>
-          <div>
-            <label className="block font-medium">Order ID</label>
-            <input
-              type="text"
-              value={formData.order_id}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Invoice Date</label>
-            <input
-              type="date"
-              value={formData.invoice_date}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="block font-medium">Status</label>
-            <input
-              type="text"
-              value={formData.status}
-              className="w-full border rounded px-3 py-2 bg-gray-200"
-              readOnly
-            />
-          </div>
-        </div>
 
-        <div>
-          <h3 className="font-semibold mb-2">Items</h3>
-          {formData.items.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-9 gap-1 mb-3 border p-2 rounded"
-            >
-              <div>
-                <label className="text-sm">Product ID</label>
-                <input
-                  type="text"
-                  value={item.product_id}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Batch</label>
-                <input
-                  type="text"
-                  value={item.batch_number}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Expiry Date</label>
-                <input
-                  type="text"
-                  value={item.expiry_date}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Ordered Qty</label>
-                <input
-                  type="number"
-                  value={item.ordered_qty}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Received Qty</label>
-                <input
-                  type="number"
-                  value={item.recevied_qty}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Shortage Qty</label>
-                <input
-                  type="number"
-                  value={item.shortage_qty}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Damaged Qty</label>
-                <input
-                  type="number"
-                  value={item.damaged_qty}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">Price</label>
-                <input
-                  type="number"
-                  value={item.item_price}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
-              <div>
-                <label className="text-sm">MRP</label>
-                <input
-                  type="number"
-                  value={item.item_mrp}
-                  className="border rounded px-2 py-1 bg-gray-200 w-full"
-                  readOnly
-                />
-              </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-3">Items</h3>
+            <div className="space-y-4">
+              {formData.items.map((item, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-9 gap-3 border p-3 rounded-lg bg-gray-50"
+                >
+                  <InputField label="Product ID" value={item.product_id} />
+                  <InputField label="Batch" value={item.batch_number} />
+                  <InputField label="Expiry" value={item.expiry_date} />
+                  <InputField label="Ordered Qty" value={item.ordered_qty} />
+                  <InputField label="Received Qty" value={item.recevied_qty} />
+                  <InputField label="Shortage" value={item.shortage_qty} />
+                  <InputField label="Damaged" value={item.damaged_qty} />
+                  <InputField label="Price" value={item.item_price} />
+                  <InputField label="MRP" value={item.item_mrp} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
 
-        <div>
-          <label className="block font-medium">Total Amount</label>
-          <input
-            type="number"
+       
+          <InputField
+            label="Total Amount"
             value={formData.total_amount}
-            className="w-full border rounded px-3 py-2 bg-gray-200"
-            readOnly
+            full
           />
-        </div>
 
-        <button
-          type="submit"
-          className={`bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center justify-center ${
-            loading ? "opacity-70 cursor-not-allowed" : ""
-          }`}
-          disabled={loading}
-        >
-          {length ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-              Saving...
-            </>
-          ) : (
-            "Save Invoice"
-          )}
-        </button>
-      </form>
+      
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className={`bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-blue-700 transition flex items-center justify-center ${
+                loading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                  Saving...
+                </>
+              ) : (
+                "Save Invoice"
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
+
+const InputField = ({ label, value, full = false }) => (
+  <div className={`${full ? "col-span-full" : ""}`}>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <input
+      type="text"
+      value={value}
+      readOnly
+      className="w-full border rounded-md px-3 py-2 bg-gray-100 focus:outline-none"
+    />
+  </div>
+);
 
 export default PurchaseInvoiceForm;

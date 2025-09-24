@@ -27,14 +27,6 @@ export const EACHSTATUS = Object.freeze({
   pi:['pending','cancelled','completed']
 })
 
-// TODO::
-// export const GENERATOR_TYPES = Object.freeze({
-//   ORDER: 'ORDER',
-//   PRODUCT: ',
-//   INVOICE: 'INV-',
-//   GRN: 'GRN-',
-//   VENDOR: 'VC-'
-// })
 
 export const DETAILSFETCH = Object.freeze({
   product: ['id','product_code', 'name', 'category', 'product_price','product_mrp',"unit_of_measure","hsn_code","gst_percentage","status","inventory_qty" ],
@@ -127,3 +119,21 @@ export const REDISWORKERQUEUE = Object.freeze({
   productQueue:[prisma.product,productLogger],
   vendorQueue:[prisma.vendor,vendorLogger]
 })
+
+export const categories = Object.freeze([
+  {  name: "tablet", uom: "pcs" },
+  {  name: "syrup", uom: "ml" },
+  {  name: "capsule", uom: "pcs" },
+  {  name: "injection", uom: "ml" },
+  {  name: "cream", uom: "kg" },
+]);
+
+export const combinations = Object.freeze([
+  "paracetemol",
+  "azithromycin",
+  "cetrazin",
+  "diclo",
+  "paracetemol 500",
+  "paracetemol 700",
+  "azithromycin 500",
+]);

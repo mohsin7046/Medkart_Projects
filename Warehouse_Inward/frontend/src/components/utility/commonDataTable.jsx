@@ -60,29 +60,29 @@ function CommonDataTable({
     if (onSort) onSort({ field, order });
   };
 
-  const handleCheckboxChange = (id,status) => {
-     if (status !== "pending") return; 
+  const handleCheckboxChange = (id, status) => {
+    if (status !== "pending") return;
 
-  let updated = [];
-  if (selectedIds.includes(id)) {
-    updated = selectedIds.filter((x) => x !== id);
-  } else {
-    updated = [...selectedIds, id];
-  }
-  setSelectedIds(updated);
-  if (onSelectionChange) onSelectionChange(updated);
+    let updated = [];
+    if (selectedIds.includes(id)) {
+      updated = selectedIds.filter((x) => x !== id);
+    } else {
+      updated = [...selectedIds, id];
+    }
+    setSelectedIds(updated);
+    if (onSelectionChange) onSelectionChange(updated);
   };
 
   const handleSelectAll = () => {
     const pendingIds = data.filter((item) => item.status === "pending").map((item) => item.id);
 
-  if (selectedIds.length === pendingIds.length) {
-    setSelectedIds([]);
-    if (onSelectionChange) onSelectionChange([]);
-  } else {
-    setSelectedIds(pendingIds);
-    if (onSelectionChange) onSelectionChange(pendingIds);
-  }
+    if (selectedIds.length === pendingIds.length) {
+      setSelectedIds([]);
+      if (onSelectionChange) onSelectionChange([]);
+    } else {
+      setSelectedIds(pendingIds);
+      if (onSelectionChange) onSelectionChange(pendingIds);
+    }
   };
 
   return (
@@ -194,7 +194,7 @@ function CommonDataTable({
                     <input
                       type="checkbox"
                       checked={selectedIds.includes(item.id)}
-                      onChange={() => handleCheckboxChange(item.id,item.status)}
+                      onChange={() => handleCheckboxChange(item.id, item.status)}
                       disabled={item.status !== STATUS.PENDING}
                     />
                   </td>}
@@ -213,24 +213,36 @@ function CommonDataTable({
                     <td className="border px-4 py-2">
                       {onEdit && (
                         <button
+                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
                           onClick={() => onEdit(item)}
-                          className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                            }`}
                         >
                           <FiEdit className="text-green-600" size={18} />
                         </button>
                       )}
                       {onView && (
                         <button
+                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
                           onClick={() => onView(item)}
-                          className="p-2 rounded-md hover:bg-gray-200 transition-colors mr-2"
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                            }`}
                         >
                           <FiEye className="text-orange-400" size={18} />
                         </button>
                       )}
                       {onDelete && (
                         <button
+                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
                           onClick={() => onDelete(item)}
-                          className="p-2 rounded-md hover:bg-gray-200 transition-colors"
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                            }`}
                         >
                           <FiTrash2 className="text-red-500" size={18} />
                         </button>

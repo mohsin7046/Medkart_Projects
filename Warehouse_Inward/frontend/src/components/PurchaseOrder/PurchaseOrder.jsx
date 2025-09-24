@@ -11,6 +11,7 @@ import {
 } from "../../constant/purchaseOrderConstant.js";
 import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE } from "../../constant/purchaseOrderConstant.js";
+import { STATUS } from "../../constant/constant.js";
 
 function PurchaseOrder() {
   const [page, setPage] = useState(1);
@@ -46,7 +47,14 @@ function PurchaseOrder() {
     ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.method
   );
 
-  const handleDelete = (order_id) => {
+  const handleDelete = (order) => {
+
+    if([STATUS.COMPLETED,STATUS.CANCELLED].includes(order.status)){
+      alert(`Cannot delete a ${order.status} order.`);
+      return;
+    }
+    const order_id = order.id;
+
     deleteItem({
       idField: "order_id",
       idValue: order_id,
@@ -95,9 +103,9 @@ function PurchaseOrder() {
       }
       }
 
-      onDelete={(order) => handleDelete(order.id)}
+      onDelete={(order) => {handleDelete(order)}}
       extraAction={(order) => {
-        const isDisabled = ["completed", "cancelled"].includes(order.status);
+        const isDisabled = [STATUS.COMPLETED,STATUS.CANCELLED].includes(order.status);
         return (
           <button
             disabled={isDisabled}

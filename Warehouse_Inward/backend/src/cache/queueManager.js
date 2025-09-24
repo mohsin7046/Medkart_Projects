@@ -6,8 +6,6 @@ const connection = {
 };
 
 
-export const appQueue = new Queue('appQueue', { connection });
-export const appQueueEvents = new QueueEvents('appQueue', { connection });
 export const purchaseOrderQueue = new Queue('purchaseOrderQueue', { connection });
 export const purchaseOrderQueueEvents = new QueueEvents('purchaseOrderQueue', { connection });
 export const grnQueue = new Queue('grnQueue', { connection });

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Select from "react-select";
+import AsyncSelect from "react-select/async";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
+import { combinations, categories,numericFields } from "../../constant/constant.js";
 
 function ProductForm() {
   const navigate = useNavigate();
@@ -16,33 +17,15 @@ function ProductForm() {
     name: "",
     category: "",
     combination: [],
-    product_mrp: "",
-    product_price: "",
-    last_purchase_price: "",
+    product_mrp: null,
+    product_price: null,
+    last_purchase_price: null,
     unit_of_measure: "",
     hsn_code: "",
-    gst_percentage: "",
+    gst_percentage: null,
     description: "",
     status: "active",
   });
-
-  const unitOptions = [
-    { value: "pcs", label: "PCS" },
-    { value: "ml", label: "ML" },
-    { value: "kg", label: "KG" },
-    { value: "liter", label: "Liter" },
-    { value: "packet", label: "Packet" },
-  ];
-
-  const combinationOptions = [
-    { value: "paracetemol", label: "paracetemol" },
-    { value: "azithromycin", label: "azithromycin" },
-    { value: "cetrazin", label: "cetrazin" },
-    { value: "diclo", label: "diclo" },
-    { value: "paracetemol 500", label: "paracetemol 500" },
-    { value: "paracetemol 700", label: "paracetemol 700" },
-    { value: "azithromycin 500", label: "azithromycin 500" },
-  ];
 
 
   useEffect(() => {
@@ -87,21 +70,28 @@ function ProductForm() {
 
   const handleChange = (e) => {
     setIsDirty(true);
-    const { name, value } = e.target;
+  const { name, value } = e.target;
 
-    if (
-      ["product_mrp", "product_price", "last_purchase_price", "gst_percentage"].includes(name)
-    ) {
-      if (value === "" || (/^\d*\.?\d*$/.test(value) && parseFloat(value) >= 0)) {
-        setFormData({ ...formData, [name]: value });
-      }
-    } else {
+  console.log( name, value);
+  
+
+  if (numericFields.includes(name)) {
+  
+    const numberValue = Number(value);
+    
+    if (!isNaN(numberValue) && numberValue >= 0) {
       setFormData({ ...formData, [name]: value });
     }
+
+  } else {
+    setFormData({ ...formData, [name]: value });
+  }
   };
 
-  const handleCombinationChange = (selected) => {
+  const handleCombinationChange = async (selected) => {
     setIsDirty(true);
+    console.log(selected);
+
     setFormData({
       ...formData,
       combination: selected ? selected.map((opt) => opt.value) : [],
@@ -172,6 +162,62 @@ function ProductForm() {
     }
   };
 
+  const loadOptions = async (inputValue) => {
+    if (!inputValue) return [];
+
+    console.log(inputValue);
+
+    try {
+      const response = await fetch(
+        `${ALLEndpoint.ProductEndpoints.getCombinations.endpoint}?search=${inputValue}`
+      );
+      const res = await response.json();
+      console.log(res);
+
+
+      const filterdData = res.data.map((item) => ({
+        value: item.value,
+        label: item.label,
+      }));
+
+      console.log(filterdData);
+      return filterdData;
+
+    } catch (error) {
+      console.error("Error fetching combinations:", error);
+      return [];
+    }
+  };
+
+  const loadCategoryOptions = async (inputValue) => {
+    if (!inputValue) return [];
+    try {
+
+      const response = await fetch(`${ALLEndpoint.ProductEndpoints.getCategories.endpoint}?search=${inputValue || ""}`);
+      const res = await response.json();
+      console.log(res);
+
+      return res.data.map((item) => ({
+        value: item.value,
+        label: item.label,
+        uom: item.uom,
+      }));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      return [];
+    }
+  };
+
+
+  const handleCategoryChange = (selected) => {
+    setIsDirty(true);
+    setFormData({
+      ...formData,
+      category: selected?.value || "",
+      unit_of_measure: selected?.uom || "",
+    });
+  };
+
   const handleBack = () => {
     if (isDirty) {
       if (!window.confirm("Entered data may be lost. Do you want to continue?")) {
@@ -182,7 +228,7 @@ function ProductForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4">
       <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           {id ? "Edit Product" : "Add Product"}
@@ -206,38 +252,36 @@ function ProductForm() {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
+            <label className="block mb-1">
               Category <span className="text-red-500">*</span>
             </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            >
-              <option value="">Select category</option>
-              <option value="tablet">Tablet</option>
-              <option value="syrup">Syrup</option>
-              <option value="capsule">Capsule</option>
-              <option value="injection">Injection</option>
-              <option value="ointment">Ointment</option>
-              <option value="cream">Cream</option>
-              <option value="powder">Powder</option>
-              <option value="drops">Drops</option>
-            </select>
+            <AsyncSelect
+              cacheOptions
+              defaultOptions={categories}
+              loadOptions={loadCategoryOptions}
+              value={
+                formData.category
+                  ? { value: formData.category, label: formData.category, uom: formData.unit_of_measure }
+                  : null
+              }
+              onChange={handleCategoryChange}
+              isMulti={false}
+              placeholder="Select category"
+            />
           </div>
 
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">
               Combination <span className="text-red-500">*</span>
             </label>
-            <Select
+            <AsyncSelect
               isMulti
-              options={combinationOptions}
+              cacheOptions
+              loadOptions={loadOptions}
+              defaultOptions={combinations}
               value={formData.combination.map((c) => ({ value: c, label: c }))}
               onChange={handleCombinationChange}
-              placeholder="Select or type combinations"
+              placeholder="Search and select combinations"
             />
           </div>
 
@@ -284,20 +328,15 @@ function ProductForm() {
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Unit of Measure</label>
-            <select
+            <input
+              type="text"
               name="unit_of_measure"
               value={formData.unit_of_measure}
               onChange={handleChange}
+              placeholder="Unit of measure"
               className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            >
-              <option value="">Select unit</option>
-              {unitOptions.map((u) => (
-                <option key={u.value} value={u.value}>
-                  {u.label}
-                </option>
-              ))}
-            </select>
+              readOnly 
+            />
           </div>
 
           <div>

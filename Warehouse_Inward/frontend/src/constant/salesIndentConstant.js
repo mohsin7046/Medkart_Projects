@@ -19,4 +19,4 @@ export const salesIndentStatusFilters = [
 ];
 
 
-export const LIMITPAGE = 3;
+export const LIMITPAGE = 5;

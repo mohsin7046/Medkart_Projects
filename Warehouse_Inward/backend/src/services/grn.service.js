@@ -32,7 +32,7 @@ export const createGRNRecordService = async (data) => {
     };
   });
 
-  const existingPO = await purchaseOrderRepo.findPOByOrderId(data.order_id);
+  const existingPO = await purchaseOrderRepo.findPOByOrderId({id:data.order_id,include:{purchaseOrderItems: true }});
 
   if (!existingPO) {
     grnLogger.error("Purchase Order not found while creating the GRN")
@@ -89,7 +89,7 @@ export const createGRNRecordService = async (data) => {
         throw new Error(newGRN?.message || 'GRN creation failed');
       }
 
-      await purchaseOrderRepo.updatePOStatus(data.order_id, statusPO || STATUS.COMPLETED);
+      await purchaseOrderRepo.updatePurchaseOrder({id:data.order_id, data:{status : statusPO || STATUS.COMPLETED}});
     }
 
     if (!newGRN) {
@@ -110,7 +110,7 @@ export const updateGRNRecordService = async (data) => {
   if ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingGRN.status)) throw new Error('Cannot update a completed or cancelled GRN');
 
   return await prisma.$transaction(async (tx) => {
-    const existingPO = await purchaseOrderRepo.findPOByOrderId(data.order_id);
+    const existingPO = await purchaseOrderRepo.findPOByOrderId({id:data.order_id,include:{purchaseOrderItems: true }});
     if (!existingPO) throw new Error('Purchase order not found');
 
     const receivedMap = data.items.reduce((map, item) => (map[item.product_id] = item, map), {});
@@ -154,7 +154,7 @@ export const updateGRNRecordService = async (data) => {
         throw new Error(updatedGRN?.message || 'GRN creation failed');
       }
 
-      await purchaseOrderRepo.updatePOStatus(data.order_id, statusPO || STATUS.COMPLETED);
+      await purchaseOrderRepo.updatePurchaseOrder({id:data.order_id, data : {status:statusPO || STATUS.COMPLETED}});
     }
 
     grnLogger.info(`GRN updated successfully with id: ${data.grn_id}`);

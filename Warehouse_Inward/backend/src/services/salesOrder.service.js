@@ -29,7 +29,6 @@ export const createSaleOrderService = async (data) => {
 
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
 
-
         const vendor = await prisma.vendor.findFirstOrThrow({
             orderBy: {
                 id: 'desc',
@@ -80,15 +79,10 @@ export const createSaleOrderService = async (data) => {
         const createdSalesOrder = await job.waitUntilFinished(salesOrderQueueEvents);
 
         if (!createdSalesOrder || createdSalesOrder.status !== 'success') {
-            throw new Error('Sales Order not created');
+            poLogger.error("❌ Error while creating sales Order");
+            throw new Error("Sales Order not created");
         }
 
-        if (!createdSalesOrder) {
-            poLogger.error("❌ Error while creating purchase Order");
-            throw new Error("Purchase Order not created");
-        }
-
-        console.log(createdSalesOrder);
         saleLogger.info(`✅ Sales Order created | Sales Order Number: ${sales_order_number}`);
     } catch (error) {
         saleLogger.error(`❌ Failed to create Sales Order | Error: ${error.message}`);
@@ -148,17 +142,10 @@ export const updateSaleOrderService = async (data) => {
         });
 
         const updatedSalesOrder = await job.waitUntilFinished(salesOrderQueueEvents);
-        console.log("ob result:", updatedSalesOrder);
 
         if (!updatedSalesOrder || updatedSalesOrder.status !== 'success') {
-            throw new Error('Sales Order not created');
-        }
-
-        console.log('ob result:', updatedSalesOrder.data);
-
-        if (!updatedSalesOrder) {
-            poLogger.error("❌ Error while creating purchase Order");
-            throw new Error("Purchase Order not created");
+            poLogger.error("❌ Error while creating sales Order");
+            throw new Error("Sales Order not created");
         }
 
         saleLogger.info(`✅ Sales Order created | Sales Order Id: ${data.sales_order_id}`);
@@ -195,23 +182,19 @@ export const deleteSalesOrderService = async (sales_order_id) => {
         });
 
         const deleteSalesOrder = await job.waitUntilFinished(salesOrderQueueEvents);
-        console.log("ob result:", deleteSalesOrder);
 
         if (!deleteSalesOrder || deleteSalesOrder.status !== 'success') {
-            throw new Error('Sales Order not deleted');
-        }
-
-        if (!deleteSalesOrder) {
             saleLogger.error(`❌ Error while deleting sales Order  ${sales_order_id}`);
             throw new Error("sales Order not deleted");
         }
+
         saleLogger.info(`✅ sales Order deleted | ID: ${sales_order_id}`);
+        return deleteSalesOrder
     } catch (error) {
         saleLogger.error(`❌ Failed to delete sales Order | ID: ${sales_order_id} | Error: ${error.message}`);
         throw error;
     }
 }
-
 
 
 export const getSalesOrderByIdService = async (id) => {
@@ -286,9 +269,10 @@ export const processSalesOrderService = async (data) => {
 
     const productIds = [...new Set(salesOrders.flatMap(o => o.products.map(p => p.product_id)))]
 
-    const allProducts = await productRepo.findProductsByIds(productIds);
+    const allProducts = await productRepo.getProducts({ids:productIds});
 
     const currentInventory = new Map()
+    
     allProducts.forEach(product => {
         currentInventory.set(product.id, product.inventory_qty)
     })
@@ -322,11 +306,11 @@ export const processSalesOrderService = async (data) => {
 
                 if (shortage > 0 && allocated_qty > 0) {
                     orderStatus = STATUS.PARTIAL_RECEVIED
-                    handleIndent(product, order, shortage, indentMap, operations)
+                    await handleIndent(product, order, shortage, indentMap, operations)
                 }
                 else if (shortage > 0 && allocated_qty <= 0) {
                     orderStatus = STATUS.PROCESSING
-                    handleIndent(product, order, shortage, indentMap, operations)
+                    await handleIndent(product, order, shortage, indentMap, operations)
                 }
             } else {
 
@@ -339,7 +323,7 @@ export const processSalesOrderService = async (data) => {
                     remaining_qty = product.ordered_qty
                     newInventory = currentInventoryQty
                     orderStatus = STATUS.PROCESSING
-                    handleIndent(product, order, product.ordered_qty, indentMap, operations)
+                    await handleIndent(product, order, product.ordered_qty, indentMap, operations)
                 }
             }
 
@@ -349,7 +333,7 @@ export const processSalesOrderService = async (data) => {
             operations.push(
                 saleOrderRepo.updateSalesOrderProducts(order.id, { allocated_qty, remaining_qty}),
                 
-                productRepo.updateProduct({ id: dbProduct.id, data: { inventory_qty: 0 } })
+                productRepo.updateProduct({ id: dbProduct.id,  data: { inventory_qty: newInventory } })
             )
         }
 
@@ -363,6 +347,7 @@ export const processSalesOrderService = async (data) => {
     }
 
     await prisma.$transaction(operations)
+
     return { message: 'Sales order(s) processed successfully' }
 }
 
@@ -384,6 +369,9 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
                     : [...existingIndent.sale_order_IDs, order.id],
                 total_remain_product: existingIndent.total_remain_product + quantity
             };
+
+            console.log("Indent Data: ", indentData);
+            
     
             const module = 'sale-indent';
             const operation = 'update';
@@ -395,6 +383,9 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
             }, { attempts: 3, backoff: { type: 'fixed', delay: 2000 }, removeOnComplete: true });
     
             const updatedindent = await job.waitUntilFinished(salesIndentQueueEvents);
+
+            console.log("Updated Indent: ", updatedindent);
+            
     
             if(!updatedindent || updatedindent.status !== 'success'){
                 throw new Error('Sales Indent not updated');
@@ -436,9 +427,6 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
     
         processedOrders.add(order.id)
     } catch (error) {
-        throw new Error(`Error in handling indent for product ${product.product_id} in order ${order.id}: ${error.message}`)
+        throw new Error(`Error in handling indent for product ${product.product_id} in order ${order.id}`)
     }
 }
-
-
-

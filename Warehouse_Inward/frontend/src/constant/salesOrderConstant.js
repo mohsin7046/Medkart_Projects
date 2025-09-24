@@ -17,10 +17,11 @@ export const salesOrderStatusFilters = [
   { label: "All", key: "all" },
   { label: "Pending", key: "pending" },
   { label: "Processing", key: "processing" },
+  { label: "Partial Received", key: "partial received" },
   { label: "Allocated", key: "allocated" },
   { label: "Cancelled", key: "cancelled" },
 ];
 
 
-export const LIMITPAGE = 3;
+export const LIMITPAGE = 10;
 

@@ -25,6 +25,14 @@ export const ALLEndpoint = Object.freeze({
     searchProduct: {
       method: "GET",
       endpoint: `${defaultEndPoint}/products/search/:q`
+    },
+    getCombinations:{
+      method: "GET",
+      endpoint: `${defaultEndPoint}/products/combinations`
+    },
+    getCategories:{
+      method: "GET",
+      endpoint: `${defaultEndPoint}/products/categories`
     }
   },
 

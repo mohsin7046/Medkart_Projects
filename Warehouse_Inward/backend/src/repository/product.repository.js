@@ -1,5 +1,6 @@
 import { prisma } from "../utilities/import.config.js";
 import { productLogger } from "../utilities/logger.js";
+import { STATUS, combinations, categories } from "../utilities/constant.js";
 
 export class ProductRepository {
 
@@ -14,34 +15,39 @@ export class ProductRepository {
 
 
   async updateProduct({ id = null, product_code = null, data }) {
-  try {
+    try {
 
-    if (id) {
-      return await prisma.product.update({
-        where: { id },
-        data,
-      });
+      switch (true) {
+        case id !== null:
+          return await prisma.product.update({
+            where: { id: parseInt(id) },
+            data,
+          });
+
+        case product_code !== null:
+          return await prisma.product.update({
+            where: { product_code },
+            data,
+          });
+
+        default:
+          break;
+      }
+
+      throw new Error("❌ Either id or product_code must be provided");
+
+    } catch (error) {
+      productLogger.error("Error updating product: " + error.message);
+      throw error;
     }
-    if (product_code) {
-      return await prisma.product.update({
-        where: { product_code },
-        data,
-      });
-    }
-    throw new Error("❌ Either id or product_code must be provided");
-    
-  } catch (error) {
-    productLogger.error("Error updating product: " + error.message);
-    throw error;
   }
-}
 
 
   async deleteProduct(product_code) {
     try {
       return await prisma.product.update({
         where: { product_code },
-        data: { deleted_at: new Date() },
+        data: { deleted_at: new Date(), status: STATUS.INACTIVE },
       });
     } catch (error) {
       productLogger.error("Error deleting product: " + error.message);
@@ -76,49 +82,71 @@ export class ProductRepository {
   }
 
 
-  async getProductById(id) {
+  async getProducts({ id = null, ids = null, select = null, include = null }) {
     try {
-      return await prisma.product.findUnique({
-        where: { id: parseInt(id) },
-      });
-    } catch (error) {
-      productLogger.error(`Error fetching product by ID (${id}): ${error.message}`);
-      throw error;
-    }
-  }
-
-
-  async getProductByCode(product_code) {
-    try {
-      return await prisma.product.findUnique({
-        where: { product_code },
-      });
-    } catch (error) {
-      productLogger.error(`Error fetching product by code (${product_code}): ${error.message}`);
-      throw error;
-    }
-  }
-
-  async findProductsByIds(productIds,select) {
-    try {
-      return await prisma.product.findMany({
-        where: { id: { in: productIds }, deleted_at: null },
+      if (id) {
+        return await prisma.product.findUnique({
+          where: { id: parseInt(id) },
           ...(select ? { select } : {}),
-      });
+          ...(include ? { include } : {}),
+        });
+      }
+
+      if (ids && ids.length) {
+        return await prisma.product.findMany({
+          where: { id: { in: ids }, deleted_at: null },
+          ...(select ? { select } : {}),
+          ...(include ? { include } : {}),
+        });
+      }
+
+      throw new Error("Either 'id' or 'ids' must be provided");
     } catch (error) {
-      saleLogger.error(`❌ Failed to fetch Products | ${error.message}`);
+      productLogger.error(`Error fetching products | ${error.message}`);
       throw error;
     }
   }
 
-  async updateProductInventory(id, inventory_qty) {
+  async getCombinations(search) {
     try {
-      return await prisma.product.update({
-        where: { id },
-        data: { inventory_qty },
-      });
+      let filtered = combinations;
+
+      if (search) {
+        filtered = combinations.filter((c) =>
+          c.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      const data = filtered.map((c) => ({ value: c, label: c }))
+
+      return data;
+
     } catch (error) {
-      saleLogger.error(`❌ Failed to update Product Inventory ID: ${id} | ${error.message}`);
+      productLogger.error("Error fetching product combinations: " + error.message);
+      throw error;
+    }
+  }
+
+  async getCategories(search) {
+    try {
+      let filtered = categories;
+
+      if (search) {
+        filtered = categories.filter((c) =>
+          c.name.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      const data = filtered.map((c) => ({
+        value: c.name,
+        label: c.name,
+        uom: c.uom,
+      }))
+
+      return data;
+
+    } catch (error) {
+      productLogger.error("Error fetching product categories: " + error.message);
       throw error;
     }
   }

@@ -2,7 +2,6 @@
 import { STATUS, LIMIT } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { vendorLogger } from '../utilities/logger.js';
-import { appQueue, appQueueEvents } from '../cache/queueManager.js'
 import { VendorRepository } from '../repository/vendor.repository.js';
 
 const vendorRepo = new VendorRepository();
@@ -10,29 +9,12 @@ const vendorRepo = new VendorRepository();
 export const createVendorService = async (data) => {
   try {
     const vendor_code = generateRandom("VENDOR");
+    
+    const newVendor = await vendorRepo.createVendor({ ...data, vendor_code });
 
-     const module = 'vendor';
-    const operation = 'create';
-
-    const result = await appQueue.add(`${module}:${operation}`, {
-      module,
-      operation,
-      payload: {
-        ...data,
-       vendor_code,
-      },
-    }, {
-      attempts: 3,
-      backoff: { type: 'fixed', delay: 2000 },
-      removeOnComplete: true,
-    });
-
-    const newVendor = await result.waitUntilFinished(appQueueEvents);
     if(!newVendor){
       throw new Error('vendor not created')
     }
-
-    console.log("FRom the vendor service",newVendor);
 
     vendorLogger.info(`✅ Vendor created successfully | Code: ${vendor_code}`);
 
@@ -46,27 +28,10 @@ export const createVendorService = async (data) => {
 export const updateVendorService = async (data) => {
   try {
     
-    const module = 'vendor';
-    const operation = 'update';
-
-    const result = await appQueue.add(`${module}:${operation}`, {
-      module,
-      operation,
-      payload: {
-        ...data,
-      },
-    }, {
-      attempts: 3,
-      backoff: { type: 'fixed', delay: 2000 },
-      removeOnComplete: true,
-    });
-
-    const updatedVendor = await result.waitUntilFinished(appQueueEvents);
+    const updatedVendor = await vendorRepo.updateVendor(data.vendor_code, data);
     if(!updatedVendor){
       throw new Error('vendor not created')
     }
-
-    console.log("FRom the vendor service",updatedVendor);
 
     vendorLogger.info(`✅ Vendor updated successfully | Code: ${data.vendor_code}`);
 
@@ -83,6 +48,7 @@ export const searchVendorsService = async (q) => {
     if (!q) {
       throw new Error("Search query 'q' is required");
     }
+    
     const searchVendor = await vendorRepo.searchVendors(q, LIMIT.VENDOR_LIMIT, STATUS.ACTIVE);
    
     vendorLogger.info(`✅ Vendor search completed | Query: ${q} | Results: ${searchVendor.length}`);
@@ -97,23 +63,8 @@ export const searchVendorsService = async (q) => {
 
 export const deleteVendorService = async (vendor_code) => {
   try {
-   
-    const module = 'vendor';
-    const operation = 'delete';
 
-    const result = await appQueue.add(`${module}:${operation}`, {
-      module,
-      operation,
-      payload: {
-        vendor_code
-      },
-    }, {
-      attempts: 3,
-      backoff: { type: 'fixed', delay: 2000 },
-      removeOnComplete: true,
-    });
-
-    const softdeleteVendor = await result.waitUntilFinished(appQueueEvents);
+    const softdeleteVendor = await vendorRepo.deleteVendor(vendor_code);
     if(!softdeleteVendor){
       throw new Error('vendor not delete')
     }

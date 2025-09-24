@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
-import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
 import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE, salesIndentColumns, salesIndentSearchFields, salesIndentStatusFilters } from "../../constant/salesIndentConstant.js";
 import { toast } from "react-toastify";
@@ -19,7 +18,7 @@ export const SalesIndent = () => {
   const [searchField, setSearchField] = useState("indent_number");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("a");
+  const [sortOrder, setSortOrder] = useState("d");
 
   const { data: salesOrders, metadata, loading, setData: setSalesIndents } =
     useFetchData({

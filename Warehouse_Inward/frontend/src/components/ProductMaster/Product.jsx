@@ -17,7 +17,7 @@ function Product() {
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("a");
+  const [sortOrder, setSortOrder] = useState("d");
 
 
   const { data: products, metadata, loading, setData: setProducts } =

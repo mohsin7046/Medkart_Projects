@@ -11,6 +11,7 @@ import {
 } from "../../constant/grnConstant.js";
 import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE } from "../../constant/grnConstant.js";
+import { STATUS } from "../../constant/constant.js";
 
 function GRNList() {
   const [page, setPage] = useState(1);
@@ -46,7 +47,12 @@ function GRNList() {
     ALLEndpoint.GRNEndpoints.deleteGRN.method
   );
 
-  const handleDelete = (grn_id) => {
+  const handleDelete = (grn) => {
+    if([STATUS.COMPLETED,STATUS.CANCELLED].includes(grn.status)){
+      alert(`Cannot delete a ${grn.status} GRN.`);
+      return;
+    }
+    const grn_id = grn_id.id;
     deleteItem({
       idField: "grn_id",
       idValue: grn_id,
@@ -91,15 +97,20 @@ function GRNList() {
       onView={(grn) =>
         navigate(ROUTES.GRN.VIEW('grn',grn.id))
       }
-      onDelete={(grn) => handleDelete(grn.id)}
-      extraAction={(grn) => (
+      onDelete={(grn) => handleDelete(grn)}
+      extraAction={(grn) => { 
+        const isDisabled = [STATUS.COMPLETED,STATUS.CANCELLED].includes(grn.status);
+
+        return(
         <button
+          disabled={isDisabled}
           onClick={() => navigate(ROUTES.PURCHASE_INVOICE.ADD(grn.id))}
-          className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors"
+          className={`bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors ${isDisabled ? "opacity-50 cursor-not-allowed" : ""
+              }}`}
         >
           Create Invoice
         </button>
-      )}
+      )}}
     />
   );
 }

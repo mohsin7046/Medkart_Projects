@@ -1,11 +1,9 @@
-import { prisma } from '../utilities/import.config.js'
-import { STATUS } from '../utilities/constant.js'
+import { STATUS,PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
 import { purchaseOrderQueue,purchaseOrderQueueEvents } from '../cache/queueManager.js'
 import { PurchaseOrderRepository } from '../repository/purchaseOrder.repository.js'
-
 
 const PurchaseOrderRepo = new PurchaseOrderRepository();
    
@@ -25,7 +23,7 @@ export const createPurchaseOrderService = async (data) => {
       }
     });
 
-    const order_number = generateRandom("ORDER");
+    const order_number = generateRandom(PREFIX.ORDER);
 
     const itemsWithTotal = items.map((item) => ({
       ...item,
@@ -67,18 +65,11 @@ export const createPurchaseOrderService = async (data) => {
     });
 
     const createdPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+
     if (!createdPO || createdPO.status !== 'success') {
-      throw new Error('Purchase Order not created');
-    }
-
-    console.log('ob result:', createdPO.data);
-
-    if (!createdPO) {
       poLogger.error("❌ Error while creating purchase Order");
       throw new Error("Purchase Order not created");
     }
-
-    console.log(createdPO);
 
     poLogger.info(`✅ Purchase Order created | Order Number: ${order_number}`);
     return createdPO;
@@ -87,7 +78,6 @@ export const createPurchaseOrderService = async (data) => {
     throw error;
   }
 }
-
 
 
 export const updatePurchaseOrderService = async (formData) => {
@@ -144,14 +134,8 @@ export const updatePurchaseOrderService = async (formData) => {
     });
 
     const updatedPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+
     if (!updatedPO || updatedPO.status !== 'success') {
-      throw new Error('Purchase Order not created');
-    }
-
-    console.log('ob result:', updatedPO.data);
-
-
-    if (!updatedPO) {
       poLogger.error("❌ Error while updating purchase Order");
       throw new Error("Purchase Order not updated");
     }
@@ -170,7 +154,7 @@ export const deletePurchaseOrderService = async (order_id) => {
   try {
     console.log(order_id);
     
-    const existingPO = await PurchaseOrderRepo.findExistingPO(order_id);
+    const existingPO = await PurchaseOrderRepo.findPOByOrderId({id:order_id});
 
     if (existingPO && (existingPO.status === STATUS.COMPLETED || existingPO.status === STATUS.CANCELLED)) {
       throw new Error('Cannot delete completed or cancelled Purchase Order');
@@ -190,11 +174,8 @@ export const deletePurchaseOrderService = async (order_id) => {
     });
 
     const deletePO = await job.waitUntilFinished(purchaseOrderQueueEvents);
-    if (!deletePO || deletePO.status !== 'success') {
-      throw new Error('Purchase Order not created');
-    }
 
-    if (!deletePO) {
+    if (!deletePO || deletePO.status !== 'success') {
       poLogger.error(`❌ Error while deleting purchase Order  ${order_id}`);
       throw new Error("Purchase Order not deleted");
     }
@@ -218,8 +199,7 @@ export const getPurchaseOrderByIdService = async (id) => {
     }
 
     poLogger.info(`✅ Purchase Order fetched | ID: ${id}`);
-    console.log(poData);
-    
+
     return poData;
   } catch (error) {
     poLogger.error(`❌ Failed to fetch Purchase Order | ID: ${id} | Error: ${error.message}`);

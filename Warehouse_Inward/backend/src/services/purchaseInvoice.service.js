@@ -52,7 +52,7 @@ export const createPurchaseInvoiceService = async ({
 
     const productIds = items.map((item) => item.product_id);
 
-    const products = await productRepo.findProductsByIds(productIds,{ id: true, gst_percentage: true });
+    const products = await productRepo.getProducts({ids:productIds,select:{ id: true, gst_percentage: true }});
 
     const productMap = products.reduce((obj, p) => {
       obj[p.id] = p.gst_percentage || 0;

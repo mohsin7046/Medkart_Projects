@@ -3,7 +3,7 @@ import { vendorLogger } from "../utilities/logger.js";
 
 export class VendorRepository {
 
-   async createVendor(data) {
+  async createVendor(data) {
     try {
       return await prisma.vendor.create({ data });
     } catch (error) {
@@ -12,7 +12,7 @@ export class VendorRepository {
     }
   }
 
-   async updateVendor(vendor_code, data) {
+  async updateVendor(vendor_code, data) {
     try {
       return await prisma.vendor.update({
         where: { vendor_code },
@@ -25,7 +25,7 @@ export class VendorRepository {
   }
 
 
-   async deleteVendor(vendor_code) {
+  async deleteVendor(vendor_code) {
     try {
       return await prisma.vendor.update({
         where: { vendor_code },
@@ -38,7 +38,7 @@ export class VendorRepository {
   }
 
 
-   async searchVendors(q, limit, status) {
+  async searchVendors(q, limit, status) {
     try {
       return await prisma.vendor.findMany({
         where: {
@@ -59,7 +59,7 @@ export class VendorRepository {
   }
 
 
-   async getVendorById(id) {
+  async getVendorById(id) {
     try {
       return await prisma.vendor.findUnique({
         where: { id: parseInt(id) },
@@ -71,23 +71,12 @@ export class VendorRepository {
   }
 
 
-   async getVendorByCode(vendor_code) {
+  async findVendor() {
     try {
-      return await prisma.vendor.findUnique({
-        where: { vendor_code },
-      });
+      return await prisma.vendor.findFirstOrThrow({ orderBy: { id: 'desc' } });
     } catch (error) {
-      vendorLogger.error(`Error fetching vendor by code (${vendor_code}): ${error.message}`);
+      saleLogger.error(`❌ Failed to fetch vendor | ${error.message}`);
       throw error;
     }
   }
-  
-  async findVendor() {
-      try {
-        return await prisma.vendor.findFirstOrThrow({ orderBy: { id: 'desc' } });
-      } catch (error) {
-        saleLogger.error(`❌ Failed to fetch vendor | ${error.message}`);
-        throw error;
-      }
-    }
 }

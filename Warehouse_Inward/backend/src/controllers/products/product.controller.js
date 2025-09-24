@@ -3,7 +3,9 @@ import {
   searchProductService,
   updateProductService,
   deleteProductService,
-  getProductByIdService
+  getProductByIdService,
+  getCombinationsService,
+  getCategoriesService
 } from '../../services/product.service.js'
 import { successResponse } from '../../utilities/response.js'
 import { createProductSchema } from '../../zodValidation/productValidation/productCreate.zod.js'
@@ -13,7 +15,7 @@ import { STATUSCODE,ENTITY } from '../../utilities/constant.js'
 
 
 export const addProduct = catchAsync(async (req, res) => {
-  req.component = ENTITY.product;
+req.component = ENTITY.product;
 const data = createProductSchema.parse(req.body);
 
   const newProduct = await addProductService(data);
@@ -63,4 +65,19 @@ export const getProductById = catchAsync(async (req, res) => {
   return successResponse(res, productByIdData, "Product data fetched successfully by id", STATUSCODE.OK);
 })
 
+export const getCategories = catchAsync(async (req, res) => {
+    req.component =  ENTITY.product;
+    const { search } = req.query;
+    const filteredCategoriesAndUOM = await getCategoriesService(search);
+  return successResponse(res, filteredCategoriesAndUOM, "Product categories fetched successfully", STATUSCODE.OK);
+})
+
+export const getCombinations = catchAsync(async (req, res) => {
+    req.component =  ENTITY.product;
+    const { search } = req.query;
+    console.log("FRom combinations",search);
+    
+  const filteredCombinations = await getCombinationsService(search);
+  return successResponse(res,filteredCombinations, "Product combinations fetched successfully", STATUSCODE.OK);
+})
 

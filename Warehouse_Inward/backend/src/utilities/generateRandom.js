@@ -1,5 +1,3 @@
-import { PREFIX } from "./constant.js"
-
 export const generateRandom = (status)=>{
   const prefix = status|| "";
   const now = new Date();

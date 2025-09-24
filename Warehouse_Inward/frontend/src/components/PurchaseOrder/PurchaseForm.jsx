@@ -191,7 +191,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50 px-4">
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
       <div className="w-full max-w-5xl bg-white shadow-lg rounded-xl p-8">
         <h2 className="text-3xl font-bold mb-6 text-center">
           {id ? "✏️ Edit Purchase Order" : "➕ Add Purchase Order"}

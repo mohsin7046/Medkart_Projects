@@ -1,4 +1,3 @@
-import { prisma } from '../utilities/import.config.js'
 import { getSalesOrderByIdService } from './salesOrder.service.js';
 import { indentLogger } from '../utilities/logger.js';
 import { STATUS } from '../utilities/constant.js';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
 
@@ -27,22 +27,19 @@ function GrnForm() {
   }, [location]);
 
   useEffect(() => {
-
     const fetchData = async () => {
       try {
-        let url = "";
+        let url = null;
+
         if (mode === "edit") {
           url = `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`;
         } else if (mode === "create") {
           url = `${ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint}/${id}`;
         }
 
-
         const res = await fetch(url);
         const response = await res.json();
         const data = response.data || response;
-
-        console.log("Fetched data", data);
 
         if (mode === "edit") {
           setFormData({
@@ -68,8 +65,6 @@ function GrnForm() {
             grn_number: "",
             order_id: id,
             received_date: new Date().toISOString().split("T")[0],
-            damaged_qty: 0,
-            shortage_qty: 0,
             status: "pending",
             items: data.purchaseOrderItems.map((i) => ({
               product_id: i.product_id,
@@ -91,7 +86,9 @@ function GrnForm() {
       }
     };
 
-    if (id) fetchData();
+    if (id && mode) {
+      fetchData();
+    }
   }, [id, mode]);
 
   const handleItemChange = (index, field, value) => {
@@ -115,7 +112,6 @@ function GrnForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
 
     let payload;
 
@@ -165,9 +161,6 @@ function GrnForm() {
         method = `${ALLEndpoint.GRNEndpoints.updateGRN.method}`;
       }
 
-      console.log(url, method);
-      console.log(payload);
-
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -176,9 +169,6 @@ function GrnForm() {
 
       if (!response.ok) {
         const resData = await response.json();
-        console.log(resData);
-      
-
         if (Array.isArray(resData.message)) {
           resData.message.forEach((err) => {
             toast.error(`${err.field}: ${err.message}`);
@@ -186,169 +176,176 @@ function GrnForm() {
         } else {
           toast.error(resData.error || resData.message || "Something went wrong");
         }
-      
         return;
       }
 
       toast.success(
-        mode === "edit" ? "✅ GRN updated successfully!" : "✅ GRN created successfully!"
+        mode === "edit"
+          ? "✅ GRN updated successfully!"
+          : "✅ GRN created successfully!"
       );
 
       navigate(mode === "edit" ? ROUTES.GRN.LIST : ROUTES.PURCHASE_ORDER.LIST);
     } catch (error) {
       console.error("Error saving GRN:", error);
-      toast.error(error);
+      toast.error(error.message || "Error saving GRN");
     }
   };
 
-
   return (
-    <div className="bg-white shadow-lg p-6 rounded-xl max-w-6xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">
-        {mode === "edit" ? "Edit Good Receipt Note" : "Create Good Receipt Note"}
-      </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
+      <div className="bg-white shadow-lg p-6 sm:p-8 rounded-xl w-full max-w-6xl">
+        <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800 text-center">
+          {mode === "edit"
+            ? "✏️ Edit Good Receipt Note"
+            : "📦 Create Good Receipt Note"}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Received Date
-            </label>
-            <input
-              type="date"
-              value={formData.received_date}
-              onChange={(e) =>
-                setFormData({ ...formData, received_date: e.target.value })
-              }
-              className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            />
+        <form onSubmit={handleSubmit} className="space-y-6">
+         
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
+                Received Date
+              </label>
+              <input
+                type="date"
+                value={formData.received_date}
+                onChange={(e) =>
+                  setFormData({ ...formData, received_date: e.target.value })
+                }
+                className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-sm font-medium text-gray-700 mb-1">
+                Purchase Order ID
+              </label>
+              <input
+                type="text"
+                value={formData.order_id}
+                readOnly
+                className="border border-gray-300 px-3 py-2 rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
+                placeholder="PO Number"
+              />
+            </div>
           </div>
-          <div className="flex flex-col">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Purchase Order ID
-            </label>
-            <input
-              type="text"
-              value={formData.order_id}
-              readOnly
-              className="border border-gray-300 px-3 py-2 rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
-              placeholder="PO Number"
-            />
-          </div>
-        </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
-            <thead>
-              <tr className="bg-gray-100 text-center">
-                <th className="border px-2 py-2">Product</th>
-                <th className="border px-2 py-2">Batch No</th>
-                <th className="border px-2 py-2">Expiry</th>
-                <th className="border px-2 py-2">Ordered</th>
-                <th className="border px-2 py-2">Received</th>
-                <th className="border px-2 py-2">Damaged</th>
-                <th className="border px-2 py-2">Shortage</th>
-                <th className="border px-2 py-2">Price</th>
-                <th className="border px-2 py-2">MRP</th>
-                <th className="border px-2 py-2">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {formData.items.map((item, idx) => (
-                <tr key={idx} className="text-center hover:bg-gray-50">
-                  <td className="border px-2 py-1">{item.product_id}</td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="text"
-                      value={item.batch_number}
-                      onChange={(e) =>
-                        handleItemChange(idx, "batch_number", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="date"
-                      value={item.expiry_date}
-                      onChange={(e) =>
-                        handleItemChange(idx, "expiry_date", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">{item.ordered_qty}</td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="number"
-                      min="0"
-                      value={item.recevied_qty}
-                      onChange={(e) =>
-                        handleItemChange(idx, "recevied_qty", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="number"
-                      value={item.damaged_qty}
-                      onChange={(e) =>
-                        handleItemChange(idx, "damaged_qty", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="number"
-                      readOnly
-                      value={item.shortage_qty}
-                      className="border px-2 py-1 rounded w-full bg-gray-100"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={item.item_price}
-                      onChange={(e) =>
-                        handleItemChange(idx, "item_price", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1">
-                    <input
-                      type="number"
-                      min="0"
-                      step="any"
-                      value={item.item_mrp}
-                      onChange={(e) =>
-                        handleItemChange(idx, "item_mrp", e.target.value)
-                      }
-                      className="border px-2 py-1 rounded w-full"
-                    />
-                  </td>
-                  <td className="border px-2 py-1 font-medium text-gray-700">
-                    ₹{item.totalAmount.toFixed(3)}
-                  </td>
+
+          <div className="overflow-x-auto rounded-lg border">
+            <table className="w-full border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr className="bg-gray-100 text-center">
+                  <th className="border px-2 py-2">Product</th>
+                  <th className="border px-2 py-2">Batch No</th>
+                  <th className="border px-2 py-2">Expiry</th>
+                  <th className="border px-2 py-2">Ordered</th>
+                  <th className="border px-2 py-2">Received</th>
+                  <th className="border px-2 py-2">Damaged</th>
+                  <th className="border px-2 py-2">Shortage</th>
+                  <th className="border px-2 py-2">Price</th>
+                  <th className="border px-2 py-2">MRP</th>
+                  <th className="border px-2 py-2">Total</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {formData.items.map((item, idx) => (
+                  <tr key={idx} className="text-center hover:bg-gray-50">
+                    <td className="border px-2 py-1">{item.product_id}</td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="text"
+                        value={item.batch_number}
+                        onChange={(e) =>
+                          handleItemChange(idx, "batch_number", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="date"
+                        value={item.expiry_date}
+                        onChange={(e) =>
+                          handleItemChange(idx, "expiry_date", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">{item.ordered_qty}</td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="number"
+                        min="0"
+                        value={item.recevied_qty}
+                        onChange={(e) =>
+                          handleItemChange(idx, "recevied_qty", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="number"
+                        value={item.damaged_qty}
+                        onChange={(e) =>
+                          handleItemChange(idx, "damaged_qty", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="number"
+                        readOnly
+                        value={item.shortage_qty}
+                        className="border px-2 py-1 rounded w-full bg-gray-100"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        value={item.item_price}
+                        onChange={(e) =>
+                          handleItemChange(idx, "item_price", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1">
+                      <input
+                        type="number"
+                        min="0"
+                        step="any"
+                        value={item.item_mrp}
+                        onChange={(e) =>
+                          handleItemChange(idx, "item_mrp", e.target.value)
+                        }
+                        className="border px-2 py-1 rounded w-full"
+                      />
+                    </td>
+                    <td className="border px-2 py-1 font-medium text-gray-700">
+                      ₹{item.totalAmount.toFixed(2)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow"
-          >
-            {mode === "edit" ? "Update GRN" : "Save GRN"}
-          </button>
-        </div>
-      </form>
+         
+          <div className="flex justify-center sm:justify-end">
+            <button
+              type="submit"
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition-transform transform hover:scale-105 disabled:opacity-50"
+            >
+              {mode === "edit" ? "Update GRN" : "Save GRN"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
