@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
@@ -9,27 +9,59 @@ import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE } from "../../constant/productConstant.js";
 
 function Product() {
-  const [page, setPage] = useState(1);
-  const limit = LIMITPAGE;
-  const navigate = useNavigate();
 
   const FILTER_KEY = "productFilters";
+  const navigate = useNavigate();
 
-const setFilterState = (key, value) => {
-  localStorage.setItem(key, JSON.stringify(value));
-};
+  const getFilterState = (key, defaultValue) => {
+    try {
+      const stored = localStorage.getItem(key);
+      console.log(stored);
+      return stored ? JSON.parse(stored) : defaultValue;
+    } catch (error) {
+      console.error("Error reading from localStorage:", error);
+      return defaultValue;
+    }
+  };
 
-const getFilterState = (key, defaultValue) => {
-  const stored = localStorage.getItem(key);
-  return stored ? JSON.parse(stored) : defaultValue;
-};
+  const setFilterState = (key, value) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      console.error("Error writing to localStorage:", error);
+    }
+  };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchField, setSearchField] = useState("name");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("d");
+  const initialFilters = getFilterState(FILTER_KEY, {
+    page: 1,
+    searchTerm: "",
+    searchField: "name",
+    statusFilter: "all",
+    sortField: "created_at",
+    sortOrder: "d",
+  });
 
+  const [page, setPage] = useState(initialFilters.page);
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm);
+  const [searchField, setSearchField] = useState(initialFilters.searchField);
+  const [statusFilter, setStatusFilter] = useState(initialFilters.statusFilter);
+  const [sortField, setSortField] = useState(initialFilters.sortField);
+  const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder);
+
+  const limit = LIMITPAGE;
+
+
+  useEffect(() => {
+    const filters = {
+      page,
+      searchTerm,
+      searchField,
+      statusFilter,
+      sortField,
+      sortOrder,
+    };
+    setFilterState(FILTER_KEY, filters);
+  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
   const { data: products, metadata, loading, setData: setProducts } =
     useFetchData({
@@ -75,6 +107,26 @@ const getFilterState = (key, defaultValue) => {
     setPage(1);
   };
 
+  const handleClearFilters = () => {
+  const defaultFilters = {
+    page: 1,
+    searchTerm: "",
+    searchField: "name",
+    statusFilter: "all",
+    sortField: "created_at",
+    sortOrder: "d",
+  };
+
+  setPage(defaultFilters.page);
+  setSearchTerm(defaultFilters.searchTerm);
+  setSearchField(defaultFilters.searchField);
+  setStatusFilter(defaultFilters.statusFilter);
+  setSortField(defaultFilters.sortField);
+  setSortOrder(defaultFilters.sortOrder);
+
+  setFilterState(FILTER_KEY, defaultFilters);
+};
+
 
   return (
     <div>
@@ -88,14 +140,18 @@ const getFilterState = (key, defaultValue) => {
         setPage={setPage}
         searchFields={searchFields}
         statusFilters={statusFilters}
+        currentSearchTerm={searchTerm}
+        currentSearchField={searchField}
+        currentStatusFilter={statusFilter}
+        currentSortField={sortField}
+        currentSortOrder={sortOrder}
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
         onAdd={() => navigate(ROUTES.PRODUCT.ADD)}
-        onEdit={(product) =>
-          navigate(ROUTES.PRODUCT.EDIT(product.id))
-        }
+        onEdit={(product) => navigate(ROUTES.PRODUCT.EDIT(product.id))}
         onDelete={(product) => handleDelete(product.product_code)}
+         onClear={handleClearFilters}
       />
     </div>
   );

@@ -1,18 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import { useState,useEffect,useRef } from "react";
 
-export function SearchSelect({ type, value, onSelect }) {
+export function SearchSelect({ type, value, onSelect, selectedIds = [] }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const isSelecting = useRef(false);
 
   useEffect(() => {
-    if (value) {
-      setQuery(value);
-    }else {
-      setQuery(""); 
-    }
-
+    if (value) setQuery(value);
+    else setQuery("");
   }, [value]);
 
   useEffect(() => {
@@ -22,46 +18,44 @@ export function SearchSelect({ type, value, onSelect }) {
     }
 
     if (isSelecting.current) {
-
       isSelecting.current = false;
       return;
     }
 
-
     const delayDebounce = setTimeout(async () => {
-       if (value && query === value) {
-      setShowDropdown(false);
-      return;
-    }
+      if (value && query === value) {
+        setShowDropdown(false);
+        return;
+      }
       const res = await fetch(`http://localhost:5000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
-      console.log(data);
-      
-       setResults(data.data || []);
+
+      // ✅ Filter out products already selected in other rows
+      const filtered = (data.data || []).filter(
+        (item) => !selectedIds.includes(item.id)
+      );
+
+      setResults(filtered);
       setShowDropdown(true);
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [query, type]);
-
-
+  }, [query, type, selectedIds]);
 
   return (
-    <div className="relative w-full ">
-      <label className="block mb-1 font-medium capitalize text-gray-700 ">{type} {<span className="text-red-500">*</span>}</label>
+    <div className="relative">
       <input
-        type="text"
-        className="border px-3 py-2 w-full rounded-lg"
+        className="border rounded-lg px-3 py-2"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={`Search ${type}...`}
       />
       {showDropdown && results.length > 0 && (
-        <ul className="absolute bg-white border w-full max-h-40 overflow-y-auto z-10">
+        <ul className="absolute z-10 bg-white border w-full rounded shadow">
           {results.map((item) => (
             <li
-              key={item.id || item[`${type}_code`]}
-              className="p-2 hover:bg-gray-200 cursor-pointer"
+              key={item.id}
+              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => {
                 setQuery(item.name);
                 isSelecting.current = true;

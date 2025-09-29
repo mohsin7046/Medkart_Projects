@@ -166,6 +166,10 @@ function SalesOrderForm() {
     0
   );
 
+  const selectedProductIds = formData.items
+    .map((item) => item.product_id)
+    .filter(Boolean);
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
       <div className="w-full max-w-5xl bg-white shadow-lg rounded-xl p-8">
@@ -202,6 +206,9 @@ function SalesOrderForm() {
                       type="product"
                       value={item.product_name}
                       onSelect={(p) => handleProductSelect(index, p)}
+                      selectedIds={selectedProductIds.filter(
+                        (id) => id !== item.product_id
+                      )}
                     />
                     {itemErrors.product_name && (
                       <span className="text-red-500 text-xs mt-1">{itemErrors.product_name}</span>
