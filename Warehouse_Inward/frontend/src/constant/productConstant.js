@@ -1,3 +1,5 @@
+import { STATUS_COLORS } from "./constant.js";
+
  export const columns = [
     { key: "product_code", label: "Product Code" },
     { key: "name", label: "Name" },
@@ -7,7 +9,7 @@
     { key: "unit_of_measure", label: "Unit" },
     { key: "hsn_code", label: "HSN" },
     { key: "gst_percentage", label: "GST %", render: (val) => `${val}%` },
-    { key: "status", label: "Status" },
+    { key: "status", label: "Status" ,background: (val)=> STATUS_COLORS[val] },
   ];
 
 export const searchFields = [
@@ -23,4 +25,4 @@ export const statusFilters = [
     { key: "inactive", label: "InActive" },
   ]
 
-export const LIMITPAGE = 2;
+export const LIMITPAGE = 8;

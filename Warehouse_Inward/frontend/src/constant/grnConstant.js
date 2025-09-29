@@ -1,3 +1,5 @@
+import { STATUS_COLORS } from "./constant";
+
 export const grnColumns = [
   { key: "grn_number", label: "GRN Number" },
   { key: "order_id", label: "Order ID" },
@@ -11,7 +13,7 @@ export const grnColumns = [
     label: "Total Amount",
     render: (val) => `₹${val}`,
   },
-  { key: "status", label: "Status" },
+  { key: "status", label: "Status" ,background: (val)=> STATUS_COLORS[val] },
 ];
 
 export const grnSearchFields = [
@@ -25,4 +27,4 @@ export const grnStatusFilters = [
   { key: "cancelled", label: "Cancelled" },
 ];
 
-export const LIMITPAGE = 2;
+export const LIMITPAGE = 8;

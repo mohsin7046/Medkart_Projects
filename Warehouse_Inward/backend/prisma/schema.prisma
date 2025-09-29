@@ -197,6 +197,8 @@ model SalesOrder {
   updated_at         DateTime            @updatedAt
   deleted_at         DateTime?
 
+  @@index([sales_order_number,status,created_at])
+
   @@map("sales_orders")
 }
 

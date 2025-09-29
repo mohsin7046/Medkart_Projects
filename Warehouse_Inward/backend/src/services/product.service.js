@@ -2,7 +2,6 @@ import { STATUS, LIMIT, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { productLogger } from '../utilities/logger.js'
 import { ProductRepository } from '../repository/product.repository.js'
-import { ca } from 'zod/v4/locales';
 
 const ProductRepo = new ProductRepository();
 
@@ -19,9 +18,19 @@ export const addProductService = async (data) => {
     productLogger.info("📦 Generated product_code: " + product_code);
 
     const product = await ProductRepo.createProduct({
-      ...data,
-      inventory_qty: 10, //TODO:Take From the Frontend
-      product_code
+    name: data.name,
+    category: data.category,
+    combination: data.combination,
+    product_mrp: data.product_mrp,
+    product_price: data.product_price,
+    last_purchase_price: data.last_purchase_price,
+    unit_of_measure:  data.unit_of_measure,
+    description: data.description,
+    hsn_code: data.hsn_code,
+    gst_percentage:   data.gst_percentage,
+    status: data.status,
+    inventory_qty: 10, //TODO:Take From the Frontend
+    product_code
     });
 
     if (!product) {
@@ -75,6 +84,9 @@ export const searchProductService = async (q) => {
     }
 
     const searchProduct = await ProductRepo.searchProducts(q, LIMIT.PRODUCT_LIMIT, STATUS.ACTIVE);
+
+    console.log("Search Results:", searchProduct); // Debug log
+    
 
     if (!searchProduct || searchProduct.length === 0) {
       productLogger.warn("⚠️ No products found for query: " + q);
@@ -138,6 +150,7 @@ export const getProductByIdService = async (id) => {
     throw error;
   }
 }
+
 
 export const getCategoriesService = async (search) => {
   try {

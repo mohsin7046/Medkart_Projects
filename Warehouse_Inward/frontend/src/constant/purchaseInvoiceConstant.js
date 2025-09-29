@@ -1,3 +1,5 @@
+import { STATUS_COLORS } from "./constant";
+
 export const invoiceColumns = [
   { key: "invoice_number", label: "Invoice Number" },
   { key: "goodReceiptNote", label: "GRN ID",render: (goodReceiptNote) => goodReceiptNote?.id || "-"  },
@@ -11,7 +13,7 @@ export const invoiceColumns = [
     label: "Total Amount",
     render: (val) => `₹${val}`,
   },
-  { key: "status", label: "Status" },
+  { key: "status", label: "Status",background: (val)=> STATUS_COLORS[val]  },
 ];
 
 export const invoiceSearchFields = [
@@ -25,4 +27,4 @@ export const invoiceStatusFilters = [
   { key: "cancelled", label: "Cancelled" },
 ];
 
-export const LIMITPAGE = 3;
+export const LIMITPAGE = 8;

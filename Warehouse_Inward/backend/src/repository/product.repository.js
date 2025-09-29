@@ -42,6 +42,19 @@ export class ProductRepository {
     }
   }
 
+   updateProductWithoutAwait({ id = null, data }) {
+    try {
+          return prisma.product.update({
+            where: { id: parseInt(id) },
+            data,
+          })
+          
+    } catch (error) {
+      productLogger.error("Error updating product: " + error.message);
+      throw error;
+    }
+  }
+
 
   async deleteProduct(product_code) {
     try {

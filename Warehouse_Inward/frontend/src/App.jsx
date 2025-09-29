@@ -19,6 +19,7 @@ import {
 } from "./components/importComponent.js";
 import CommonView from "./components/utility/CommonView.jsx";
 
+
 function App() {
   return (
     <Router>
@@ -60,6 +61,7 @@ function App() {
           <Route path={ROUTES.SALES_INDENT.LIST} element={<SalesIndent />} />
 
           <Route path={ROUTES.COMMON_VIEW.VIEW} element={<CommonView />} />
+  
         </Routes>
       </div>
     </Router>

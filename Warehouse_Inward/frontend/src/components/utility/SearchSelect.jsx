@@ -33,7 +33,7 @@ export function SearchSelect({ type, value, onSelect }) {
       setShowDropdown(false);
       return;
     }
-      const res = await fetch(`http://localhost:3000/api/v1/${type}s/search/${query}`);
+      const res = await fetch(`http://localhost:5000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
       console.log(data);
       
@@ -47,10 +47,11 @@ export function SearchSelect({ type, value, onSelect }) {
 
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full ">
+      <label className="block mb-1 font-medium capitalize text-gray-700 ">{type} {<span className="text-red-500">*</span>}</label>
       <input
         type="text"
-        className="border p-2 w-full rounded"
+        className="border px-3 py-2 w-full rounded-lg"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={`Search ${type}...`}

@@ -1,9 +1,11 @@
+import { STATUS_COLORS } from "./constant";
+
 export const salesIndentColumns = [
   { key: "indent_number", label: "Indent No" },
   { key: "product", label: "Name",render: (product) => product?.name || "-"  },
   { key: "total_remain_product", label: "Total Reamin Product" },
   { key: "total_sales_order", label: "Total Sales Order" },
-  { key: "status", label: "Status" },
+  { key: "status", label: "Status" ,background: (val)=> STATUS_COLORS[val] },
   { key: "created_at", label: "Created At",render: (val) => (val ? new Date(val).toLocaleDateString("en-GB") : "-") },
 ];
 

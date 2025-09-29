@@ -1,12 +1,12 @@
-import { STATUS,PREFIX } from '../utilities/constant.js'
+import { STATUS, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
-import { purchaseOrderQueue,purchaseOrderQueueEvents } from '../cache/queueManager.js'
+import { purchaseOrderQueue, purchaseOrderQueueEvents } from '../cache/queueManager.js'
 import { PurchaseOrderRepository } from '../repository/purchaseOrder.repository.js'
 
 const PurchaseOrderRepo = new PurchaseOrderRepository();
-   
+
 export const createPurchaseOrderService = async (data) => {
   try {
     const { vendor_id, order_date, expected_delivery_date, items } = data;
@@ -26,7 +26,10 @@ export const createPurchaseOrderService = async (data) => {
     const order_number = generateRandom(PREFIX.ORDER);
 
     const itemsWithTotal = items.map((item) => ({
-      ...item,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      item_price: item.item_price,
+      item_mrp: item.item_mrp,
       totalAmount: decimalConversion(item.quantity * item.item_price),
     }));
 
@@ -36,24 +39,24 @@ export const createPurchaseOrderService = async (data) => {
 
     const module = 'purchaseOrder';
     const operation = 'create';
-    const changeddata =  {
-        vendor_id,
-        order_date: new Date(order_date),
-        order_number,
-        expected_delivery_date: new Date(expected_delivery_date),
-        total_amount,
-        status: STATUS.PENDING,
-        purchaseOrderItems: {
-          create: items.map((item, idx) => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            item_price: item.item_price,
-            item_mrp: item.item_mrp,
-            totalAmount: itemsWithTotal[idx].totalAmount,
-          })),
-        },
-      }
-      
+    const changeddata = {
+      vendor_id,
+      order_date: new Date(order_date),
+      order_number,
+      expected_delivery_date: new Date(expected_delivery_date),
+      total_amount,
+      status: STATUS.PENDING,
+      purchaseOrderItems: {
+        create: items.map((item, idx) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          item_price: item.item_price,
+          item_mrp: item.item_mrp,
+          totalAmount: itemsWithTotal[idx].totalAmount,
+        })),
+      },
+    }
+
     const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
       module,
       operation,
@@ -96,7 +99,10 @@ export const updatePurchaseOrderService = async (formData) => {
     });
 
     const itemsWithTotal = formData.items.map(item => ({
-      ...item,
+      product_id: item.product_id,
+      quantity: item.quantity,
+      item_price: item.item_price,
+      item_mrp: item.item_mrp,
       totalAmount: decimalConversion(item.quantity * item.item_price),
     }));
 
@@ -104,24 +110,24 @@ export const updatePurchaseOrderService = async (formData) => {
       itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0)
     );
 
-     const module = 'purchaseOrder';
+    const module = 'purchaseOrder';
     const operation = 'update';
-    const data =  {
-       id: formData.order_id,
-       order_date: new Date(formData.order_date),
-        expected_delivery_date: new Date(formData.expected_delivery_date),
-        total_amount,
-        purchaseOrderItems: {
-          deleteMany: { order_id: formData.order_id },
-          create: formData.items.map((item, idx) => ({
-            product_id: item.product_id,
-            quantity: item.quantity,
-            item_price: item.item_price,
-            item_mrp: item.item_mrp,
-            totalAmount: itemsWithTotal[idx].totalAmount,
-          })),
-        },
-      }
+    const data = {
+      id: formData.order_id,
+      order_date: new Date(formData.order_date),
+      expected_delivery_date: new Date(formData.expected_delivery_date),
+      total_amount,
+      purchaseOrderItems: {
+        deleteMany: { order_id: formData.order_id },
+        create: formData.items.map((item, idx) => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          item_price: item.item_price,
+          item_mrp: item.item_mrp,
+          totalAmount: itemsWithTotal[idx].totalAmount,
+        })),
+      },
+    }
 
     const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
       module,
@@ -139,7 +145,7 @@ export const updatePurchaseOrderService = async (formData) => {
       poLogger.error("❌ Error while updating purchase Order");
       throw new Error("Purchase Order not updated");
     }
-  
+
     poLogger.info(`✅ Purchase Order updated | ID: ${formData.order_id}`);
     return updatedPO;
   } catch (error) {
@@ -153,8 +159,8 @@ export const updatePurchaseOrderService = async (formData) => {
 export const deletePurchaseOrderService = async (order_id) => {
   try {
     console.log(order_id);
-    
-    const existingPO = await PurchaseOrderRepo.findPOByOrderId({id:order_id});
+
+    const existingPO = await PurchaseOrderRepo.findPOByOrderId({ id: order_id });
 
     if (existingPO && (existingPO.status === STATUS.COMPLETED || existingPO.status === STATUS.CANCELLED)) {
       throw new Error('Cannot delete completed or cancelled Purchase Order');
@@ -163,10 +169,10 @@ export const deletePurchaseOrderService = async (order_id) => {
     const module = 'purchaseOrder';
     const operation = 'delete';
 
-     const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
+    const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
       module,
       operation,
-      payload: {order_id},
+      payload: { order_id },
     }, {
       attempts: 3,
       backoff: { type: 'fixed', delay: 2000 },

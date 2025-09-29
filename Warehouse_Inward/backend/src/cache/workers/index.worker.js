@@ -4,4 +4,4 @@ import './invoiceWorker.js'
 import './salesOrderWorker.js'
 import './salesIndentWorker.js'
 
-console.log("✅ Workers started: productQueue, vendorQueue");
+console.log("✅ Workers started....");

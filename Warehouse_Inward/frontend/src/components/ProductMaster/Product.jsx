@@ -65,7 +65,6 @@ function Product() {
   };
 
 
-
   return (
     <div>
       <CommonDataTable

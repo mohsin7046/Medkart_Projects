@@ -1,5 +1,5 @@
 
-import { STATUS, LIMIT } from '../utilities/constant.js'
+import { STATUS, LIMIT, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { vendorLogger } from '../utilities/logger.js';
 import { VendorRepository } from '../repository/vendor.repository.js';
@@ -8,9 +8,18 @@ const vendorRepo = new VendorRepository();
 
 export const createVendorService = async (data) => {
   try {
-    const vendor_code = generateRandom("VENDOR");
+    const vendor_code = generateRandom(PREFIX.VENDOR);
     
-    const newVendor = await vendorRepo.createVendor({ ...data, vendor_code });
+    const newVendor = await vendorRepo.createVendor({ 
+    name: data.name,
+    email: data.email,
+    contact_person: data.contact_person,
+    contact_number: data.contact_number,
+    gst_number: data.gst_number,
+    address: data.address,
+    status: data.status,
+    vendor_code 
+    });
 
     if(!newVendor){
       throw new Error('vendor not created')
@@ -29,6 +38,7 @@ export const updateVendorService = async (data) => {
   try {
     
     const updatedVendor = await vendorRepo.updateVendor(data.vendor_code, data);
+    
     if(!updatedVendor){
       throw new Error('vendor not created')
     }

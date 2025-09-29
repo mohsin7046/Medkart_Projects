@@ -13,6 +13,8 @@ export class SalesOrderRepository {
   }
 
   async updateSalesOrder(id, data) {
+    console.log(data);
+    
     try {
       return await prisma.salesOrder.update({
         where: { id },
@@ -24,9 +26,21 @@ export class SalesOrderRepository {
     }
   }
 
-  async updateSalesOrderProducts(sales_order_id, data) {
+    updateSalesOrderwithoutAwait(id, data) {
     try {
-      return await prisma.salesOrderProduct.updateMany({
+      return prisma.salesOrder.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      saleLogger.error(`Failed to update SalesOrder | ID: ${id} | ${error.message}`);
+      throw error;
+    }
+  }
+
+   updateSalesOrderProducts(sales_order_id, data) {
+    try {
+      return prisma.salesOrderProduct.updateMany({
         where: { sales_order_id },
         data,
       });

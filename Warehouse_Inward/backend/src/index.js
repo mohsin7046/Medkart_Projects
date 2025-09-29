@@ -4,6 +4,6 @@ import './routes/index.routes.js'
 import './cache/workers/index.worker.js'
 
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log('Warehouse Inward service running on port 3000')
+app.listen(process.env.PORT || 8000, () => {
+  console.log('Warehouse Inward service running on port 5000')
 })

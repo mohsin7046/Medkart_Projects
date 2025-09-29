@@ -1,4 +1,4 @@
-export const defaultEndPoint = 'http://localhost:3000/api/v1';
+export const defaultEndPoint = 'http://localhost:5000/api/v1';
 
 export const ALLEndpoint = Object.freeze({
   ProductEndpoints: {

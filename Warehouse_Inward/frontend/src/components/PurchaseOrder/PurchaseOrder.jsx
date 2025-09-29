@@ -26,7 +26,7 @@ function PurchaseOrder() {
 
   const {
     data: orders,
-    metadata,
+    metadata, 
     loading,
     setData: setOrders,
   } = useFetchData({

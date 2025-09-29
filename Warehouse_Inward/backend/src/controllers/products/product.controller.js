@@ -42,6 +42,9 @@ export const getProductSearch = catchAsync(async (req, res) => {
 
   const products = await searchProductService(q);
 
+  console.log(products);
+  
+
   return successResponse(res, products, "Products fetched successfully", STATUSCODE.OK);
 })
 

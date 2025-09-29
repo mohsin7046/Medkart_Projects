@@ -3,271 +3,190 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
+import { InputField } from "../../resuableComponent/Inputfeild.jsx";
+import { Button } from "../../resuableComponent/Button.jsx";
 import { SearchSelect } from "../utility/SearchSelect.jsx";
 
 function SalesOrderForm() {
-  const navigate = useNavigate();
   const { id } = useParams();
-  console.log(id);
-
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
+  const [formDirty, setFormDirty] = useState(false);
 
   const [formData, setFormData] = useState({
-    sales_order_id: "",
     name: "",
     email: "",
     contact_number: "",
     address: "",
     order_type: "B2C",
-    items: [
-      { product_id: "", vendor_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" },
-    ],
+    items: [{ product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_price: "" }],
   });
 
+
   useEffect(() => {
-    if (id) {
-      const fetchSalesOrder = async () => {
+    if (!id) return;
+
+    (async () => {
+      try {
         setLoading(true);
-        try {
-          console.log(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
+        const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
+        const { data } = await res.json();
+        if (!res.ok || !data) throw new Error("Failed to fetch sales order");
 
-          const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
-          const data = await res.json();
-          console.log(data);
+        const items = data.items?.map((i) => ({
+          product_id: i.product_id || "",
+          vendor_id: i.vendor_id || "",
+          product_name: i.product_name || "",
+          ordered_qty: i.ordered_qty?.toString() || "",
+          product_mrp: i.product_mrp?.toString() || "",
+          product_price: i.product_price?.toString() || "",
+        })) || [];
 
-          const order = data?.data;
-          if (!order) return;
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          contact_number: data.contact_number || "",
+          address: data.address || "",
+          order_type: data.order_type || "B2C",
+          items,
+        });
 
-          setFormData({
-            sales_order_id: order.id,
-            name: order.name || "",
-            email: order.email || "",
-            contact_number: order.contact_number || "",
-            address: order.address || "",
-            order_type: order.order_type || "B2C",
-            items: order.items?.map((i) => ({
-              product_id: i.product_id || "",
-              vendor_id: i.vendor_id || ""
-              , product_name: i.product_name || "",
-              ordered_qty: i.ordered_qty?.toString() || "",
-              product_mrp: i?.product_mrp?.toString() || "",
-              product_price: i?.product_price?.toString() || "",
-            })) || [],
-          });
-        } catch (err) {
-          console.error(err);
-          toast.error("Failed to load sales order");
-        }
+      } catch (err) {
+        toast.error("Error loading sales order");
+        console.error(err);
+      } finally {
         setLoading(false);
-      };
-      fetchSalesOrder();
-    }
+      }
+    })();
   }, [id]);
 
-  const handleChange = (e) => {
-    setIsDirty(true);
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+  const updateField = (name, value) => {
+    console.log(name, value);
+    
+    setFormDirty(true);
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleItemChange = (index, field, value) => {
-    setIsDirty(true);
-    const newItems = [...formData.items];
-    newItems[index][field] = value;
-    setFormData({ ...formData, items: newItems });
-  };
-
-  const addItem = () => {
-    setFormData({
-      ...formData,
-      items: [...formData.items, { product_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+  const updateItem = (index, field, value) => {
+    setFormDirty(true);
+    setFormData((prev) => {
+      const updated = [...prev.items];
+      updated[index] = { ...updated[index], [field]: value };
+      return { ...prev, items: updated };
     });
   };
 
-  const removeItem = (index) => {
-    const newItems = [...formData.items];
-    newItems.splice(index, 1);
-    setFormData({ ...formData, items: newItems });
+  const addItem = () =>
+    setFormData((prev) => ({
+      ...prev,
+      items: [...prev.items, { product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+    }));
+
+  const removeItem = (index) =>
+    setFormData((prev) => ({ ...prev, items: prev.items.filter((_, i) => i !== index) }));
+
+  const handleProductSelect = (index, product) => {
+    updateItem(index, "product_id", product.id);
+    updateItem(index, "product_name", product.name);
+    updateItem(index, "product_mrp", product.product_mrp);
+    updateItem(index, "product_price", product.product_price);
+    updateItem(index, "vendor_id", product.vendor_id || "");
+  };
+
+  const confirmNavigation = (path) => {
+    if (formDirty && !window.confirm("Unsaved changes will be lost. Continue?")) return;
+    navigate(path);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const payload = {
+      ...(id && { sales_order_id: parseInt(id) }),
+      name: formData.name,
+      email: formData.email,
+      contact_number: formData.contact_number,
+      address: formData.address,
+      order_type: formData.order_type,
+      items: formData.items.map((i) => ({
+        product_id: parseInt(i.product_id),
+        ...(id && { vendor_id: parseInt(i.vendor_id) }),
+        product_name: i.product_name,
+        ordered_qty: parseFloat(i.ordered_qty) || 0,
+        product_mrp: parseFloat(i.product_mrp) || 0,
+        product_price: parseFloat(i.product_price) || 0,
+      })),
+    };
+
+    console.log(payload);
+    
+
     try {
-      let url = ALLEndpoint.SalesOrderEndpoints.addSalesOrder.endpoint;
-      let method = ALLEndpoint.SalesOrderEndpoints.addSalesOrder.method;
-      if (id) {
-        url = ALLEndpoint.SalesOrderEndpoints.updateSalesOrder.endpoint;
-        method = ALLEndpoint.SalesOrderEndpoints.updateSalesOrder.method;
-      }
+      const endpoint = id
+        ? ALLEndpoint.SalesOrderEndpoints.updateSalesOrder
+        : ALLEndpoint.SalesOrderEndpoints.addSalesOrder;
 
-      let payload;
-      if (!id) {
-        payload = {
-          name: formData.name,
-          email: formData.email,
-          contact_number: formData.contact_number,
-          address: formData.address,
-          order_type: formData.order_type,
-          items: formData.items.map((i) => ({
-            product_id: parseInt(i.product_id),
-            product_name: i.product_name,
-            ordered_qty: parseFloat(i.ordered_qty) || 0,
-            product_mrp: parseFloat(i.product_mrp) || 0,
-            product_price: parseFloat(i.product_price) || 0,
-          })),
-        };
-      }
-
-      if (id) {
-        payload = {
-          sales_order_id: formData.sales_order_id,
-          name: formData.name,
-          email: formData.email,
-          contact_number: formData.contact_number,
-          address: formData.address,
-          order_type: formData.order_type,
-          items: formData.items.map((i) => ({
-            product_id: parseInt(i.product_id),
-            product_name: i.product_name,
-            vendor_id: parseInt(i.vendor_id),
-            ordered_qty: parseFloat(i.ordered_qty) || 0,
-            product_mrp: parseFloat(i.product_mrp) || 0,
-            product_price: parseFloat(i.product_price) || 0,
-          })),
-        };
-      }
-
-      console.log("payload", payload);
-
-
-      const res = await fetch(url, {
-        method,
+      const res = await fetch(endpoint.endpoint, {
+        method: endpoint.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
       if (!res.ok) {
-        const resData = await res.json();
-        toast.error(resData.message || "Something went wrong");
-        setLoading(false);
+        toast.error(data.message || "Error submitting sales order");
         return;
       }
 
       toast.success(id ? "Sales order updated!" : "Sales order created!");
-      setIsDirty(false);
       navigate(ROUTES.SALES_ORDER.LIST);
-      setLoading(false);
     } catch (err) {
       console.error(err);
-      toast.error("Error saving sales order");
+      toast.error("Error submitting sales order");
+    } finally {
       setLoading(false);
     }
   };
 
-  const handleBack = () => {
-    if (isDirty && !window.confirm("Unsaved changes may be lost. Continue?")) return;
-    navigate(ROUTES.SALES_ORDER.LIST);
-  };
-
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-      <div className="w-full max-w-5xl bg-white shadow-xl rounded-2xl p-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">{id ? "Edit Sales Order" : "Add Sales Order"}</h2>
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+      <div className="w-full max-w-5xl bg-white shadow-lg rounded-xl p-8">
+        <h2 className="text-3xl font-bold mb-6 text-center">{id ? "✏️ Edit Sales Order" : "➕ Add Sales Order"}</h2>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {loading && <p className="text-center text-blue-600 mb-4">Loading...</p>}
 
-          <div>
-            <label>Name</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg" required />
-          </div>
-          <div>
-            <label>Email</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg" required />
-          </div>
-          <div>
-            <label>Contact Number</label>
-            <input type="text" name="contact_number" value={formData.contact_number} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg" required />
-          </div>
-          <div>
-            <label>Address</label>
-            <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg" />
-          </div>
-          <div>
-            <label>Order Type</label>
-            <select name="order_type" value={formData.order_type} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg">
+        <form onSubmit={handleSubmit} className="space-y-6">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InputField label="Name" name="name" value={formData.name} onChange={(e) => updateField("name", e.target.value)} required />
+            <InputField label="Email" type="email" name="email" value={formData.email} onChange={(e) => updateField("email", e.target.value)} required />
+            <InputField label="Contact Number" name="contact_number" value={formData.contact_number} onChange={(e) => updateField("contact_number", e.target.value)} required />
+            <InputField label="Address" name="address" value={formData.address} onChange={(e) => updateField("address", e.target.value)} />
+            <select value={formData.order_type} onChange={(e) => updateField("order_type", e.target.value)} className="border rounded-lg px-3 py-2">
               <option value="B2C">B2C</option>
               <option value="B2B">B2B</option>
             </select>
           </div>
 
-
-          <div className="md:col-span-2">
-            <h3 className="text-xl font-semibold mb-2">Products</h3>
-            {formData.items.map((item, idx) => (
-              <div key={idx} className="border p-4 rounded mb-4 grid grid-cols-1 md:grid-cols-6 gap-4 relative">
-
-                <div>
-                  <label>Product</label>
-                  <SearchSelect
-                    type="product"
-                    value={item.product_name || ""}
-                    onSelect={(p) => {
-                      console.log(p);
-
-                      handleItemChange(idx, "product_id", p.id);
-                      handleItemChange(idx, "product_name", p.name);
-                      handleItemChange(idx, "product_mrp", p.product_mrp);
-                      handleItemChange(idx, "product_price", p.product_price);
-                    }}
-                  />
-                </div>
-
-
-                <div>
-                  <label>Ordered Qty</label>
-                  <input
-                    type="number"
-                    value={item.ordered_qty}
-                    onChange={(e) => handleItemChange(idx, "ordered_qty", e.target.value)}
-                    className="w-full border px-2 py-1 rounded"
-                  />
-                </div>
-
-
-                <div>
-                  <label>MRP</label>
-                  <input type="number" value={item.product_mrp} readOnly disabled={!item.product_id} className="w-full border px-2 py-1 rounded bg-gray-100" />
-                </div>
-
-
-                <div>
-                  <label>Price</label>
-                  <input type="number" value={item.product_price} readOnly disabled={!item.product_id} className="w-full border px-2 py-1 rounded bg-gray-100" />
-                </div>
-
-                {/* Remove button */}
-                <div className="flex items-end">
-                  <button type="button" onClick={() => removeItem(idx)} className="bg-red-500 text-white px-3 py-1 rounded mt-2">
-                    Remove
-                  </button>
-                </div>
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Products</h3>
+            {formData.items.map((item, index) => (
+              <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end border-b pb-3">
+                <SearchSelect type="product" value={item.product_name} onSelect={(p) => handleProductSelect(index, p)} />
+                <InputField label="Qty" type="number" value={item.ordered_qty} onChange={(e) => updateItem(index, "ordered_qty", e.target.value)} min="0" />
+                <InputField label="Price" type="number" value={item.product_price} readOnly />
+                <InputField label="MRP" type="number" value={item.product_mrp} readOnly />
+                <button type="button" className="text-red-600 text-lg" onClick={() => removeItem(index)}>🗑️</button>
               </div>
             ))}
-            <button type="button" onClick={addItem} className="bg-green-500 text-white px-4 py-2 rounded">
-              Add Product
-            </button>
+            <Button type="button" variant="primary" onClick={addItem}>+ Add Product</Button>
           </div>
 
-          <div className="md:col-span-2 flex justify-between mt-8">
-            <button type="button" onClick={handleBack} className="bg-gray-500 text-white px-5 py-2 rounded">
-              Back
-            </button>
-            <button type="submit" disabled={loading} className={`px-5 py-2 rounded text-white ${loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}>
-              {loading ? "Saving..." : id ? "Update Sales Order" : "Create Sales Order"}
-            </button>
+          <div className="flex justify-between">
+            <Button type="button" variant="secondary" onClick={() => confirmNavigation(ROUTES.SALES_ORDER.LIST)}>Back</Button>
+            <Button type="submit" variant="primary" loading={loading}>{id ? "Update Order" : "Submit"}</Button>
           </div>
         </form>
       </div>

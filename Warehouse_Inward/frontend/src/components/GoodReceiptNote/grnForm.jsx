@@ -3,11 +3,14 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
+import { InputField } from "../../resuableComponent/Inputfeild.jsx";
+import { Button } from "../../resuableComponent/Button.jsx";
 
 function GrnForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   const [mode, setMode] = useState("");
   const [formData, setFormData] = useState({
@@ -30,7 +33,7 @@ function GrnForm() {
     const fetchData = async () => {
       try {
         let url = null;
-
+        setLoading(true);
         if (mode === "edit") {
           url = `${ALLEndpoint.GRNEndpoints.getGRNById.endpoint}/${id}`;
         } else if (mode === "create") {
@@ -83,12 +86,15 @@ function GrnForm() {
       } catch (err) {
         toast.error("❌ Failed to fetch data");
         console.error("Error fetching GRN/PO:", err);
+      }finally {
+        setLoading(false);
       }
     };
 
     if (id && mode) {
       fetchData();
-    }
+    };
+
   }, [id, mode]);
 
   const handleItemChange = (index, field, value) => {
@@ -112,6 +118,7 @@ function GrnForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+     setLoading(true);
 
     let payload;
 
@@ -189,63 +196,41 @@ function GrnForm() {
     } catch (error) {
       console.error("Error saving GRN:", error);
       toast.error(error.message || "Error saving GRN");
+    } finally {
+      setLoading(false);
     }
   };
 
-  return (
+ return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 p-4">
       <div className="bg-white shadow-lg p-6 sm:p-8 rounded-xl w-full max-w-6xl">
         <h2 className="text-xl sm:text-2xl font-bold mb-6 text-gray-800 text-center">
-          {mode === "edit"
-            ? "✏️ Edit Good Receipt Note"
-            : "📦 Create Good Receipt Note"}
+          {mode === "edit" ? "✏️ Edit GRN" : "📦 Create GRN"}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-         
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">
-                Received Date
-              </label>
-              <input
-                type="date"
-                value={formData.received_date}
-                onChange={(e) =>
-                  setFormData({ ...formData, received_date: e.target.value })
-                }
-                className="border border-gray-300 px-3 py-2 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">
-                Purchase Order ID
-              </label>
-              <input
-                type="text"
-                value={formData.order_id}
-                readOnly
-                className="border border-gray-300 px-3 py-2 rounded-lg w-full bg-gray-100 text-gray-600 cursor-not-allowed"
-                placeholder="PO Number"
-              />
-            </div>
+            <InputField
+              label="Received Date"
+              type="date"
+              value={formData.received_date}
+              onChange={(e) => setFormData({ ...formData, received_date: e.target.value })}
+            />
+            <InputField
+              label="Purchase Order ID"
+              type="text"
+              value={formData.order_id}
+              readOnly
+            />
           </div>
-
 
           <div className="overflow-x-auto rounded-lg border">
             <table className="w-full border-collapse text-xs sm:text-sm">
               <thead>
                 <tr className="bg-gray-100 text-center">
-                  <th className="border px-2 py-2">Product</th>
-                  <th className="border px-2 py-2">Batch No</th>
-                  <th className="border px-2 py-2">Expiry</th>
-                  <th className="border px-2 py-2">Ordered</th>
-                  <th className="border px-2 py-2">Received</th>
-                  <th className="border px-2 py-2">Damaged</th>
-                  <th className="border px-2 py-2">Shortage</th>
-                  <th className="border px-2 py-2">Price</th>
-                  <th className="border px-2 py-2">MRP</th>
-                  <th className="border px-2 py-2">Total</th>
+                  {["Product", "Batch No", "Expiry", "Ordered", "Received", "Damaged", "Shortage", "Price", "MRP", "Total"].map((h) => (
+                    <th key={h} className="border px-2 py-2">{h}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
@@ -253,96 +238,38 @@ function GrnForm() {
                   <tr key={idx} className="text-center hover:bg-gray-50">
                     <td className="border px-2 py-1">{item.product_id}</td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="text"
-                        value={item.batch_number}
-                        onChange={(e) =>
-                          handleItemChange(idx, "batch_number", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField value={item.batch_number} onChange={(e) => handleItemChange(idx, "batch_number", e.target.value)} />
                     </td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="date"
-                        value={item.expiry_date}
-                        onChange={(e) =>
-                          handleItemChange(idx, "expiry_date", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField type="date" value={item.expiry_date} onChange={(e) => handleItemChange(idx, "expiry_date", e.target.value)} />
                     </td>
                     <td className="border px-2 py-1">{item.ordered_qty}</td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="number"
-                        min="0"
-                        value={item.recevied_qty}
-                        onChange={(e) =>
-                          handleItemChange(idx, "recevied_qty", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField type="number" min="0" value={item.recevied_qty} onChange={(e) => handleItemChange(idx, "recevied_qty", e.target.value)} />
                     </td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="number"
-                        value={item.damaged_qty}
-                        onChange={(e) =>
-                          handleItemChange(idx, "damaged_qty", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField type="number" min="0" value={item.damaged_qty} onChange={(e) => handleItemChange(idx, "damaged_qty", e.target.value)} />
                     </td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="number"
-                        readOnly
-                        value={item.shortage_qty}
-                        className="border px-2 py-1 rounded w-full bg-gray-100"
-                      />
+                      <InputField type="number" value={item.shortage_qty} readOnly />
                     </td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        value={item.item_price}
-                        onChange={(e) =>
-                          handleItemChange(idx, "item_price", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField type="number" min="0" step="any" value={item.item_price} onChange={(e) => handleItemChange(idx, "item_price", e.target.value)} />
                     </td>
                     <td className="border px-2 py-1">
-                      <input
-                        type="number"
-                        min="0"
-                        step="any"
-                        value={item.item_mrp}
-                        onChange={(e) =>
-                          handleItemChange(idx, "item_mrp", e.target.value)
-                        }
-                        className="border px-2 py-1 rounded w-full"
-                      />
+                      <InputField type="number" min="0" step="any" value={item.item_mrp} onChange={(e) => handleItemChange(idx, "item_mrp", e.target.value)} />
                     </td>
-                    <td className="border px-2 py-1 font-medium text-gray-700">
-                      ₹{item.totalAmount.toFixed(2)}
-                    </td>
+                    <td className="border px-2 py-1 font-medium text-gray-700">₹{item.totalAmount.toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-         
           <div className="flex justify-center sm:justify-end">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow transition-transform transform hover:scale-105 disabled:opacity-50"
-            >
+            <Button type="submit" variant="primary" loading={loading}>
               {mode === "edit" ? "Update GRN" : "Save GRN"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

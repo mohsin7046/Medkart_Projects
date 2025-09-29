@@ -1,5 +1,5 @@
 import { prisma } from '../utilities/import.config.js'
-import { STATUS } from '../utilities/constant.js'
+import { PREFIX, STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { piLogger } from '../utilities/logger.js'
@@ -17,11 +17,6 @@ export const createPurchaseInvoiceService = async ({
   invoice_date,
   items  
 }) => {
-
-  if (!grn_id || !invoice_date || !items?.length) {
-    piLogger.error('Missing required fields while creating purchase invoice');
-    throw new Error('All fields are required');
-  }
 
   for (const item of items) {
     if (item.item_mrp < item.item_price) {
@@ -72,7 +67,7 @@ export const createPurchaseInvoiceService = async ({
     });
 
     total_amount = decimalConversion(total_amount);
-    const invoice_number = generateRandom('INVOICE');
+    const invoice_number = generateRandom(PREFIX.INVOICE);
 
     const module = 'invoice';
     const operation = 'create';

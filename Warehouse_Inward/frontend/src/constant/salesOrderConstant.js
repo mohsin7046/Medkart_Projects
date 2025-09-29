@@ -1,8 +1,10 @@
+import { STATUS_COLORS } from "./constant";
+
 export const salesOrderColumns = [
   { key: "sales_order_number", label: "Order No" },
   { key: "name", label: "Name" },
   { key: "totalOrderQty", label: "Total Qty" },
-  { key: "status", label: "Status" },
+  { key: "status", label: "Status",background: (val)=> STATUS_COLORS[val]  },
   { key: "order_type", label: "Order Type" },
   { key: "created_at", label: "Created At",render: (val) => (val ? new Date(val).toLocaleDateString("en-GB") : "-") },
 ];
@@ -21,7 +23,6 @@ export const salesOrderStatusFilters = [
   { label: "Allocated", key: "allocated" },
   { label: "Cancelled", key: "cancelled" },
 ];
-
 
 export const LIMITPAGE = 10;
 

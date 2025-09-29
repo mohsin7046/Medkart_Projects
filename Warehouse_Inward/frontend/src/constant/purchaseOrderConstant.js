@@ -1,4 +1,5 @@
-// /constant/purchaseOrderConstant.js
+
+import { STATUS_COLORS } from "./constant";
 
 export const purchaseOrderColumns = [
   { key: "order_number", label: "Order Number" },
@@ -18,7 +19,7 @@ export const purchaseOrderColumns = [
     label: "Expected Delivery",
     render: (val) => (val ? new Date(val).toLocaleDateString("en-GB") : "-"),
   },
-  { key: "status", label: "Status" },
+  { key: "status", label: "Status" ,background: (val)=> STATUS_COLORS[val]  },
 ];
 
 export const purchaseOrderSearchFields = [
@@ -33,4 +34,4 @@ export const purchaseOrderStatusFilters = [
   { key: "cancelled", label: "Cancelled" },
 ];
 
-export const LIMITPAGE = 3;
+export const LIMITPAGE = 8;

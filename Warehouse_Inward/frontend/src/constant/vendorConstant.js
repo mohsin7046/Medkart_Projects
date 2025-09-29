@@ -1,10 +1,13 @@
+import { STATUS_COLORS } from "./constant";
+
 export const columns = [
     { key: "vendor_code", label: "Vendor Code" },
     { key: "name", label: "Name" },
     { key: "email", label: "Email" },
-    { key: "contact_number", label: "Contact" },
+    { key: "contact_person", label: "Contact Person" },
+    { key: "contact_number", label: "Contact Number" },
     { key: "address", label: "Address" },
-    { key: "status", label: "Status" },
+    { key: "status", label: "Status" , background: (val)=> STATUS_COLORS[val]  },
   ];
 
 export const searchFields = [
@@ -21,4 +24,4 @@ export const statusFilters = [
     { key: "inactive", label: "Inactive" },
   ];
 
-  export const LIMITPAGE = 2;
+  export const LIMITPAGE = 8;

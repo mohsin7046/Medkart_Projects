@@ -28,7 +28,7 @@ export const SalesOrder = () => {
       name: "saleorder",
       page,
       limit,
-      debounceDelay: 500,
+      debounceDelay: 500,  
       searchTerm,
       searchField,
       statusFilter,

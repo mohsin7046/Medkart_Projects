@@ -3,11 +3,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
+import { InputField } from "../../resuableComponent/Inputfeild.jsx";
+import { TextAreaField } from "../../resuableComponent/TextAreaFeild.jsx";
+import { Button } from "../../resuableComponent/Button.jsx";
 
 function VendorForm() {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -21,118 +23,83 @@ function VendorForm() {
     status: "active",
   });
 
-
   useEffect(() => {
-    if (id) {
-      const fetchVendor = async () => {
-        try {
-          setLoading(true);
-          const res = await fetch(`${ALLEndpoint.VendorEndpoints.getVendorById.endpoint}/${id}`);
-          const response = await res.json();
-          if (!res.ok) {
-          toast.error("Error fetch vendor details")
-          throw new Error("Error fetch vendor details")
-          }
-          const data = response.data;
+    if (!id) return;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${ALLEndpoint.VendorEndpoints.getVendorById.endpoint}/${id}`);
+        const { data, message } = await res.json();
+        if (!res.ok) throw new Error(message || "Error fetching vendor");
 
-          console.log(data);
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          vendor_code: data.vendor_code || "",
+          contact_person: data.contact_person || "",
+          contact_number: data.contact_number?.toString() || "",
+          gst_number: data.gst_number?.toString() || "",
+          address: data.address || "",
+          status: data.status || "active",
+        });
 
-          setFormData({
-            name: data.name || "",
-            email: data.email || "",
-            vendor_code: data.vendor_code,
-            contact_person: data.contact_person || "",
-            contact_number: data.contact_number?.toString() || "",
-            gst_number: data.gst_number?.toString() || "",
-            address: data.address || "",
-            status: data.status || "active",
-          });
-
-          setLoading(false);
-          toast.success()
-        } catch (error) {
-          console.error(error);
-          toast.error("Error loading vendor details");
-          setLoading(false);
-        }
-      };
-
-      fetchVendor();
-    }
+        toast.success("Vendor loaded successfully");
+      } catch (err) {
+        toast.error("Error loading vendor details");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [id]);
-
 
   const handleChange = (e) => {
     setIsDirty(true);
     const { name, value } = e.target;
 
-
     if (["contact_number", "gst_number"].includes(name)) {
       if (value === "" || (/^\d*$/.test(value) && parseInt(value, 10) >= 0)) {
-        setFormData({ ...formData, [name]: value });
+        setFormData((prev) => ({ ...prev, [name]: value }));
       }
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      let url = `${ALLEndpoint.VendorEndpoints.addVendor.endpoint}`;
-      let method = `${ALLEndpoint.VendorEndpoints.addVendor.method}`;
+      const endpoint = id
+        ? ALLEndpoint.VendorEndpoints.updateVendor
+        : ALLEndpoint.VendorEndpoints.addVendor;
 
-      if (id) {
-        url =`${ALLEndpoint.VendorEndpoints.updateVendor.endpoint}`;
-        method = `${ALLEndpoint.VendorEndpoints.updateVendor.method}`;
-      }
-
-      console.log(url,method);
-      
-      const response = await fetch(url, {
-        method,
+      const res = await fetch(endpoint.endpoint, {
+        method: endpoint.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        const resData = await response.json();
-        console.log(resData);
-
-        if (Array.isArray(resData.message)) {
-          resData.message.forEach((err) => {
-            toast.error(`${err.field}: ${err.message}`);
-          });
-        } else {
-
-          toast.error(resData.error || resData.message || "Something went wrong");
-        }
-
-        setLoading(false);
+      const data = await res.json();
+      if (!res.ok) {
+        (Array.isArray(data.message) ? data.message : [data]).forEach((err) =>
+          toast.error(err.field ? `${err.field}: ${err.message}` : err.message || "Error")
+        );
         return;
       }
-     
+
       toast.success(id ? "Vendor updated successfully!" : "Vendor added successfully!");
       setIsDirty(false);
-      setLoading(false);
-     navigate(ROUTES.VENDOR.LIST);
-    } catch (error) {
-      console.error("Error saving vendor:", error);
+      navigate(ROUTES.VENDOR.LIST);
+    } catch (err) {
       toast.error("Something went wrong!");
+    } finally {
       setLoading(false);
     }
   };
 
-
   const handleBack = () => {
-    if (isDirty) {
-      if (!window.confirm("Entered data may be lost. Do you want to continue?")) {
-        return;
-      }
-    }
+    if (isDirty && !window.confirm("Unsaved changes will be lost. Continue?")) return;
     navigate(ROUTES.VENDOR.LIST);
   };
 
@@ -144,136 +111,32 @@ function VendorForm() {
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Vendor Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter vendor name"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-      
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter email address"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <InputField label="Vendor Name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter vendor name" />
+          <InputField label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="Enter email address" />
+          <InputField label="Contact Person" name="contact_person" value={formData.contact_person} onChange={handleChange} required placeholder="Enter contact person" />
+          <InputField label="Contact Number" name="contact_number" value={formData.contact_number} onChange={handleChange} required placeholder="Enter contact number" />
+          <InputField label="GST Number" name="gst_number" value={formData.gst_number} onChange={handleChange} required placeholder="Enter GST number" />
 
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Contact Person <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="contact_person"
-              value={formData.contact_person}
-              onChange={handleChange}
-              placeholder="Enter contact person"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Contact Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="contact_number"
-              value={formData.contact_number}
-              onChange={handleChange}
-              placeholder="Enter contact number"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-         
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              GST Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="gst_number"
-              value={formData.gst_number}
-              onChange={handleChange}
-              placeholder="Enter GST number"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-         
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Status <span className="text-red-500">*</span>
-            </label>
+            <label className="block text-gray-700 font-medium mb-1">Status <span className="text-red-500">*</span></label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
               className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
 
-         
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-1">
-              Address <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="Enter vendor address"
-              rows="3"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
+          <TextAreaField label="Address" name="address" value={formData.address} onChange={handleChange} required placeholder="Enter vendor address" />
 
-          
           <div className="md:col-span-2 flex justify-between mt-8">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow"
-            >
-              Back
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-5 py-2 rounded-lg shadow text-white ${loading
-                  ? "bg-blue-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-                }`}
-            >
-              {loading ? "Saving..." : id ? "Update Vendor" : "Add Vendor"}
-            </button>
+            <Button type="button" variant="secondary" onClick={handleBack}>Back</Button>
+            <Button type="submit" variant="primary" loading={loading}>
+              {id ? "Update Vendor" : "Add Vendor"}
+            </Button>
           </div>
         </form>
       </div>

@@ -19,7 +19,11 @@ export const createSaleOrderService = async (data) => {
         console.log(sales_order_number);
 
         const itemsWithTotal = data.items.map((item) => ({
-            ...item,
+            product_id: item.product_id,
+            vendor_id: item.vendor_id,
+            ordered_qty: item.ordered_qty,
+            allocated_qty: 0,
+            remaining_qty: item.ordered_qty,
             totalAmount: decimalConversion(item.ordered_qty * item.product_price)
         }))
 
@@ -94,7 +98,11 @@ export const createSaleOrderService = async (data) => {
 export const updateSaleOrderService = async (data) => {
     try {
         const itemsWithTotal = data.items.map((item) => ({
-            ...item,
+             product_id: item.product_id,
+            vendor_id: item.vendor_id,
+            ordered_qty: item.ordered_qty,
+            allocated_qty: 0,
+            remaining_qty: item.ordered_qty,
             totalAmount: decimalConversion(item.ordered_qty * item.product_price)
         }))
 
@@ -127,7 +135,6 @@ export const updateSaleOrderService = async (data) => {
             }
         };
 
-
         const module = 'sale-order';
         const operation = 'update';
 
@@ -144,7 +151,7 @@ export const updateSaleOrderService = async (data) => {
         const updatedSalesOrder = await job.waitUntilFinished(salesOrderQueueEvents);
 
         if (!updatedSalesOrder || updatedSalesOrder.status !== 'success') {
-            poLogger.error("❌ Error while creating sales Order");
+            saleLogger.error("❌ Error while creating sales Order");
             throw new Error("Sales Order not created");
         }
 
@@ -221,7 +228,6 @@ export const getSalesOrderByIdService = async (id) => {
 }
 
 
-
 export const getSalesOrderForEditByIdService = async (id) => {
     try {
         const fetchSalesOrder = await saleOrderRepo.getSalesOrderForEditById(id)
@@ -250,7 +256,6 @@ export const getSalesOrderForEditByIdService = async (id) => {
         throw error;
     }
 }
-
 
 
 export const processSalesOrderService = async (data) => {
@@ -327,18 +332,17 @@ export const processSalesOrderService = async (data) => {
                 }
             }
 
-
             currentInventory.set(dbProduct.id, newInventory)
 
             operations.push(
-                saleOrderRepo.updateSalesOrderProducts(order.id, { allocated_qty, remaining_qty}),
+                 saleOrderRepo.updateSalesOrderProducts(order.id, { allocated_qty, remaining_qty}),
                 
-                productRepo.updateProduct({ id: dbProduct.id,  data: { inventory_qty: newInventory } })
+                 productRepo.updateProductWithoutAwait({ id: dbProduct.id,  data: { inventory_qty: newInventory } })
             )
         }
 
         operations.push(
-            saleOrderRepo.updateSalesOrder(order.id, {
+             saleOrderRepo.updateSalesOrderwithoutAwait(order.id, {
                     processed: true,
                     status: orderStatus,
                     processed_date: new Date()
@@ -355,78 +359,40 @@ export const processSalesOrderService = async (data) => {
 let processedOrders = new Set();
 
 const handleIndent = async (product, order, quantity, indentMap, operations) => {
-  
-    try {
-        const existingIndent = indentMap.get(product.product_id)
-        const isOrderAlreadyProcessed = processedOrders.has(order.id)
-        
-        if (existingIndent) {
-            const indentData = {
-                id: existingIndent.id,
-                total_sales_order: existingIndent.total_sales_order + (isOrderAlreadyProcessed ? 0 : 1),
-                sale_order_IDs: isOrderAlreadyProcessed
-                    ? existingIndent.sale_order_IDs
-                    : [...existingIndent.sale_order_IDs, order.id],
-                total_remain_product: existingIndent.total_remain_product + quantity
-            };
+    const existingIndent = indentMap.get(product.product_id)
+    const isOrderAlreadyProcessed = processedOrders.has(order.id)
+    if (existingIndent) {
 
-            console.log("Indent Data: ", indentData);
-            
-    
-            const module = 'sale-indent';
-            const operation = 'update';
-    
-            const job = await salesIndentQueue.add(`${module}:${operation}`, {
-                module,
-                operation,
-                payload: { data: indentData },
-            }, { attempts: 3, backoff: { type: 'fixed', delay: 2000 }, removeOnComplete: true });
-    
-            const updatedindent = await job.waitUntilFinished(salesIndentQueueEvents);
+        operations.push(
+             prisma.salesIndent.update({
+                where: { id: existingIndent.id },
+                data: {
+                    total_sales_order: existingIndent.total_sales_order + (isOrderAlreadyProcessed ? 0 : 1),
+                    sale_order_IDs: isOrderAlreadyProcessed ?
+                        existingIndent.sale_order_IDs :
+                        [...existingIndent.sale_order_IDs, order.id],
+                    total_remain_product: existingIndent.total_remain_product + quantity
+                }
+            })
+        )
 
-            console.log("Updated Indent: ", updatedindent);
-            
-    
-            if(!updatedindent || updatedindent.status !== 'success'){
-                throw new Error('Sales Indent not updated');
-            }
-    
-            operations.push(updatedindent)
-    
-        } else {
-    
-            const indentData = {
-                product_id: product.product_id,
-                total_sales_order: 1,
-                total_remain_product: quantity,
-                sale_order_IDs: [order.id],
-                status: 'open',
-                indent_number: generateRandom(PREFIX.INDENT)
-            };
-    
-            const module = 'sale-indent';
-            const operation = 'create';
-    
-            const job = await salesIndentQueue.add(`${module}:${operation}`, {
-                module,
-                operation,
-                payload: { data: indentData },
-            }, { attempts: 3, backoff: { type: 'fixed', delay: 2000 }, removeOnComplete: true });
-    
-            const createdIndent = await job.waitUntilFinished(salesIndentQueueEvents);
-    
-            if(!createdIndent || createdIndent.status !== 'success'){
-                throw new Error('Sales Indent not updated');
-            }
-    
-            operations.push(
-                createdIndent
-            )
-    
-        }
-    
-        processedOrders.add(order.id)
-    } catch (error) {
-        throw new Error(`Error in handling indent for product ${product.product_id} in order ${order.id}`)
+
+    } else {
+ 
+        operations.push(
+             prisma.salesIndent.create({
+                data: {
+                    indent_number: generateRandom(PREFIX.INDENT),
+                    product_id: product.product_id,
+                    total_sales_order: 1,
+                    total_remain_product: quantity,
+                    sale_order_IDs: [order.id],
+                    status: 'open'
+                }
+            })
+        )
+
     }
+
+    processedOrders.add(order.id)
 }

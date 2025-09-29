@@ -86,7 +86,7 @@ function CommonDataTable({
   };
 
   return (
-    <div className="bg-white shadow-md p-4 rounded-md overflow-x-auto">
+    <div className="bg-white p-4 rounded-md overflow-x-auto">
 
       <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
@@ -203,21 +203,21 @@ function CommonDataTable({
                   </td>
 
                   {columns.map((col) => (
-                    <td key={col.key} className="border px-4 py-2">
-                      {col.render
-                        ? col.render(item[col.key], item)
-                        : item[col.key]}
+                    <td key={col.key} className={`border px-4 py-2`}>
+                      <span className={`${col.background ? col.background(item[col.key]) : ""} px-2 py-1 rounded-full inline-block`}>
+                        {col.render ? col.render(item[col.key], item) : item[col.key]}
+                      </span>
                     </td>
                   ))}
-                  {showActions && (
+                  {showActions  && (
                     <td className="border px-4 py-2">
-                      {onEdit && (
+                      {onEdit  &&  (
                         <button
-                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
+                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED,STATUS.ALLOCATED,STATUS.PARTIAL_RECEVIED].includes(item.status)}
                           onClick={() => onEdit(item)}
-                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${[STATUS.CANCELLED, STATUS.COMPLETED,STATUS.ALLOCATED,STATUS.PARTIAL_RECEVIED].includes(item.status)
+                            ? "opacity-30 cursor-not-allowed"
+                            : ""
                             }`}
                         >
                           <FiEdit className="text-green-600" size={18} />
@@ -227,21 +227,21 @@ function CommonDataTable({
                         <button
                           disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
                           onClick={() => onView(item)}
-                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                            }`}
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)
+                            ? "opacity-30 cursor-not-allowed"
+                            : ""
+                            }`}  
                         >
                           <FiEye className="text-orange-400" size={18} />
                         </button>
                       )}
                       {onDelete && (
                         <button
-                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED].includes(item.status)}
+                          disabled={[STATUS.CANCELLED, STATUS.COMPLETED,STATUS.ALLOCATED,STATUS.PARTIAL_RECEVIED].includes(item.status)}
                           onClick={() => onDelete(item)}
-                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${["completed", "cancelled"].includes(item.status)
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
+                          className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${[STATUS.CANCELLED, STATUS.COMPLETED,STATUS.ALLOCATED,STATUS.PARTIAL_RECEVIED].includes(item.status)
+                            ? "opacity-30 cursor-not-allowed"
+                            : ""
                             }`}
                         >
                           <FiTrash2 className="text-red-500" size={18} />

@@ -4,12 +4,14 @@ import AsyncSelect from "react-select/async";
 import { toast } from "react-toastify";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { ROUTES } from "../../constant/routePath.js";
-import { combinations, categories,numericFields } from "../../constant/constant.js";
+import { combinations, categories, numericFields } from "../../constant/constant.js";
+import { InputField } from "../../resuableComponent/Inputfeild.jsx";
+import { TextAreaField } from "../../resuableComponent/TextAreaFeild.jsx";
+import { Button } from "../../resuableComponent/Button.jsx";
 
 function ProductForm() {
   const navigate = useNavigate();
   const { id } = useParams();
-
   const [loading, setLoading] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
 
@@ -17,253 +19,153 @@ function ProductForm() {
     name: "",
     category: "",
     combination: [],
-    product_mrp: null,
-    product_price: null,
-    last_purchase_price: null,
+    product_mrp: "",
+    product_price: "",
+    last_purchase_price: "",
     unit_of_measure: "",
     hsn_code: "",
-    gst_percentage: null,
+    gst_percentage: "",
     description: "",
     status: "active",
   });
 
 
+  const fetchJSON = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("Network error");
+    return res.json();
+  };
+
   useEffect(() => {
-    if (id) {
-      const fetchProduct = async () => {
-        try {
-          setLoading(true);
-          const response = await fetch(`${ALLEndpoint.ProductEndpoints.getProductById.endpoint}/${id}`);
-          if (!response.ok) {
-            throw new Error("Failed to fetch product");
-          }
-          const res = await response.json();
-
-          const data = res.data;
-
-          setFormData({
-            name: data.name || "",
-            product_code: data.product_code || "",
-            category: data.category || "",
-            combination: Array.isArray(data.combination) ? data.combination : [],
-            product_mrp: data.product_mrp?.toString() || "",
-            product_price: data.product_price?.toString() || "",
-            last_purchase_price: data.last_purchase_price?.toString() || "",
-            unit_of_measure: data.unit_of_measure || "",
-            hsn_code: data.hsn_code || "",
-            gst_percentage: data.gst_percentage?.toString() || "",
-            description: data.description || "",
-            status: data.status || "active",
-          });
-
-          setLoading(false);
-        } catch (error) {
-          console.error(error);
-          toast.error("Error loading product details");
-          setLoading(false);
-        }
-      };
-
-      fetchProduct();
-    }
+    if (!id) return;
+    (async () => {
+      try {
+        setLoading(true);
+        const { data } = await fetchJSON(`${ALLEndpoint.ProductEndpoints.getProductById.endpoint}/${id}`);
+        setFormData({
+          name: data.name || "",
+          product_code: data.product_code || "",
+          category: data.category || "",
+          combination: Array.isArray(data.combination) ? data.combination : [],
+          product_mrp: data.product_mrp?.toString() || "",
+          product_price: data.product_price?.toString() || "",
+          last_purchase_price: data.last_purchase_price?.toString() || "",
+          unit_of_measure: data.unit_of_measure || "",
+          hsn_code: data.hsn_code || "",
+          gst_percentage: data.gst_percentage?.toString() || "",
+          description: data.description || "",
+          status: data.status || "active",
+        });
+      } catch {
+        toast.error("Error loading product details");
+      } finally {
+        setLoading(false);
+      }
+    })();
   }, [id]);
 
   const handleChange = (e) => {
     setIsDirty(true);
-  const { name, value } = e.target;
-
-  console.log( name, value);
-  
-
-  if (numericFields.includes(name)) {
-  
-    const numberValue = Number(value);
-    
-    if (!isNaN(numberValue) && numberValue >= 0) {
-      setFormData({ ...formData, [name]: value });
-    }
-
-  } else {
-    setFormData({ ...formData, [name]: value });
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: numericFields.includes(name) ? (value >= 0 ? value : prev[name]) : value,
+    }));
   };
 
-  const handleCombinationChange = async (selected) => {
+  const handleCombinationChange = (selected) => {
     setIsDirty(true);
-    console.log(selected);
+    setFormData((prev) => ({ ...prev, combination: selected?.map((opt) => opt.value) || [] }));
+  };
 
-    setFormData({
-      ...formData,
-      combination: selected ? selected.map((opt) => opt.value) : [],
-    });
+  const handleCategoryChange = (selected) => {
+    setIsDirty(true);
+    setFormData((prev) => ({
+      ...prev,
+      category: selected?.value || "",
+      unit_of_measure: selected?.uom || "",
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      let url = `${ALLEndpoint.ProductEndpoints.addProduct.endpoint}`;
-      let method = `${ALLEndpoint.ProductEndpoints.addProduct.method}`;
-
-      if (id) {
-        url = `${ALLEndpoint.ProductEndpoints.updateProduct.endpoint}`;
-        method = `${ALLEndpoint.ProductEndpoints.updateProduct.method}`;
-      }
+      const endpoint = id
+        ? ALLEndpoint.ProductEndpoints.updateProduct
+        : ALLEndpoint.ProductEndpoints.addProduct;
 
       const payload = {
         ...formData,
-        product_mrp: formData.product_mrp ? parseFloat(formData.product_mrp) : 0,
-        product_price: formData.product_price ? parseFloat(formData.product_price) : 0,
-        last_purchase_price: formData.last_purchase_price
-          ? parseFloat(formData.last_purchase_price)
-          : 0,
-        gst_percentage: formData.gst_percentage
-          ? parseFloat(formData.gst_percentage)
-          : 0,
-        hsn_code: formData.hsn_code,
+        product_mrp: parseFloat(formData.product_mrp) || 0,
+        product_price: parseFloat(formData.product_price) || 0,
+        last_purchase_price: parseFloat(formData.last_purchase_price) || 0,
+        gst_percentage: parseFloat(formData.gst_percentage) || 0,
       };
 
-      console.log(payload);
-
-
-      const response = await fetch(url, {
-        method,
+      const res = await fetch(endpoint.endpoint, {
+        method: endpoint.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        const resData = await response.json();
-        console.log(resData);
-
-        if (Array.isArray(resData.message)) {
-          resData.message.forEach((err) => {
-            toast.error(`${err.field}: ${err.message}`);
-          });
-        } else {
-
-          toast.error(resData.error || resData.message || "Something went wrong");
-        }
-
-        setLoading(false);
+      const data = await res.json();
+      if (!res.ok) {
+        (Array.isArray(data.message) ? data.message : [data]).forEach((err) =>
+          toast.error(err.field ? `${err.field}: ${err.message}` : err.message || "Error")
+        );
         return;
       }
-
-      await response.json();
-      toast.success(id ? "Product updated successfully!" : "Product added successfully!");
+      toast.success(id ? "Product updated!" : "Product added!");
       setIsDirty(false);
-      setLoading(false);
       navigate(ROUTES.PRODUCT.LIST);
-    } catch (error) {
-      console.error("Error saving product:", error);
-      toast.error("Something went wrong!");
+    } catch (err) {
+      toast.error("Error saving product!");
+    } finally {
       setLoading(false);
     }
   };
 
   const loadOptions = async (inputValue) => {
     if (!inputValue) return [];
-
-    console.log(inputValue);
-
     try {
-      const response = await fetch(
+      const { data } = await fetchJSON(
         `${ALLEndpoint.ProductEndpoints.getCombinations.endpoint}?search=${inputValue}`
       );
-      const res = await response.json();
-      console.log(res);
-
-
-      const filterdData = res.data.map((item) => ({
-        value: item.value,
-        label: item.label,
-      }));
-
-      console.log(filterdData);
-      return filterdData;
-
-    } catch (error) {
-      console.error("Error fetching combinations:", error);
+      return data.map((item) => ({ value: item.value, label: item.label }));
+    } catch {
       return [];
     }
   };
 
   const loadCategoryOptions = async (inputValue) => {
-    if (!inputValue) return [];
     try {
-
-      const response = await fetch(`${ALLEndpoint.ProductEndpoints.getCategories.endpoint}?search=${inputValue || ""}`);
-      const res = await response.json();
-      console.log(res);
-
-      return res.data.map((item) => ({
-        value: item.value,
-        label: item.label,
-        uom: item.uom,
-      }));
-    } catch (error) {
-      console.error("Error fetching categories:", error);
+      const { data } = await fetchJSON(
+        `${ALLEndpoint.ProductEndpoints.getCategories.endpoint}?search=${inputValue || ""}`
+      );
+      return data.map((item) => ({ value: item.value, label: item.label, uom: item.uom }));
+    } catch {
       return [];
     }
   };
 
-
-  const handleCategoryChange = (selected) => {
-    setIsDirty(true);
-    setFormData({
-      ...formData,
-      category: selected?.value || "",
-      unit_of_measure: selected?.uom || "",
-    });
-  };
-
-  const handleBack = () => {
-    if (isDirty) {
-      if (!window.confirm("Entered data may be lost. Do you want to continue?")) {
-        return;
-      }
-    }
-    navigate(ROUTES.PRODUCT.LIST);
-  };
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4">
-      <div className="w-full max-w-4xl bg-white shadow-xl rounded-2xl p-8">
+      <div className="w-full max-w-6xl bg-white shadow-xl rounded-2xl p-8">
         <h2 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           {id ? "Edit Product" : "Add Product"}
         </h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <InputField label="Product Name" name="name" value={formData.name} onChange={handleChange} required placeholder="Enter product name" />
 
           <div>
-            <label className="block text-gray-700 font-medium mb-1">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter product name"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">
-              Category <span className="text-red-500">*</span>
-            </label>
+            <label className="block mb-1">Category <span className="text-red-500">*</span></label>
             <AsyncSelect
               cacheOptions
               defaultOptions={categories}
               loadOptions={loadCategoryOptions}
-              value={
-                formData.category
-                  ? { value: formData.category, label: formData.category, uom: formData.unit_of_measure }
-                  : null
-              }
+              value={formData.category ? { value: formData.category, label: formData.category, uom: formData.unit_of_measure } : null}
               onChange={handleCategoryChange}
               isMulti={false}
               placeholder="Select category"
@@ -271,9 +173,7 @@ function ProductForm() {
           </div>
 
           <div className="md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-1">
-              Combination <span className="text-red-500">*</span>
-            </label>
+            <label className="block text-gray-700 font-medium mb-1">Combination <span className="text-red-500">*</span></label>
             <AsyncSelect
               isMulti
               cacheOptions
@@ -285,134 +185,37 @@ function ProductForm() {
             />
           </div>
 
+          <InputField label="Product MRP" name="product_mrp" value={formData.product_mrp} onChange={handleChange} required placeholder="Enter MRP" />
+          <InputField label="Product Price" name="product_price" value={formData.product_price} onChange={handleChange} required placeholder="Enter price" />
+          <InputField label="Last Purchase Price" name="last_purchase_price" value={formData.last_purchase_price} onChange={handleChange} required placeholder="Enter last purchase price" />
+          <InputField label="Unit of Measure" name="unit_of_measure" value={formData.unit_of_measure} onChange={handleChange} readOnly placeholder="Unit of measure" />
+          <InputField label="HSN Code" name="hsn_code" value={formData.hsn_code} onChange={handleChange} required placeholder="Enter HSN code" />
+          <InputField label="GST Percentage" name="gst_percentage" value={formData.gst_percentage} onChange={handleChange} required placeholder="Enter GST %" />
 
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Product MRP</label>
-            <input
-              type="text"
-              name="product_mrp"
-              value={formData.product_mrp}
-              onChange={handleChange}
-              placeholder="Enter MRP"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Product Price</label>
-            <input
-              type="text"
-              name="product_price"
-              value={formData.product_price}
-              onChange={handleChange}
-              placeholder="Enter selling price"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Last Purchase Price</label>
-            <input
-              type="text"
-              name="last_purchase_price"
-              value={formData.last_purchase_price}
-              onChange={handleChange}
-              placeholder="Enter last purchase price"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">Unit of Measure</label>
-            <input
-              type="text"
-              name="unit_of_measure"
-              value={formData.unit_of_measure}
-              onChange={handleChange}
-              placeholder="Unit of measure"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              readOnly 
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">HSN Code</label>
-            <input
-              type="text"
-              name="hsn_code"
-              value={formData.hsn_code}
-              onChange={handleChange}
-              placeholder="Enter HSN code"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-1">GST Percentage</label>
-            <input
-              type="text"
-              name="gst_percentage"
-              value={formData.gst_percentage}
-              onChange={handleChange}
-              placeholder="Enter GST %"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
-
-          <div className="md:col-span-2">
-            <label className="block text-gray-700 font-medium mb-1">Description</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              placeholder="Enter product description"
-              rows="3"
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            />
-          </div>
-
+          <TextAreaField label="Description" name="description" value={formData.description} onChange={handleChange} required placeholder="Enter description" />
 
           <div>
             <label className="block text-gray-700 font-medium mb-1">Status</label>
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              required
-            >
+            <select name="status" value={formData.status} onChange={handleChange} className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
           </div>
 
-
           <div className="md:col-span-2 flex justify-between mt-8">
-            <button
-              type="button"
-              onClick={handleBack}
-              className="px-5 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow"
+            <Button
+              variant="secondary"
+              onClick={() =>
+                (isDirty && !window.confirm("Unsaved changes. Continue?")) ||
+                navigate(ROUTES.PRODUCT.LIST)
+              }
             >
               Back
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className={`px-5 py-2 rounded-lg shadow text-white ${loading
-                ? "bg-blue-400 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700"
-                }`}
-            >
+            </Button>
+
+            <Button type="submit" disabled={loading} variant="primary">
               {loading ? "Saving..." : id ? "Update Product" : "Add Product"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
