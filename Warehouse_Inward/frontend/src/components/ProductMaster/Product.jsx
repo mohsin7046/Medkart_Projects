@@ -13,6 +13,17 @@ function Product() {
   const limit = LIMITPAGE;
   const navigate = useNavigate();
 
+  const FILTER_KEY = "productFilters";
+
+const setFilterState = (key, value) => {
+  localStorage.setItem(key, JSON.stringify(value));
+};
+
+const getFilterState = (key, defaultValue) => {
+  const stored = localStorage.getItem(key);
+  return stored ? JSON.parse(stored) : defaultValue;
+};
+
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("name");
   const [statusFilter, setStatusFilter] = useState("all");

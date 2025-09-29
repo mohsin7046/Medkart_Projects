@@ -16,20 +16,19 @@ export const createSaleOrderService = async (data) => {
     try {
         const sales_order_number = generateRandom(PREFIX.SALE);
 
-        console.log(sales_order_number);
+        const product_price = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
 
         const itemsWithTotal = data.items.map((item) => ({
             product_id: item.product_id,
-            vendor_id: item.vendor_id,
             ordered_qty: item.ordered_qty,
             allocated_qty: 0,
             remaining_qty: item.ordered_qty,
-            totalAmount: decimalConversion(item.ordered_qty * item.product_price)
+            total_amount: decimalConversion(item.ordered_qty * (product_price.find(p => p.id === item.product_id)?.product_price || 0))
         }))
 
-        const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
+        const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.total_amount, 0));
 
-        const totalOrderQty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
+        const total_order_qty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
 
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
 
@@ -38,7 +37,6 @@ export const createSaleOrderService = async (data) => {
                 id: 'desc',
             },
         });
-
 
         const changeddata = {
             sales_order_number,
@@ -49,7 +47,7 @@ export const createSaleOrderService = async (data) => {
             order_type: data.order_type,
             priority,
             processed: false,
-            totalOrderQty,
+            total_order_qty,
             total_amount,
             delivery_status: STATUS.NOT_DISPATCHED,
             payment_status: STATUS.UNPAID,
@@ -61,11 +59,10 @@ export const createSaleOrderService = async (data) => {
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
-                    totalAmount: itemsWithTotal[idx].totalAmount,
+                    total_amount: itemsWithTotal[idx].total_amount,
                 }))
             }
         };
-
 
         const module = 'sale-order';
         const operation = 'create';
@@ -83,7 +80,7 @@ export const createSaleOrderService = async (data) => {
         const createdSalesOrder = await job.waitUntilFinished(salesOrderQueueEvents);
 
         if (!createdSalesOrder || createdSalesOrder.status !== 'success') {
-            poLogger.error("❌ Error while creating sales Order");
+            saleLogger.error("❌ Error while creating sales Order");
             throw new Error("Sales Order not created");
         }
 
@@ -97,19 +94,27 @@ export const createSaleOrderService = async (data) => {
 
 export const updateSaleOrderService = async (data) => {
     try {
+        const product_price = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
+
         const itemsWithTotal = data.items.map((item) => ({
-             product_id: item.product_id,
-            vendor_id: item.vendor_id,
+            product_id: item.product_id,
             ordered_qty: item.ordered_qty,
             allocated_qty: 0,
             remaining_qty: item.ordered_qty,
-            totalAmount: decimalConversion(item.ordered_qty * item.product_price)
+            total_amount: decimalConversion(item.ordered_qty * (product_price.find(p => p.id === item.product_id)?.product_price || 0))
         }))
 
-        const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0));
+        const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.total_amount, 0));
 
-        const totalOrderQty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
+        const total_order_qty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
+
+        const vendor = await prisma.vendor.findFirstOrThrow({
+            orderBy: {
+                id: 'desc',
+            },
+        });
+
 
         const changeddata = {
             sales_order_id: data.sales_order_id,
@@ -119,18 +124,18 @@ export const updateSaleOrderService = async (data) => {
             order_type: data.order_type,
             priority,
             processed: false,
-            totalOrderQty,
+            total_order_qty,
             total_amount,
             status: STATUS.PENDING,
             products: {
                 deleteMany: { sales_order_id: data.sales_order_id },
                 create: data.items.map((item, idx) => ({
                     product_id: item.product_id,
-                    vendor_id: item.vendor_id,
+                    vendor_id: vendor.id,
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
-                    totalAmount: itemsWithTotal[idx].totalAmount,
+                    total_amount: itemsWithTotal[idx].total_amount,
                 })),
             }
         };
@@ -274,20 +279,19 @@ export const processSalesOrderService = async (data) => {
 
     const productIds = [...new Set(salesOrders.flatMap(o => o.products.map(p => p.product_id)))]
 
-    const allProducts = await productRepo.getProducts({ids:productIds});
+    const allProducts = await productRepo.getProducts({ ids: productIds });
 
     const currentInventory = new Map()
-    
+
     allProducts.forEach(product => {
         currentInventory.set(product.id, product.inventory_qty)
     })
 
-    const existingIndents = await indentRepo.existingIndentsByProductIds(productIds);   
+    const existingIndents = await indentRepo.existingIndentsByProductIds(productIds);
 
     const indentMap = new Map(existingIndents.map(i => [i.product_id, i]))
 
     const operations = []
-
 
     for (const order of salesOrders) {
         let orderStatus = STATUS.ALLOCATED
@@ -335,18 +339,18 @@ export const processSalesOrderService = async (data) => {
             currentInventory.set(dbProduct.id, newInventory)
 
             operations.push(
-                 saleOrderRepo.updateSalesOrderProducts(order.id, { allocated_qty, remaining_qty}),
-                
-                 productRepo.updateProductWithoutAwait({ id: dbProduct.id,  data: { inventory_qty: newInventory } })
+                saleOrderRepo.updateSalesOrderProducts(order.id, dbProduct.id, { allocated_qty, remaining_qty }),
+
+                productRepo.updateProductWithoutAwait({ id: dbProduct.id, data: { inventory_qty: newInventory } })
             )
         }
 
         operations.push(
-             saleOrderRepo.updateSalesOrderwithoutAwait(order.id, {
-                    processed: true,
-                    status: orderStatus,
-                    processed_date: new Date()
-                }),
+            saleOrderRepo.updateSalesOrderwithoutAwait(order.id, {
+                processed: true,
+                status: orderStatus,
+                processed_date: new Date()
+            }),
         )
     }
 
@@ -361,10 +365,10 @@ let processedOrders = new Set();
 const handleIndent = async (product, order, quantity, indentMap, operations) => {
     const existingIndent = indentMap.get(product.product_id)
     const isOrderAlreadyProcessed = processedOrders.has(order.id)
-    if (existingIndent) {
 
+    if (existingIndent) {
         operations.push(
-             prisma.salesIndent.update({
+            prisma.salesIndent.update({
                 where: { id: existingIndent.id },
                 data: {
                     total_sales_order: existingIndent.total_sales_order + (isOrderAlreadyProcessed ? 0 : 1),
@@ -378,9 +382,9 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
 
 
     } else {
- 
+
         operations.push(
-             prisma.salesIndent.create({
+            prisma.salesIndent.create({
                 data: {
                     indent_number: generateRandom(PREFIX.INDENT),
                     product_id: product.product_id,

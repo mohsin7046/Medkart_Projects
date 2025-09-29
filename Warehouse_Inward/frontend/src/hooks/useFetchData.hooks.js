@@ -44,6 +44,9 @@ export const useFetchData = ({
         if (name) params.append("name", name);
         if (searchField) params.append("field", searchField);
 
+        console.log("params",params.toString());
+        
+
         const response = await fetch(`${endpoint}?${params.toString()}`);
 
         if (!response.ok) {

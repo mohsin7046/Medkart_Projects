@@ -38,10 +38,12 @@ export class SalesOrderRepository {
     }
   }
 
-   updateSalesOrderProducts(sales_order_id, data) {
+   updateSalesOrderProducts(sales_order_id,product_id, data) {
+    console.log("FRom Db",data);
+    
     try {
       return prisma.salesOrderProduct.updateMany({
-        where: { sales_order_id },
+        where: { sales_order_id,product_id },
         data,
       });
     } catch (error) {
@@ -126,7 +128,7 @@ export class SalesOrderRepository {
             processed: true,
             payment_status: true,
             delivery_status: true,
-            totalOrderQty: true,
+            total_order_qty: true,
             total_amount: true,
             products: {
                 select: {
@@ -134,7 +136,7 @@ export class SalesOrderRepository {
                     allocated_qty: true,
                     remaining_qty: true,
                     updated_at: true,
-                    totalAmount: true,
+                    total_amount: true,
                     product: {
                         select: {
                             name: true,

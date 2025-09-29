@@ -41,11 +41,14 @@ export const SalesOrder = () => {
     ALLEndpoint.SalesOrderEndpoints.deleteSalesOrder.method
   );
 
+  console.log("salesOrders", salesOrders);
+  
+
   const handleDelete = (sales_order_id) => {
     console.log(sales_order_id);
 
     deleteItem({
-      idField: "sales_order_id",
+      idField: "id",
       idValue: sales_order_id,
       setState: setSalesOrders,
     });
@@ -71,8 +74,9 @@ export const SalesOrder = () => {
     setPage(1);
   };
 
-  const handleSubmit = async (id) => {
-    console.log(id);
+  const handleSubmit = async (ids) => {
+    console.log("ids",ids);
+    
 
     try {
       const res = await fetch(ALLEndpoint.SalesOrderEndpoints.processSalesOrder.endpoint, {
@@ -80,7 +84,7 @@ export const SalesOrder = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ sales_order_ids: id })
+        body: JSON.stringify({ sales_order_ids: ids })
       });
 
       const data = await res.json();
@@ -88,6 +92,14 @@ export const SalesOrder = () => {
       if (!res) {
         toast.error(data.error || "Failed to Process Sales Oder")
       }
+
+      setSalesOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        ids === order.id
+          ? { ...order, status: STATUS.PROCESSED } 
+          : order
+      )
+    );
 
       console.log(data);
       toast.success("Successsfully processed the sales Order")

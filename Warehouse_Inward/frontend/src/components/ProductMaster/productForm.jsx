@@ -171,7 +171,7 @@ function ProductForm() {
               placeholder="Select category"
             />
           </div>
-
+  
           <div className="md:col-span-2">
             <label className="block text-gray-700 font-medium mb-1">Combination <span className="text-red-500">*</span></label>
             <AsyncSelect

@@ -94,7 +94,7 @@ model PurchaseOrderItem{
   quantity    Int
   item_price       Float
   item_mrp        Float
-  totalAmount       Float
+  total_amount       Float
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   deleted_at DateTime?
@@ -134,7 +134,7 @@ model GoodReceiptNoteItem{
   shortage_qty Int?
   item_price       Float
   item_mrp        Float
-  totalAmount       Float
+  total_amount       Float
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   deleted_at DateTime?
@@ -167,7 +167,7 @@ model PurchaseInvoiceItem{
   quantity    Int
   item_price       Float
   item_mrp        Float
-  totalAmount       Float
+  total_amount       Float
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
   deleted_at DateTime?
@@ -190,7 +190,7 @@ model SalesOrder {
   processed          Boolean    
   payment_status     String              // unpaid | paid | partial
   delivery_status    String              // not dispatched | dispatched | delivered
-  totalOrderQty      Int
+  total_order_qty      Int
   total_amount       Float
   products           SalesOrderProduct[]
   created_at         DateTime            @default(now())
@@ -210,7 +210,7 @@ model SalesOrderProduct {
   ordered_qty    Int
   allocated_qty  Int      
   remaining_qty  Int
-  totalAmount    Int
+  total_amount    Float
   created_at     DateTime   @default(now())
   updated_at     DateTime   @updatedAt
   deleted_at         DateTime?

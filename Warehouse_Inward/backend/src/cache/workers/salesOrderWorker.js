@@ -31,7 +31,7 @@ createWorker('salesOrderQueue', async (job) => {
           order_type: payload.data.order_type,
           priority: payload.data.priority,
           processed: payload.data.processed,
-          totalOrderQty: payload.data.totalOrderQty,
+          total_order_qty: payload.data.total_order_qty,
           total_amount: payload.data.total_amount,
           status: payload.data.status,
           products: payload.data.products,

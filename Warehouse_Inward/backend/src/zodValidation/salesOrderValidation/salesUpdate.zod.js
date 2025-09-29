@@ -6,27 +6,10 @@ const salesOrderProductSchema = z.object({
     .number()
     .min(1, 'Product id is required').optional(),
 
-    vendor_id:z.number()
-    .min(1, 'Vendor id is required').optional(),
-
-  product_name: z
-    .string()
-    .min(1, 'Product name is required').optional(),
-
   ordered_qty: z
     .number()
     .int('Ordered quantity must be an integer')
     .positive('Ordered quantity must be greater than 0').optional(),
-
-  product_mrp: z
-    .number()
-    .positive('MRP must be a positive number')
-    .optional(),
-
-  product_price: z
-    .number()
-    .positive('Price must be a positive number')
-    .optional(),
 
 }).strict()
 

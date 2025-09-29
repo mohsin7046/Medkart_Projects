@@ -29,12 +29,12 @@ export const EACHSTATUS = Object.freeze({
 
 
 export const DETAILSFETCH = Object.freeze({
-  product: ['id','product_code', 'name', 'category', 'product_price','product_mrp',"unit_of_measure","hsn_code","gst_percentage","status","inventory_qty" ],
+  product: ['id','product_code', 'name', 'category', 'product_price','product_mrp',"unit_of_measure","hsn_code","gst_percentage","status","inventory_qty", ],
   vendor: ['id','vendor_code','name', 'email', 'contact_person','contact_number', 'address','status'],
   order: ['id','order_number','vendor_id','order_date','total_amount','expected_delivery_date','status'],
   grn: ['id','grn_number','order_id','received_date','total_amount','status'],
   invoice: ['id','invoice_number','invoice_date','total_amount','status',{goodReceiptNote:{select:{id:true}}}],
-  saleorder:['id','sales_order_number','name','totalOrderQty','status','processed','order_type','created_at'],
+  saleorder:['id','sales_order_number','name','total_order_qty','status','processed','order_type','created_at'],
   saleindent:['id','indent_number','total_sales_order','total_remain_product','status','created_at',{product:{select:{name:true}}}]
 })
 

@@ -31,10 +31,9 @@ export const updateSalesOrder = catchAsync(async(req,res)=>{
 
 export const deleteSalesOrder = catchAsync(async (req, res) => {
    req.component = ENTITY.so
-  const { sales_order_id } = req.body
+  const { id } = req.body
 
-  console.log(sales_order_id);
-  
+ const sales_order_id = id;
 
   const deletedSalesOrder = await deleteSalesOrderService(sales_order_id)
 

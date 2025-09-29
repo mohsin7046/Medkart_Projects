@@ -33,6 +33,9 @@ export const getSalesIndentByIdService = async (id) => {
         })
     );
 
+    console.log(salesOrders);
+    
+
     return {
         indent_number: salesIndentData.indent_number,
         total_sales_order: salesIndentData.total_sales_order,

@@ -22,7 +22,7 @@ function SalesOrderForm() {
     order_type: "B2C",
     items: [{ product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_price: "" }],
   });
-
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!id) return;
@@ -31,8 +31,8 @@ function SalesOrderForm() {
       try {
         setLoading(true);
         const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
-        const { data } = await res.json();
-        if (!res.ok || !data) throw new Error("Failed to fetch sales order");
+
+        const {data} = await res.json();
 
         const items = data.items?.map((i) => ({
           product_id: i.product_id || "",
@@ -63,7 +63,7 @@ function SalesOrderForm() {
 
   const updateField = (name, value) => {
     console.log(name, value);
-    
+
     setFormDirty(true);
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -80,7 +80,7 @@ function SalesOrderForm() {
   const addItem = () =>
     setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, { product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+      items: [...prev.items, { product_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" }],
     }));
 
   const removeItem = (index) =>
@@ -112,16 +112,12 @@ function SalesOrderForm() {
       order_type: formData.order_type,
       items: formData.items.map((i) => ({
         product_id: parseInt(i.product_id),
-        ...(id && { vendor_id: parseInt(i.vendor_id) }),
-        product_name: i.product_name,
         ordered_qty: parseFloat(i.ordered_qty) || 0,
-        product_mrp: parseFloat(i.product_mrp) || 0,
-        product_price: parseFloat(i.product_price) || 0,
       })),
     };
 
     console.log(payload);
-    
+
 
     try {
       const endpoint = id
@@ -136,7 +132,21 @@ function SalesOrderForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        toast.error(data.message || "Error submitting sales order");
+        const errorList = Array.isArray(data.message) ? toast.error(data.message) : [{ message: data.message }];
+        const newErrors = {};
+
+        errorList.forEach(err => {
+          if (err.field?.startsWith("items.")) {
+            const [, idx, fieldName] = err.field.split(".");
+            if (!newErrors.items) newErrors.items = {};
+            if (!newErrors.items[idx]) newErrors.items[idx] = {};
+            newErrors.items[idx][fieldName] = err.message;
+          } else if (err.field) {
+            newErrors[err.field] = err.message;
+          }
+        });
+
+        setErrors(newErrors);
         return;
       }
 
@@ -149,6 +159,12 @@ function SalesOrderForm() {
       setLoading(false);
     }
   };
+
+   const totalQty = formData.items.reduce((sum, item) => sum + (parseFloat(item.ordered_qty) || 0), 0);
+  const totalAmount = formData.items.reduce(
+    (sum, item) => sum + ((parseFloat(item.ordered_qty) || 0) * (parseFloat(item.product_price) || 0)),
+    0
+  );
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
@@ -172,17 +188,73 @@ function SalesOrderForm() {
 
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Products</h3>
-            {formData.items.map((item, index) => (
-              <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end border-b pb-3">
-                <SearchSelect type="product" value={item.product_name} onSelect={(p) => handleProductSelect(index, p)} />
-                <InputField label="Qty" type="number" value={item.ordered_qty} onChange={(e) => updateItem(index, "ordered_qty", e.target.value)} min="0" />
-                <InputField label="Price" type="number" value={item.product_price} readOnly />
-                <InputField label="MRP" type="number" value={item.product_mrp} readOnly />
-                <button type="button" className="text-red-600 text-lg" onClick={() => removeItem(index)}>🗑️</button>
-              </div>
-            ))}
+            {formData.items.map((item, index) => {
+              const itemErrors = errors.items?.[index] || {};
+
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-5 gap-3 items-start border-b pb-3"
+                >
+             
+                  <div className="flex flex-col">
+                    <SearchSelect
+                      type="product"
+                      value={item.product_name}
+                      onSelect={(p) => handleProductSelect(index, p)}
+                    />
+                    {itemErrors.product_name && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.product_name}</span>
+                    )}
+                  </div>
+
+                  
+                  <div className="flex flex-col">
+                    <InputField
+                      label="Qty"
+                      type="number"
+                      value={item.ordered_qty}
+                      onChange={(e) => updateItem(index, "ordered_qty", e.target.value)}
+                      min="0"
+                    />
+                    {itemErrors.ordered_qty && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.ordered_qty}</span>
+                    )}
+                  </div>
+
+               
+                  <div className="flex flex-col">
+                    <InputField label="Price" type="number" value={item.product_price} readOnly />
+                  </div>
+
+                 
+                  <div className="flex flex-col">
+                    <InputField label="MRP" type="number" value={item.product_mrp} readOnly />
+                  </div>
+
+                  <div className="flex flex-col justify-end mt-6">
+                    <button
+                      type="button"
+                      className="text-red-600 text-lg"
+                      onClick={() => removeItem(index)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
             <Button type="button" variant="primary" onClick={addItem}>+ Add Product</Button>
           </div>
+
+          <div>
+                <span className="font-semibold">Total Quantity: </span>
+                <span>{totalQty}</span>
+              </div>
+              <div>
+                <span className="font-semibold">Total Amount: </span>
+                <span>₹{totalAmount.toFixed(2)}</span>
+              </div>
 
           <div className="flex justify-between">
             <Button type="button" variant="secondary" onClick={() => confirmNavigation(ROUTES.SALES_ORDER.LIST)}>Back</Button>
