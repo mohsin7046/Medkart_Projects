@@ -2,8 +2,11 @@ import { z } from 'zod'
 
 const salesOrderProductSchema = z.object({
   product_id: z
-    .number()
-    .min(1, 'Product id is required'),
+  .number({
+    required_error: 'Product is required',
+    invalid_type_error: 'Product must be a number',
+  })
+  .min(1, 'Product id must be greater than 0'),
 
   ordered_qty: z
     .number()

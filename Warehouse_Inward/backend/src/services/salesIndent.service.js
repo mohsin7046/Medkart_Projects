@@ -6,73 +6,109 @@ import { SalesIndentRepository } from '../repository/salesIndent.repository.js'
 const indentRepo = new SalesIndentRepository()
 
 export const getFlattenedSalesIndentByIdService = async (id) => {
-  const salesIndentData = await indentRepo.findIndentById(id, {
-    indent_number: true,
-    product_id: true,
-    total_sales_order: true,
-    total_remain_product: true,
-    status: true,
-    sale_order_IDs: true,
-    created_at: true
-  })
 
-  if (!salesIndentData) {
-    indentLogger.error(`Sales Indent not found for ID: ${id}`)
-    throw new Error(`Sales Indent not found for ID: ${id}`)
+  const salesIndentDataOptimized = await indentRepo.findIndentById({
+    id,
+    select: {
+      indent_number: true,
+      product_id: true,
+      total_sales_order: true,
+      total_remain_product: true,
+      status: true,
+      created_at: true,
+      salesOrders: {
+        select: {
+          salesOrderId: true,
+          salesOrder: {
+            select: {
+              sales_order_number: true,
+              order_type: true,
+              address: true,
+              payment_status: true,
+              delivery_status: true,
+              processed_date: true,
+              status: true,
+              products: {
+                select: {
+                  ordered_qty: true,
+                  allocated_qty: true,
+                  remaining_qty: true,
+                  product: {
+                    select: {
+                      id: true,
+                      name: true,
+                      category: true,
+                      combination: true,
+                      product_price: true,
+                      product_mrp: true
+                    }
+                  },
+                  vendor: {
+                    select: {
+                      name: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // console.log(salesIndentDataOptimized.salesOrders[0].salesOrder);
+  
+  if (!salesIndentDataOptimized) {
+    indentLogger.error(`Sales Indent not found for ID: ${id}`);
+    throw new Error(`Sales Indent not found for ID: ${id}`);
   }
 
-  const flattenedRows = []
+  const flattenedRows = [];
 
-  await Promise.all(
-    salesIndentData.sale_order_IDs.map(async (orderId) => {
-      const order = await getSalesOrderByIdService(orderId)
+  salesIndentDataOptimized.salesOrders.forEach((indentSO) => {
+    const order = indentSO.salesOrder;
 
-      const remainingFiltered =
-        salesIndentData.status === STATUS.CLOSED
-          ? order.products
-          : order.products.filter((p) => p.remaining_qty > 0)
+    const relevantProducts = order.products.filter((p) => {
+      const matchesProduct = p.product.id === salesIndentDataOptimized.product_id;
+      const hasRemainingQty =  p.remaining_qty > 0;
+      console.log(`Product ${p.product_id}: matchesProduct=${matchesProduct}, hasRemainingQty=${hasRemainingQty}`);
+      return matchesProduct && hasRemainingQty;
+    });
 
-      const productFiltered = remainingFiltered.filter(
-        (p) => String(p.product_id) === String(salesIndentData.product_id)
-      )
+    console.log("Relevant products:", relevantProducts);
 
-
-      productFiltered.forEach((prod) => {
-        flattenedRows.push({
-          indent_number: salesIndentData.indent_number,
-          indent_status: salesIndentData.status,
-          indent_created_at: salesIndentData.created_at,
-          sales_order_number: order.sales_order_number,
-          order_type: order.order_type,
-          address: order.address,
-          contact_number: order.contact_number,
-          email: order.email,
-          payment_status: order.payment_status,
-          delivery_status: order.delivery_status,
-          processed_date: order.processed_date,
-          total_order_qty: order.total_order_qty,
-          total_amount: order.total_amount,
-          order_status: order.status,
-          ordered_qty: prod.ordered_qty,
-          allocated_qty: prod.allocated_qty,
-          remaining_qty: prod.remaining_qty,
-          product_name: prod.product.name,
-          product_category: prod.product.category,
-          product_combination: prod.product.combination,
-          product_price: prod.product.product_price,
-          product_mrp: prod.product.product_mrp,
-          vendor_name: prod.vendor?.name || null
-        })
-      })
-    })
-  )
+    relevantProducts.forEach((prod) => {
+      flattenedRows.push({
+        indent_number: salesIndentDataOptimized.indent_number,
+        indent_status: salesIndentDataOptimized.status,
+        indent_created_at: salesIndentDataOptimized.created_at,
+        sales_order_number: order.sales_order_number,
+        order_type: order.order_type,
+        address: order.address,
+        payment_status: order.payment_status,
+        delivery_status: order.delivery_status,
+        processed_date: order.processed_date,
+        order_status: order.status,
+        ordered_qty: prod.ordered_qty,
+        allocated_qty: prod.allocated_qty,
+        remaining_qty: prod.remaining_qty,
+        product_name: prod.product.name,
+        product_category: prod.product.category,
+        product_combination: prod.product.combination,
+        product_price: prod.product.product_price,
+        product_mrp: prod.product.product_mrp,
+        vendor_name: prod.vendor?.name || null
+      });
+    });
+  });
 
   return {
-    indent_number: salesIndentData.indent_number,
-    total_sales_order: salesIndentData.total_sales_order,
-    total_remain_product: salesIndentData.total_remain_product,
-    status: salesIndentData.status,
-    created_at: salesIndentData.created_at,
+    indent_number: salesIndentDataOptimized.indent_number,
+    total_sales_order: salesIndentDataOptimized.total_sales_order,
+    total_remain_product: salesIndentDataOptimized.total_remain_product,
+    status: salesIndentDataOptimized.status,
+    created_at: salesIndentDataOptimized.created_at,
     items: flattenedRows
-  }
-}
+  };
+};

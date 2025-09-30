@@ -30,7 +30,7 @@ export function SearchSelect({ type, value, onSelect, selectedIds = [] }) {
       const res = await fetch(`http://localhost:5000/api/v1/${type}s/search/${query}`);
       const data = await res.json();
 
-      // ✅ Filter out products already selected in other rows
+    
       const filtered = (data.data || []).filter(
         (item) => !selectedIds.includes(item.id)
       );
@@ -45,7 +45,7 @@ export function SearchSelect({ type, value, onSelect, selectedIds = [] }) {
   return (
     <div className="relative">
       <input
-        className="border rounded-lg px-3 py-2"
+        className="border w-full rounded-lg px-3 py-2  focus:ring-2 focus:ring-blue-400 outline-none"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={`Search ${type}...`}

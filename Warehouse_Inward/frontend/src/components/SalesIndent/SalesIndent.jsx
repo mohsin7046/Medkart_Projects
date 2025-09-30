@@ -1,24 +1,29 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
 import { ROUTES } from "../../constant/routePath.js";
-import { LIMITPAGE, salesIndentColumns, salesIndentSearchFields, salesIndentStatusFilters } from "../../constant/salesIndentConstant.js";
-import { toast } from "react-toastify";
-import { STATUS } from "../../constant/constant.js";
-
+import { LIMITPAGE, salesIndentColumns, salesIndentSearchFields, salesIndentStatusFilters,FILTER_KEY_INDENT,defaultIndentValue } from "../../constant/salesIndentConstant.js";
+import { getFilterState, setFilterState } from "../../constant/commonFilterLocal.js";
 
 export const SalesIndent = () => {
-  const [page, setPage] = useState(1);
+  
   const limit = LIMITPAGE;
   const navigate = useNavigate();
+  const initialFilters = getFilterState(FILTER_KEY_INDENT, defaultIndentValue);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchField, setSearchField] = useState("indent_number");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("d");
+  const [page, setPage] = useState(initialFilters.page);
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm);
+  const [searchField, setSearchField] = useState(initialFilters.searchField);
+  const [statusFilter, setStatusFilter] = useState(initialFilters.statusFilter);
+  const [sortField, setSortField] = useState(initialFilters.sortField);
+  const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder);
+
+    useEffect(() => {
+    const filters = { page, searchTerm, searchField, statusFilter, sortField, sortOrder };
+    setFilterState(FILTER_KEY_INDENT, filters);
+  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
   const { data: salesOrders, metadata, loading, setData: setSalesIndents } =
     useFetchData({
@@ -54,32 +59,17 @@ export const SalesIndent = () => {
     setPage(1);
   };
 
-  const handleSubmit = async (id) => {
-    console.log(id);
+  const handleClearFilters = () => {
+    setPage(defaultIndentValue.page);
+    setSearchTerm(defaultIndentValue.searchTerm);
+    setSearchField(defaultIndentValue.searchField);
+    setStatusFilter(defaultIndentValue.statusFilter);
+    setSortField(defaultIndentValue.sortField);
+    setSortOrder(defaultIndentValue.sortOrder);
 
-    try {
-      const res = await fetch(ALLEndpoint.SalesOrderEndpoints.processSalesOrder.endpoint, {
-        method: ALLEndpoint.SalesOrderEndpoints.processSalesOrder.method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ sales_order_ids: id })
-      });
+    setFilterState(FILTER_KEY_INDENT, defaultIndentValue);
+  };
 
-      const data = await res.json();
-
-      if (!res) {
-        toast.error(data.error || "Failed to Process Sales Oder")
-      }
-
-      console.log(data);
-      toast.success("Successsfully processed the sales Order")
-
-    } catch (error) {
-      toast.error(error || "SOmething went wrong")
-      console.error(error)
-    }
-  }
 
   return (
     <div>
@@ -93,9 +83,15 @@ export const SalesIndent = () => {
         setPage={setPage}
         searchFields={salesIndentSearchFields}
         statusFilters={salesIndentStatusFilters}
+        currentSearchTerm={searchTerm}
+        currentSearchField={searchField}
+        currentStatusFilter={statusFilter}
+        currentSortField={sortField}
+        currentSortOrder={sortOrder}
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
+        onClear={handleClearFilters}
         onView={(order) => {
           navigate(ROUTES.SALES_INDENT.VIEW('salesIndent', order.id))
         }

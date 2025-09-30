@@ -279,6 +279,7 @@ function CommonDataTable({
                             STATUS.COMPLETED,
                             STATUS.ALLOCATED,
                             STATUS.PARTIAL_RECEVIED,
+                            STATUS.PROCESSING
                           ].includes(item.status)}
                           onClick={() => onEdit(item)}
                           className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${
@@ -287,6 +288,7 @@ function CommonDataTable({
                               STATUS.COMPLETED,
                               STATUS.ALLOCATED,
                               STATUS.PARTIAL_RECEVIED,
+                              STATUS.PROCESSING
                             ].includes(item.status)
                               ? "opacity-30 cursor-not-allowed"
                               : ""
@@ -320,6 +322,7 @@ function CommonDataTable({
                             STATUS.COMPLETED,
                             STATUS.ALLOCATED,
                             STATUS.PARTIAL_RECEVIED,
+                            STATUS.PROCESSING
                           ].includes(item.status)}
                           onClick={() => onDelete(item)}
                           className={`p-2 rounded-md hover:bg-gray-200 transition-colors mr-2 ${
@@ -328,6 +331,7 @@ function CommonDataTable({
                               STATUS.COMPLETED,
                               STATUS.ALLOCATED,
                               STATUS.PARTIAL_RECEVIED,
+                              STATUS.PROCESSING
                             ].includes(item.status)
                               ? "opacity-30 cursor-not-allowed"
                               : ""

@@ -6,6 +6,7 @@ import grnRoutes from './grn.routes.js'
 import purchaseInvoiceRoutes from './purchaseInvoice.routes.js'
 import SalesOrderRoutes from './salesOrder.routes.js'
 import IndentRoutes from './salesIndent.routes.js'
+import PurchaseIndentRoutes from '../routes/purchaseIndent.routes.js'
 import { errorHandler } from '../middleware/errorHandler.middleware.js'
 import { getMainMetrics, requestMetricsMiddleware } from '../metricsRegistry/metrics.js'
 
@@ -21,6 +22,7 @@ app.use(str, grnRoutes)
 app.use(str, purchaseInvoiceRoutes)
 app.use(str,SalesOrderRoutes)
 app.use(str,IndentRoutes)
+app.use(str,PurchaseIndentRoutes)
 
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', 'text/plain; version=0.0.4')

@@ -11,7 +11,7 @@ export const InputField = ({ label, name, type = "text", value, onChange, requir
       placeholder={placeholder}
       readOnly={readOnly}
       required={required}
-      className="w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+      className={`w-full border px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none ${readOnly ? "bg-gray-300 cursor-not-allowed":""}`}
     />
   </div>
 );

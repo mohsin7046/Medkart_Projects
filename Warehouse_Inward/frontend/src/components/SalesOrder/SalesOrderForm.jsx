@@ -32,7 +32,7 @@ function SalesOrderForm() {
         setLoading(true);
         const res = await fetch(`${ALLEndpoint.SalesOrderEndpoints.getSalesOrderEdit.endpoint}/${id}`);
 
-        const {data} = await res.json();
+        const { data } = await res.json();
 
         const items = data.items?.map((i) => ({
           product_id: i.product_id || "",
@@ -111,6 +111,7 @@ function SalesOrderForm() {
       address: formData.address,
       order_type: formData.order_type,
       items: formData.items.map((i) => ({
+        ...(id && { vendor_id: parseInt(i.vendor_id) }),
         product_id: parseInt(i.product_id),
         ordered_qty: parseFloat(i.ordered_qty) || 0,
       })),
@@ -132,9 +133,17 @@ function SalesOrderForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        const errorList = Array.isArray(data.message) ? toast.error(data.message) : [{ message: data.message }];
-        const newErrors = {};
+        let errorList = [];
 
+        if (Array.isArray(data.message)) {
+          errorList = data.message;  
+          toast.error("Multiple errors occurred"); 
+        } else {
+          errorList = [{ message: data.message }];
+          toast.error(data.message);
+        }
+
+        const newErrors = {};
         errorList.forEach(err => {
           if (err.field?.startsWith("items.")) {
             const [, idx, fieldName] = err.field.split(".");
@@ -146,9 +155,11 @@ function SalesOrderForm() {
           }
         });
 
+        console.log(newErrors);
         setErrors(newErrors);
         return;
       }
+
 
       toast.success(id ? "Sales order updated!" : "Sales order created!");
       navigate(ROUTES.SALES_ORDER.LIST);
@@ -160,7 +171,7 @@ function SalesOrderForm() {
     }
   };
 
-   const totalQty = formData.items.reduce((sum, item) => sum + (parseFloat(item.ordered_qty) || 0), 0);
+  const totalQty = formData.items.reduce((sum, item) => sum + (parseFloat(item.ordered_qty) || 0), 0);
   const totalAmount = formData.items.reduce(
     (sum, item) => sum + ((parseFloat(item.ordered_qty) || 0) * (parseFloat(item.product_price) || 0)),
     0
@@ -200,8 +211,11 @@ function SalesOrderForm() {
                   key={index}
                   className="grid grid-cols-1 md:grid-cols-5 gap-3 items-start border-b pb-3"
                 >
-             
+
                   <div className="flex flex-col">
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Product <span className="text-red-500">*</span>
+                    </label>
                     <SearchSelect
                       type="product"
                       value={item.product_name}
@@ -210,12 +224,11 @@ function SalesOrderForm() {
                         (id) => id !== item.product_id
                       )}
                     />
-                    {itemErrors.product_name && (
-                      <span className="text-red-500 text-xs mt-1">{itemErrors.product_name}</span>
+                    {itemErrors.product_id && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.product_id}</span>
                     )}
                   </div>
 
-                  
                   <div className="flex flex-col">
                     <InputField
                       label="Qty"
@@ -229,12 +242,12 @@ function SalesOrderForm() {
                     )}
                   </div>
 
-               
+
                   <div className="flex flex-col">
                     <InputField label="Price" type="number" value={item.product_price} readOnly />
                   </div>
 
-                 
+
                   <div className="flex flex-col">
                     <InputField label="MRP" type="number" value={item.product_mrp} readOnly />
                   </div>
@@ -255,13 +268,13 @@ function SalesOrderForm() {
           </div>
 
           <div>
-                <span className="font-semibold">Total Quantity: </span>
-                <span>{totalQty}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Total Amount: </span>
-                <span>₹{totalAmount.toFixed(2)}</span>
-              </div>
+            <span className="font-semibold">Total Quantity: </span>
+            <span>{totalQty}</span>
+          </div>
+          <div>
+            <span className="font-semibold">Total Amount: </span>
+            <span>₹{totalAmount.toFixed(2)}</span>
+          </div>
 
           <div className="flex justify-between">
             <Button type="button" variant="secondary" onClick={() => confirmNavigation(ROUTES.SALES_ORDER.LIST)}>Back</Button>

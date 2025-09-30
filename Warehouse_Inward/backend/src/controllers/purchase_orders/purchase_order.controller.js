@@ -1,20 +1,20 @@
 import {
-  createPurchaseOrderService,
+  createPurchaseOrderAgainstPurchaseIndentService,
   deletePurchaseOrderService,
-  updatePurchaseOrderService,
   getPurchaseOrderByIdService
 } from '../../services/purchaseOrder.service.js'
 import {  successResponse } from '../../utilities/response.js'
-import { updatePurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderUpdate.zod.js'
-import { createPurchaseOrderSchema } from '../../zodValidation/purchaseOrderValidation/purchaseOrderCreate.zod.js'
 import { catchAsync } from '../../utilities/tryCatchAsyncHandler.js'
 import { ENTITY, STATUSCODE } from '../../utilities/constant.js'
 
 
-export const createPurchaseOrder = catchAsync(async (req, res) => {
+export const createPurchaseOrderAgainstPurchaseIndent = catchAsync(async (req, res) => {
   req.component = ENTITY.po; 
-  const data = createPurchaseOrderSchema.parse(req.body);
-  const newPO = await createPurchaseOrderService(data);
+
+  const purchase_indent_ids = req.body;
+  
+  const newPO = await createPurchaseOrderAgainstPurchaseIndentService(purchase_indent_ids);
+
   return successResponse(res, newPO, 'Successfully created Purchase Order', STATUSCODE.OK);
 })
 
@@ -27,12 +27,12 @@ export const deletePurchaseOrder = catchAsync(async (req, res) => {
 })
 
 
-export const updatePurchaseOrder = catchAsync(async (req, res) => {
- req.component =ENTITY.po;
-  const formData = updatePurchaseOrderSchema.parse(req.body);
-  const updatedPO = await updatePurchaseOrderService(formData);
-  return successResponse(res, updatedPO, 'Successfully updated Purchase Order', STATUSCODE.OK);
-})
+// export const updatePurchaseOrder = catchAsync(async (req, res) => {
+//  req.component =ENTITY.po;
+//   const formData = updatePurchaseOrderSchema.parse(req.body);
+//   const updatedPO = await updatePurchaseOrderService(formData);
+//   return successResponse(res, updatedPO, 'Successfully updated Purchase Order', STATUSCODE.OK);
+// })
 
 
 export const getPurchaseOrderById = catchAsync(async(req,res)=>{

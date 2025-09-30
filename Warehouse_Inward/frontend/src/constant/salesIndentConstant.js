@@ -22,3 +22,14 @@ export const salesIndentStatusFilters = [
 
 
 export const LIMITPAGE = 5;
+
+export const FILTER_KEY_INDENT = "salesIndentFilters";
+
+export const defaultIndentValue = {
+  page: 1,
+  searchTerm: "",
+  searchField: "indent_number", 
+  statusFilter: "all",
+  sortField: "created_at",
+  sortOrder: "d",
+};

@@ -140,8 +140,10 @@ export class SalesOrderRepository {
                     product: {
                         select: {
                             name: true,
+                            id:true,
                             category: true,
                             combination: true,
+                            inventory_qty:true,
                             product_mrp: true,
                             product_price: true,
                             description: true,

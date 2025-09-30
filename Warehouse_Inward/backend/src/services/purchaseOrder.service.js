@@ -4,152 +4,114 @@ import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { poLogger } from '../utilities/logger.js'
 import { purchaseOrderQueue, purchaseOrderQueueEvents } from '../cache/queueManager.js'
 import { PurchaseOrderRepository } from '../repository/purchaseOrder.repository.js'
+import { prisma } from '../utilities/import.config.js'
 
 const PurchaseOrderRepo = new PurchaseOrderRepository();
 
-export const createPurchaseOrderService = async (data) => {
+export const createPurchaseOrderAgainstPurchaseIndentService = async ({purchase_indent_ids}) => {
   try {
-    const { vendor_id, order_date, expected_delivery_date, items } = data;
-
-    if (expected_delivery_date <= order_date) {
-      poLogger.error("expected_delivery_date must be greater than order_date");
-      throw new Error("expected_delivery_date must be greater than order_date");
-    }
-
-    items.forEach(item => {
-      if (item.item_mrp < item.item_price) {
-        poLogger.error(`MRP cannot be less than price for product ${item.product_id}`);
-        throw new Error(`MRP cannot be less than price for product `);
+    console.log(purchase_indent_ids);
+  
+    const pendingIndents = await prisma.purchaseIndent.findMany({
+      where: { 
+        status: STATUS.PENDING, 
+        id: { in: purchase_indent_ids }
+      },
+      select: {
+        id: true,
+        product_id: true,
+        vendor_id: true,
+        sale_ident_ids: true,
+        total_order_qty: true,
+        total_amount: true
       }
     });
 
-    const order_number = generateRandom(PREFIX.ORDER);
-
-    const itemsWithTotal = items.map((item) => ({
-      product_id: item.product_id,
-      quantity: item.quantity,
-      item_price: item.item_price,
-      item_mrp: item.item_mrp,
-      totalAmount: decimalConversion(item.quantity * item.item_price),
-    }));
-
-    const total_amount = decimalConversion(
-      itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0)
-    );
-
-    const module = 'purchaseOrder';
-    const operation = 'create';
-    const changeddata = {
-      vendor_id,
-      order_date: new Date(order_date),
-      order_number,
-      expected_delivery_date: new Date(expected_delivery_date),
-      total_amount,
-      status: STATUS.PENDING,
-      purchaseOrderItems: {
-        create: items.map((item, idx) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-          item_price: item.item_price,
-          item_mrp: item.item_mrp,
-          totalAmount: itemsWithTotal[idx].totalAmount,
-        })),
-      },
+    console.log(pendingIndents);
+    
+    if (!pendingIndents.length) {
+      console.log("No pending PurchaseIndents to convert.");
+      return { success: true, message: "No pending indents found", count: 0 };
     }
 
-    const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
-      module,
-      operation,
-      payload: changeddata,
-    }, {
-      attempts: 3,
-      backoff: { type: 'fixed', delay: 2000 },
-      removeOnComplete: true,
+    const vendorGroups = pendingIndents.reduce((acc, indent) => {
+      if (!acc.has(indent.vendor_id)) {
+        acc.set(indent.vendor_id, {
+          purchase_indent_ids: [],
+          total_amount: 0,
+          total_order_qty: 0,
+          products: []
+        });
+      }
+      
+      const group = acc.get(indent.vendor_id);
+      group.purchase_indent_ids.push(indent.id);
+      group.total_amount += indent.total_amount;
+      group.total_order_qty += indent.total_order_qty;
+      group.products.push({
+        id: indent.id,
+        product_id: indent.product_id,
+        ordered_qty: indent.total_order_qty,
+        amount: indent.total_amount
+      });
+      
+      return acc;
+    }, new Map());
+
+    console.log("VendorGroups", vendorGroups);
+
+
+    const result = await prisma.$transaction(async (tx) => {
+      const createdOrders = [];
+
+      
+      for (const [vendorId, group] of vendorGroups.entries()) {
+      
+        const purchaseOrder = await tx.purchaseOrder.create({
+          data: {
+            order_number: generateRandom(PREFIX.ORDER),
+            vendor_id: vendorId,
+            order_date: new Date(),
+            total_order_qty: group.total_order_qty,
+            total_amount: group.total_amount,
+            status: STATUS.PENDING,
+          },
+        });
+
+        createdOrders.push(purchaseOrder);
+
+        await tx.purchaseOrderProduct.createMany({
+          data: group.products.map(indent => ({
+            purchase_order_id: purchaseOrder.id,
+            product_id: indent.product_id,
+            ordered_qty: indent.ordered_qty,
+            total_amount: indent.amount,
+          }))
+        });
+
+        await tx.purchaseIndent.updateMany({
+          where: { 
+            id: { in: group.purchase_indent_ids }
+          },
+          data: {
+            status: STATUS.ACCEPTED,
+          }
+        });
+      }
+
+      return createdOrders;
     });
 
-    const createdPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
+    console.log(`✅ Created ${result.length} PurchaseOrders from ${pendingIndents.length} PurchaseIndents.`);
+    
+    return { 
+      success: true, 
+      purchaseOrders: result, 
+      count: result.length 
+    };
 
-    if (!createdPO || createdPO.status !== 'success') {
-      poLogger.error("❌ Error while creating purchase Order");
-      throw new Error("Purchase Order not created");
-    }
-
-    poLogger.info(`✅ Purchase Order created | Order Number: ${order_number}`);
-    return createdPO;
   } catch (error) {
     poLogger.error(`❌ Failed to create Purchase Order | Error: ${error.message}`);
-    throw error;
-  }
-}
-
-
-export const updatePurchaseOrderService = async (formData) => {
-  try {
-
-    if (formData.expected_delivery_date <= formData.order_date) {
-      poLogger.error("expected_delivery_date must be greater than order_date");
-      throw new Error("expected_delivery_date must be greater than order_date");
-    }
-
-    formData.items.forEach(item => {
-      if (item.item_mrp < item.item_price) {
-        poLogger.error(`MRP cannot be less than price for product ${item.product_id}`);
-        throw new Error(`MRP cannot be less than price for product `);
-      }
-    });
-
-    const itemsWithTotal = formData.items.map(item => ({
-      product_id: item.product_id,
-      quantity: item.quantity,
-      item_price: item.item_price,
-      item_mrp: item.item_mrp,
-      totalAmount: decimalConversion(item.quantity * item.item_price),
-    }));
-
-    const total_amount = decimalConversion(
-      itemsWithTotal.reduce((sum, item) => sum + item.totalAmount, 0)
-    );
-
-    const module = 'purchaseOrder';
-    const operation = 'update';
-    const data = {
-      id: formData.order_id,
-      order_date: new Date(formData.order_date),
-      expected_delivery_date: new Date(formData.expected_delivery_date),
-      total_amount,
-      purchaseOrderItems: {
-        deleteMany: { order_id: formData.order_id },
-        create: formData.items.map((item, idx) => ({
-          product_id: item.product_id,
-          quantity: item.quantity,
-          item_price: item.item_price,
-          item_mrp: item.item_mrp,
-          totalAmount: itemsWithTotal[idx].totalAmount,
-        })),
-      },
-    }
-
-    const job = await purchaseOrderQueue.add(`${module}:${operation}`, {
-      module,
-      operation,
-      payload: data,
-    }, {
-      attempts: 3,
-      backoff: { type: 'fixed', delay: 2000 },
-      removeOnComplete: true,
-    });
-
-    const updatedPO = await job.waitUntilFinished(purchaseOrderQueueEvents);
-
-    if (!updatedPO || updatedPO.status !== 'success') {
-      poLogger.error("❌ Error while updating purchase Order");
-      throw new Error("Purchase Order not updated");
-    }
-
-    poLogger.info(`✅ Purchase Order updated | ID: ${formData.order_id}`);
-    return updatedPO;
-  } catch (error) {
-    poLogger.error(`❌ Failed to update Purchase Order | ID: ${formData.order_id} | Error: ${error.message}`);
     throw error;
   }
 }

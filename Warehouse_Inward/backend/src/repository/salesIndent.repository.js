@@ -1,8 +1,9 @@
+import { STATUS } from '../utilities/constant.js';
 import { prisma } from '../utilities/import.config.js';
 import { indentLogger } from '../utilities/logger.js';
 
 export class SalesIndentRepository  {
-  async findIndentById(id, select = undefined, include = undefined) {
+  async findIndentById({id, select = undefined, include = undefined}) {
     try {
       return await prisma.salesIndent.findUnique({
         where: { id: parseInt(id) },
@@ -18,7 +19,7 @@ export class SalesIndentRepository  {
   async existingIndentsByProductIds(productIds,select = undefined) {
     try {
       return await prisma.salesIndent.findMany({
-        where: { product_id: { in: productIds }, status: 'open' },
+        where: { product_id: { in: productIds }, status: STATUS.OPEN },
          ...(select ? { select } : {}),
     })
     } catch (error) {

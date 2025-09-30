@@ -35,7 +35,9 @@ export const DETAILSFETCH = Object.freeze({
   grn: ['id','grn_number','order_id','received_date','total_amount','status'],
   invoice: ['id','invoice_number','invoice_date','total_amount','status',{goodReceiptNote:{select:{id:true}}}],
   saleorder:['id','sales_order_number','name','total_order_qty','status','processed','order_type','created_at'],
-  saleindent:['id','indent_number','total_sales_order','total_remain_product','status','created_at',{product:{select:{name:true}}}]
+  saleindent:['id','indent_number','total_sales_order','total_remain_product','status','created_at',{product:{select:{name:true}}}],
+  purchaseindent:['id',"purchase_indent_number",'B2B_order_qty','B2C_order_qty','total_order_qty','total_amount','status',{ product: { select: { name: true } } },   // <-- add product name
+    { vendor: { select: { name: true } } }  ]
 })
 
 export const PREFIX = Object.freeze({
@@ -45,7 +47,8 @@ export const PREFIX = Object.freeze({
   GRN: 'GRN-', 
   VENDOR: 'VC-',
   SALE:'SO-',
-  INDENT:'IN-'
+  INDENT:'IN-',
+  PURCHASE_IDENT:'PIN'
 })
 
 export const LIMIT = Object.freeze({
@@ -60,7 +63,8 @@ export const FEILD = Object.freeze({
   grn: ['grn_number'],
   invoice: ['invoice_number'],
   saleorder:['sales_order_number'],
-  saleindent:['indent_number']
+  saleindent:['indent_number'],
+  purchaseindent:['purchase_indent_number']
 })
  
 export const SEARCHFILTERNAME = Object.freeze({
@@ -70,7 +74,8 @@ export const SEARCHFILTERNAME = Object.freeze({
   grn: prisma.goodReceiptNote,
   vendor: prisma.vendor,
   saleorder:prisma.salesOrder,
-  saleindent:prisma.salesIndent
+  saleindent:prisma.salesIndent,
+  purchaseindent:prisma.purchaseIndent
 })
 
 export const SETEXPIRY = Object.freeze({

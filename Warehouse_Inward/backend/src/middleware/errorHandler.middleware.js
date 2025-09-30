@@ -18,6 +18,7 @@ export const errorHandler = (err, req, res,next) => {
   const logger = loggerMap[component] || appLogger;
 
   if (err.name === "ZodError") {
+  
     const validationErrors = err.issues.map((issue) => ({
       field: issue.path.join("."),
       message: issue.message,

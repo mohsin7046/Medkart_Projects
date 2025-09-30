@@ -96,24 +96,44 @@ export const updateSaleOrderService = async (data) => {
     try {
         const product_price = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
 
-        const itemsWithTotal = data.items.map((item) => ({
-            product_id: item.product_id,
-            ordered_qty: item.ordered_qty,
-            allocated_qty: 0,
-            remaining_qty: item.ordered_qty,
-            total_amount: decimalConversion(item.ordered_qty * (product_price.find(p => p.id === item.product_id)?.product_price || 0))
-        }))
+        console.log(data.items);
+
+        const itemsWithTotal = await Promise.all(
+            data.items.map(async (item) => {
+                let vendorId = item?.vendor_id;
+
+                if (!vendorId || vendorId == null) {
+                    const vendor = await prisma.vendor.findFirstOrThrow({
+                        orderBy: { id: 'desc' },
+                    });
+
+                    if (!vendor) {
+                        throw new Error(`❌ Vendor not found for product_id: ${item.product_id}`);
+                    }
+
+                    vendorId = vendor.id;
+                }
+
+                const price = product_price.find(p => p.id === item.product_id)?.product_price || 0;
+
+                return {
+                    product_id: item.product_id,
+                    vendor_id: vendorId,
+                    ordered_qty: item.ordered_qty,
+                    allocated_qty: 0,
+                    remaining_qty: item.ordered_qty,
+                    total_amount: decimalConversion(item.ordered_qty * price),
+                };
+            })
+        );
+
+        console.log(itemsWithTotal);
+
 
         const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.total_amount, 0));
 
         const total_order_qty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
-
-        const vendor = await prisma.vendor.findFirstOrThrow({
-            orderBy: {
-                id: 'desc',
-            },
-        });
 
 
         const changeddata = {
@@ -131,7 +151,7 @@ export const updateSaleOrderService = async (data) => {
                 deleteMany: { sales_order_id: data.sales_order_id },
                 create: data.items.map((item, idx) => ({
                     product_id: item.product_id,
-                    vendor_id: vendor.id,
+                    vendor_id: itemsWithTotal[idx].vendor_id,
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
@@ -265,6 +285,8 @@ export const getSalesOrderForEditByIdService = async (id) => {
 
 export const processSalesOrderService = async (data) => {
     const { sales_order_ids } = data
+    console.log(sales_order_ids);
+
     const orderIds = Array.isArray(sales_order_ids) ? sales_order_ids : [sales_order_ids]
 
     let salesOrders = await saleOrderRepo.findProductsInSalesOrders(orderIds);
@@ -289,10 +311,12 @@ export const processSalesOrderService = async (data) => {
 
     const existingIndents = await indentRepo.existingIndentsByProductIds(productIds);
 
+    console.log("existingIndent at start", existingIndents);
+
     const indentMap = new Map(existingIndents.map(i => [i.product_id, i]))
 
     const operations = []
-
+   
     for (const order of salesOrders) {
         let orderStatus = STATUS.ALLOCATED
         const isB2B = order.order_type === 'B2B'
@@ -315,11 +339,23 @@ export const processSalesOrderService = async (data) => {
 
                 if (shortage > 0 && allocated_qty > 0) {
                     orderStatus = STATUS.PARTIAL_RECEVIED
-                    await handleIndent(product, order, shortage, indentMap, operations)
+                    const indentResult = await handleIndent(product, order, shortage, indentMap, operations)
+                    console.log("Indent Result", indentResult);
+
+
+                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
+                        indentMap.set(dbProduct.id, indentResult?.indent)
+                    }
                 }
                 else if (shortage > 0 && allocated_qty <= 0) {
                     orderStatus = STATUS.PROCESSING
-                    await handleIndent(product, order, shortage, indentMap, operations)
+                    const indentResult = await handleIndent(product, order, shortage, indentMap, operations)
+                    console.log("Indent Result", indentResult);
+
+                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
+                        indentMap.set(dbProduct.id, indentResult?.indent)
+                    }
+
                 }
             } else {
 
@@ -332,7 +368,15 @@ export const processSalesOrderService = async (data) => {
                     remaining_qty = product.ordered_qty
                     newInventory = currentInventoryQty
                     orderStatus = STATUS.PROCESSING
-                    await handleIndent(product, order, product.ordered_qty, indentMap, operations)
+
+                    const indentResult = await handleIndent(product, order, product.ordered_qty, indentMap, operations)
+
+                    console.log("Indent Result", indentResult);
+
+                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
+                        indentMap.set(dbProduct.id, indentResult?.indent)
+                    }
+
                 }
             }
 
@@ -364,34 +408,69 @@ let processedOrders = new Set();
 
 const handleIndent = async (product, order, quantity, indentMap, operations) => {
     const existingIndent = indentMap.get(product.product_id)
+    console.log("existingIndent in handleIdent", existingIndent);
+
     const isOrderAlreadyProcessed = processedOrders.has(order.id)
+    console.log("OrderId and productId in handle", order.id, product.product_id);
+
+    let indent = null;
+    let isNew = false;
 
     if (existingIndent) {
+
+        const updatedIndent = {
+            total_sales_order: existingIndent.total_sales_order + 1,
+            salesOrders: [
+                ...(existingIndent.salesOrders || []),
+                { salesOrderId: order.id }
+            ],
+            total_remain_product: existingIndent.total_remain_product + quantity
+        }
+
+        indent = updatedIndent;
+
         operations.push(
             prisma.salesIndent.update({
-                where: { id: existingIndent.id },
-                data: {
-                    total_sales_order: existingIndent.total_sales_order + (isOrderAlreadyProcessed ? 0 : 1),
-                    sale_order_IDs: isOrderAlreadyProcessed ?
-                        existingIndent.sale_order_IDs :
-                        [...existingIndent.sale_order_IDs, order.id],
-                    total_remain_product: existingIndent.total_remain_product + quantity
-                }
+                where: { indent_number: existingIndent.indent_number },
+                    data: {
+                        total_sales_order: updatedIndent.total_sales_order,
+                        total_remain_product: updatedIndent.total_remain_product,
+                        salesOrders: {
+                            create: {
+                                salesOrderId: order.id
+                            }
+                        }
+                    }
             })
         )
 
+    } else if (!existingIndent) {
+        const indentNumber = generateRandom(PREFIX.INDENT)
+        const createdData = {
+            indent_number: indentNumber,
+            product_id: product.product_id,
+            total_sales_order: 1,
+            total_remain_product: quantity,
+            status: STATUS.OPEN,
+            salesOrders: [{ salesOrderId: order.id }]
+        };
 
-    } else {
+        indent = createdData
+        isNew = true;
 
         operations.push(
             prisma.salesIndent.create({
                 data: {
-                    indent_number: generateRandom(PREFIX.INDENT),
+                    indent_number: indentNumber,
                     product_id: product.product_id,
                     total_sales_order: 1,
                     total_remain_product: quantity,
-                    sale_order_IDs: [order.id],
-                    status: 'open'
+                    status: STATUS.OPEN,
+                    salesOrders: {
+                        create: {
+                            salesOrderId: order.id
+                        }
+                    }
                 }
             })
         )
@@ -399,4 +478,6 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
     }
 
     processedOrders.add(order.id)
+
+    return { indent, isNew }
 }

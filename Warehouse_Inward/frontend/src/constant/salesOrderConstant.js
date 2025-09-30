@@ -26,3 +26,13 @@ export const salesOrderStatusFilters = [
 
 export const LIMITPAGE = 10;
 
+export const FILTER_KEY = "salesOrderFilters";
+
+export const defaultValue = {
+    page: 1,
+    searchTerm: "",
+    searchField: "name",
+    statusFilter: "all",
+    sortField: "created_at",
+    sortOrder: "d",
+  }

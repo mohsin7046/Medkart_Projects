@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
@@ -8,18 +8,35 @@ import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE, salesOrderColumns, salesOrderSearchFields, salesOrderStatusFilters } from "../../constant/salesOrderConstant.js";
 import { toast } from "react-toastify";
 import { STATUS } from "../../constant/constant.js";
-
-
+import { getFilterState,setFilterState } from "../../constant/commonFilterLocal.js";
+import { FILTER_KEY,defaultValue } from "../../constant/salesOrderConstant.js";
 export const SalesOrder = () => {
-  const [page, setPage] = useState(1);
+
+  const initialFilters = getFilterState(FILTER_KEY, defaultValue);
+
+  const [page, setPage] = useState(initialFilters.page);
+  const [searchTerm, setSearchTerm] = useState(initialFilters.searchTerm);
+  const [searchField, setSearchField] = useState(initialFilters.searchField);
+  const [statusFilter, setStatusFilter] = useState(initialFilters.statusFilter);
+  const [sortField, setSortField] = useState(initialFilters.sortField);
+  const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder);
+
   const limit = LIMITPAGE;
+
+  useEffect(() => {
+    const filters = {
+      page,
+      searchTerm,
+      searchField,
+      statusFilter,
+      sortField,
+      sortOrder,
+    };
+    setFilterState(FILTER_KEY, filters);
+  }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
+
   const navigate = useNavigate();
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchField, setSearchField] = useState("sales_order_number");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [sortField, setSortField] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("d");
   const [selectedIds, setSelectedIds] = useState([]);
 
   const { data: salesOrders, metadata, loading, setData: setSalesOrders } =
@@ -28,7 +45,7 @@ export const SalesOrder = () => {
       name: "saleorder",
       page,
       limit,
-      debounceDelay: 500,  
+      debounceDelay: 500,
       searchTerm,
       searchField,
       statusFilter,
@@ -41,8 +58,7 @@ export const SalesOrder = () => {
     ALLEndpoint.SalesOrderEndpoints.deleteSalesOrder.method
   );
 
-  console.log("salesOrders", salesOrders);
-  
+
 
   const handleDelete = (sales_order_id) => {
     console.log(sales_order_id);
@@ -74,10 +90,28 @@ export const SalesOrder = () => {
     setPage(1);
   };
 
-  const handleSubmit = async (ids) => {
-    console.log("ids",ids);
-    
+  const handleClearFilters = () => {
+    const defaultFilters = {
+      page: 1,
+      searchTerm: "",
+      searchField: "name",
+      statusFilter: "all",
+      sortField: "created_at",
+      sortOrder: "d",
+    };
 
+    setPage(defaultFilters.page);
+    setSearchTerm(defaultFilters.searchTerm);
+    setSearchField(defaultFilters.searchField);
+    setStatusFilter(defaultFilters.statusFilter);
+    setSortField(defaultFilters.sortField);
+    setSortOrder(defaultFilters.sortOrder);
+
+    setFilterState(FILTER_KEY, defaultFilters);
+  };
+
+
+  const handleSubmit = async (ids) => {
     try {
       const res = await fetch(ALLEndpoint.SalesOrderEndpoints.processSalesOrder.endpoint, {
         method: ALLEndpoint.SalesOrderEndpoints.processSalesOrder.method,
@@ -94,12 +128,12 @@ export const SalesOrder = () => {
       }
 
       setSalesOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        ids === order.id
-          ? { ...order, status: STATUS.PROCESSED } 
-          : order
-      )
-    );
+        prevOrders.map((order) =>
+          ids === order.id
+            ? { ...order, status: STATUS.PROCESSED }
+            : order
+        )
+      );
 
       console.log(data);
       toast.success("Successsfully processed the sales Order")
@@ -113,7 +147,7 @@ export const SalesOrder = () => {
   return (
     <div>
       <CommonDataTable
-        columns={salesOrderColumns}
+        columns={salesOrderColumns}  
         data={salesOrders}
         page={page}
         limit={limit}
@@ -122,6 +156,11 @@ export const SalesOrder = () => {
         setPage={setPage}
         searchFields={salesOrderSearchFields}
         statusFilters={salesOrderStatusFilters}
+        currentSearchTerm={searchTerm}
+        currentSearchField={searchField}
+        currentStatusFilter={statusFilter}
+        currentSortField={sortField}
+        currentSortOrder={sortOrder}
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
@@ -133,11 +172,11 @@ export const SalesOrder = () => {
           navigate(ROUTES.PURCHASE_ORDER.VIEW('salesOrder', order.id))
         }
         }
-        
+        onClear={handleClearFilters}
         extraAction={(order) => {
           const isDisabled = [STATUS.PENDING].includes(order.status);
           console.log(isDisabled);
-          
+
           return (
             <button
               disabled={!isDisabled}

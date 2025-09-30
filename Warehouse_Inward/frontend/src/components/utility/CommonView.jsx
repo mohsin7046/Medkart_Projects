@@ -9,6 +9,7 @@ function CommonView() {
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null);
 
   useEffect(() => {
     if (!config) return;
@@ -33,21 +34,81 @@ function CommonView() {
   const getValue = (obj, path) =>
     path.split(".").reduce((acc, key) => acc?.[key], obj);
 
+  const handleAction = async (action) => {
+    if (!window.confirm(`Are you sure you want to ${action.label}?`)) return;
+    setActionLoading(action.key);
+    console.log(data);
+    
+
+    try {
+      const res = await fetch(
+        `${action.endpoint}`,
+        {
+          method: action.method || "POST",
+          headers: { "Content-Type": "application/json" },
+          body: action.body ? JSON.stringify(action.body(id)) : null,
+        }
+      );
+
+      const result = await res.json();
+      if (res.ok) {
+        alert(`✅ ${action.label} successful!`);
+       
+        setData((prev) => ({
+          ...prev,
+          status: "processed",
+          ...result.data, 
+        }));
+      } else {
+        alert(`Failed: ${result.message || "Something went wrong"}`);
+      }
+    } catch (err) {
+      console.error("Action failed", err);
+      alert(`Failed to ${action.label}`);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <button
-        onClick={() => navigate(-1)}
-        className="mb-6 px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-lg shadow hover:opacity-90 transition"
-      >
-        ← Back
-      </button>
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-gradient-to-r from-gray-700 to-gray-900 text-white rounded-lg shadow hover:opacity-90 transition"
+        >
+          ← Back
+        </button>
+
+        <div className="flex gap-3">
+          {config.actions?.map(
+            (action) =>
+              (!action.showWhen || action.showWhen(data)) && (
+                <button
+                  key={action.key}
+                  onClick={() => handleAction(action)}
+                  disabled={actionLoading === action.key}
+                  className={`px-4 py-2 rounded-lg shadow transition text-white ${
+                    actionLoading === action.key
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  }`}
+                >
+                  {actionLoading === action.key
+                    ? `${action.label}...`
+                    : action.label}
+                </button>
+              )
+          )}
+        </div>
+      </div>
 
       <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
         {config.title}
       </h2>
 
-    
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+     
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {config.headerFields.map((field) => {
           let value = getValue(data, field.key);
           if (field.isDate && value) value = new Date(value).toLocaleDateString();
@@ -55,16 +116,18 @@ function CommonView() {
           return (
             <div
               key={field.key}
-              className="p-4 bg-white shadow rounded-lg border hover:shadow-md transition"
+              className="p-3 bg-white shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition"
             >
-              <p className="text-gray-500 text-sm">{field.label}</p>
-              <p className="font-semibold text-gray-800 mt-1">{value ?? "-"}</p>
+              <p className="text-gray-500 text-xs">{field.label}</p>
+              <p className="font-semibold text-gray-800 text-sm mt-1 break-words">
+                {value ?? "-"}
+              </p>
             </div>
           );
         })}
       </div>
 
-      
+   
       <h3 className="text-2xl font-semibold mb-4 text-gray-800">Orders</h3>
       <div className="overflow-x-auto w-full">
         <table className="min-w-full border border-gray-300 text-sm table-fixed">

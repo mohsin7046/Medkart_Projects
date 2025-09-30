@@ -1,3 +1,4 @@
+import { STATUS } from "./constant.js";
 import { ALLEndpoint } from "./endPoints.js";
 
 export const VIEW_CONFIG = {
@@ -20,7 +21,7 @@ export const VIEW_CONFIG = {
   },
 
   grn: {
-    title: "GRN Details",
+    title: "GRN Details",  
     endpoint: ALLEndpoint.GRNEndpoints.getGRNById.endpoint,
     headerFields: [
       { label: "GRN Number", key: "grn_number" },
@@ -77,6 +78,7 @@ export const VIEW_CONFIG = {
     { label: "EmailId", key: "email" },
     { label: "Processed Date", key: "processed_date", isDate: true }, 
     { label: "Total Amount", key: "total_amount", isCurrency: true },
+    { label: "Total Order Qty", key: "total_order_qty"},
     { label: "Status", key: "status", isStatus: true },
   ],
   itemKey: "products", 
@@ -88,16 +90,28 @@ export const VIEW_CONFIG = {
     { label: "Remaining Qty", key: "remaining_qty" },
     { label: "Price", key: "product.product_price", isCurrency: true },
     { label: "MRP", key: "product.product_mrp", isCurrency: true },
+    { label: "Inventory Qty", key: "product.inventory_qty" },
     { label: "GST %", key: "product.gst_percentage" },
     { label: "Combination", key: "product.combination" },
     { label: "HSN Code", key: "product.hsn_code" },
-    { label: "Total", key: "totalAmount", isCurrency: true }, 
+    { label: "Total", key: "total_amount", isCurrency: true }, 
+  ],
+  actions: [
+    {
+      label: "Process Order",
+      key: "process",
+      method: ALLEndpoint.SalesOrderEndpoints.processSalesOrder.method,
+      endpoint: ALLEndpoint.SalesOrderEndpoints.processSalesOrder.endpoint,
+      body: (id) => ({ sales_order_ids: [parseInt(id)] }),
+      showWhen: (data) => ![STATUS.PROCESSING,STATUS.PARTIAL_RECEVIED,STATUS.ALLOCATED].includes(data.status),
+    },
   ],
 },
 
-salesIndent : {
+salesIndent: {
   title: "Sales Indent Details",
   endpoint: ALLEndpoint.SalesIndentEndpoints.getSalesIndentById.endpoint,
+
 
   headerFields: [
     { label: "Indent Number", key: "indent_number" },
@@ -107,39 +121,23 @@ salesIndent : {
     { label: "Created At", key: "created_at", isDate: true },
   ],
 
-  itemKey: "sales_orders",
+  itemKey: "items",
 
   itemColumns: [
     { label: "Sales Order No", key: "sales_order_number" },
     { label: "Order Type", key: "order_type" },
     { label: "Address", key: "address" },
-    { label: "Contact No", key: "contact_number" },
-    { label: "Email", key: "email" },
-    { label: "Payment Status", key: "payment_status" },
-    { label: "Delivery Status", key: "delivery_status" },
     { label: "Processed Date", key: "processed_date", isDate: true },
-    { label: "Total Order Qty", key: "total_order_qty" },
-    { label: "Total Amount", key: "total_amount", isCurrency: true },
-    { label: "Product Name", key: "products.product.name", isCurrency: true },
-    { label: "Vendor Name", key: "products.vendor.name", isCurrency: true },
-    { label: "Status", key: "status", isStatus: true },
+    { label: "Ordered Qty", key: "ordered_qty" },
+    { label: "Allocated Qty", key: "allocated_qty" },
+    { label: "Remaining Qty", key: "remaining_qty" },
+    { label: "Product Name", key: "product_name" },
+    { label: "Product Category", key: "product_category" },
+    { label: "Product Combination", key: "product_combination" },
+    { label: "Product Price", key: "product_price", isCurrency: true },
+    { label: "Product MRP", key: "product_mrp", isCurrency: true },
+    { label: "Vendor Name", key: "vendor_name" },
+    { label: "Order Status", key: "order_status", isStatus: true },
   ],
-
-  // subItemKey: "products",
-  // subItemColumns: [
-  //   { label: "Product Name", key: "product.name" },
-  //   { label: "Vendor Name", key: "vendor.name" },
-  //   { label: "Category", key: "product.category" },
-  //   { label: "Ordered Qty", key: "ordered_qty" },
-  //   { label: "Allocated Qty", key: "allocated_qty" },
-  //   { label: "Remaining Qty", key: "remaining_qty" },
-  //   { label: "Price", key: "product.product_price", isCurrency: true },
-  //   { label: "MRP", key: "product.product_mrp", isCurrency: true },
-  //   { label: "GST %", key: "product.gst_percentage" },
-  //   { label: "Combination", key: "product.combination" },
-  //   { label: "HSN Code", key: "product.hsn_code" },
-  //   { label: "Total", key: "totalAmount", isCurrency: true },
-  // ],
 }
-
 };

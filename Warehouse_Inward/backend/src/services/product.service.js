@@ -4,7 +4,7 @@ import { productLogger } from '../utilities/logger.js'
 import { ProductRepository } from '../repository/product.repository.js'
 
 const ProductRepo = new ProductRepository();
-
+ 
 export const addProductService = async (data) => {
   try {
 
