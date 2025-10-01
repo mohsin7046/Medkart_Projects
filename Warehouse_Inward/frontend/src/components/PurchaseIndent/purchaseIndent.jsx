@@ -3,23 +3,18 @@ import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
 import { useFetchData } from "../../hooks/useFetchData.hooks.js";
-import { useDeleteData } from "../../hooks/useDeleteData.hooks.js";
-import { columns, searchFields, statusFilters } from "../../constant/productConstant.js";
+import { purchaseIndentColumns, purchaseIndentSearchFields, salesIndentStatusFilters, LIMITPAGE } from "../../constant/purchaseIndentConstant.js";
 import { ROUTES } from "../../constant/routePath.js";
-import { LIMITPAGE } from "../../constant/productConstant.js";
 
 function PurchaseIndent() {
-
-  const FILTER_KEY = "productFilters";
+  const FILTER_KEY = "purchaseIndentFilters";
   const navigate = useNavigate();
 
   const getFilterState = (key, defaultValue) => {
     try {
       const stored = localStorage.getItem(key);
-      console.log(stored);
       return stored ? JSON.parse(stored) : defaultValue;
-    } catch (error) {
-      console.error("Error reading from localStorage:", error);
+    } catch {
       return defaultValue;
     }
   };
@@ -27,15 +22,13 @@ function PurchaseIndent() {
   const setFilterState = (key, value) => {
     try {
       localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
-      console.error("Error writing to localStorage:", error);
-    }
+    } catch {}
   };
 
   const initialFilters = getFilterState(FILTER_KEY, {
     page: 1,
     searchTerm: "",
-    searchField: "name",
+    searchField: "purchase_indent_number",
     statusFilter: "all",
     sortField: "created_at",
     sortOrder: "d",
@@ -50,23 +43,15 @@ function PurchaseIndent() {
 
   const limit = LIMITPAGE;
 
-
   useEffect(() => {
-    const filters = {
-      page,
-      searchTerm,
-      searchField,
-      statusFilter,
-      sortField,
-      sortOrder,
-    };
+    const filters = { page, searchTerm, searchField, statusFilter, sortField, sortOrder };
     setFilterState(FILTER_KEY, filters);
   }, [page, searchTerm, searchField, statusFilter, sortField, sortOrder]);
 
-  const { data: products, metadata, loading, setData: setProducts } =
+  const { data: purchaseIndents, metadata, loading, setData: setPurchaseIndents } =
     useFetchData({
-      endpoint: ALLEndpoint.ProductEndpoints.getProduct.endpoint,
-      name: "product",
+      endpoint: ALLEndpoint.PurchaseIndentEnpoints.getPurchaseIndent.endpoint,
+      name: "purchaseindent",
       page,
       limit,
       debounceDelay: 500,
@@ -77,18 +62,16 @@ function PurchaseIndent() {
       sortOrder,
     });
 
-  const { deleteItem } = useDeleteData(
-    ALLEndpoint.ProductEndpoints.deleteProduct.endpoint,
-    ALLEndpoint.ProductEndpoints.deleteProduct.method
-  );
-
-  const handleDelete = (product_code) => {
-    deleteItem({
-      idField: "product_code",
-      idValue: product_code,
-      setState: setProducts,
-    });
-  };
+ 
+const flattenPurchaseIndents = (purchaseIndents || []).flatMap(indent =>
+  indent.items.map(item => ({
+    ...indent,
+    product: item.product,         
+    qty_to_be_order: item.qty_to_be_order,
+    order_qty: item.order_qty,
+    total_amount: item.total_amount 
+  }))
+);
 
   const handleSearch = ({ field, value }) => {
     setSearchField(field);
@@ -108,38 +91,37 @@ function PurchaseIndent() {
   };
 
   const handleClearFilters = () => {
-  const defaultFilters = {
-    page: 1,
-    searchTerm: "",
-    searchField: "name",
-    statusFilter: "all",
-    sortField: "created_at",
-    sortOrder: "d",
+    const defaultFilters = {
+      page: 1,
+      searchTerm: "",
+      searchField: "purchase_indent_number",
+      statusFilter: "all",
+      sortField: "created_at",
+      sortOrder: "d",
+    };
+
+    setPage(defaultFilters.page);
+    setSearchTerm(defaultFilters.searchTerm);
+    setSearchField(defaultFilters.searchField);
+    setStatusFilter(defaultFilters.statusFilter);
+    setSortField(defaultFilters.sortField);
+    setSortOrder(defaultFilters.sortOrder);
+
+    setFilterState(FILTER_KEY, defaultFilters);
   };
-
-  setPage(defaultFilters.page);
-  setSearchTerm(defaultFilters.searchTerm);
-  setSearchField(defaultFilters.searchField);
-  setStatusFilter(defaultFilters.statusFilter);
-  setSortField(defaultFilters.sortField);
-  setSortOrder(defaultFilters.sortOrder);
-
-  setFilterState(FILTER_KEY, defaultFilters);
-};
-
 
   return (
     <div>
       <CommonDataTable
-        columns={columns}
-        data={products}
+        columns={purchaseIndentColumns}
+        data={flattenPurchaseIndents}
         page={page}
         limit={limit}
         metadata={metadata}
         loading={loading}
         setPage={setPage}
-        searchFields={searchFields}
-        statusFilters={statusFilters}
+        searchFields={purchaseIndentSearchFields}
+        statusFilters={salesIndentStatusFilters}
         currentSearchTerm={searchTerm}
         currentSearchField={searchField}
         currentStatusFilter={statusFilter}
@@ -148,13 +130,13 @@ function PurchaseIndent() {
         onSearch={handleSearch}
         onFilter={handleFilter}
         onSort={handleSort}
-        onAdd={() => navigate(ROUTES.PRODUCT.ADD)}
-        onEdit={(product) => navigate(ROUTES.PRODUCT.EDIT(product.id))}
-        onDelete={(product) => handleDelete(product.product_code)}
-         onClear={handleClearFilters}
+        onView={(indent) =>{
+        navigate(ROUTES.PURCHASE_ORDER.VIEW('purchaseIndent', indent.id))
+      }}
+        onClear={handleClearFilters}
       />
     </div>
   );
 }
 
-export default Product;
+export default PurchaseIndent;

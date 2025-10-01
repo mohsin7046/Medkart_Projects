@@ -7,7 +7,7 @@ import {buildSelect} from '../../utilities/builtSelectForDb.js'
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
  
-  const filters = req.query;
+  const filters = req.query;  
   const { name, field } = filters;
 
   if (!SEARCHFILTERNAME[name]) {

@@ -18,7 +18,7 @@ export const getFlattenedSalesIndentByIdService = async (id) => {
       created_at: true,
       salesOrders: {
         select: {
-          salesOrderId: true,
+          sales_order_id: true,
           salesOrder: {
             select: {
               sales_order_number: true,

@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { VIEW_CONFIG } from "../../constant/view.config.js";
+import { toast } from "react-toastify";
 
 function CommonView() {
   const { type, id } = useParams();
   const navigate = useNavigate();
+  console.log(type,id);
+  
   const config = VIEW_CONFIG[type];
-
+  console.log(config);
+  
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
@@ -17,6 +21,10 @@ function CommonView() {
       try {
         const res = await fetch(`${config.endpoint}/${id}`);
         const response = await res.json();
+        
+       if(!res){
+        toast.error(response.message)
+       }
         setData(response.data);
       } catch (err) {
         console.error("❌ Fetch failed", err);
@@ -38,7 +46,7 @@ function CommonView() {
     if (!window.confirm(`Are you sure you want to ${action.label}?`)) return;
     setActionLoading(action.key);
     console.log(data);
-    
+
 
     try {
       const res = await fetch(
@@ -53,11 +61,11 @@ function CommonView() {
       const result = await res.json();
       if (res.ok) {
         alert(`✅ ${action.label} successful!`);
-       
+
         setData((prev) => ({
           ...prev,
           status: "processed",
-          ...result.data, 
+          ...result.data,
         }));
       } else {
         alert(`Failed: ${result.message || "Something went wrong"}`);
@@ -88,11 +96,10 @@ function CommonView() {
                   key={action.key}
                   onClick={() => handleAction(action)}
                   disabled={actionLoading === action.key}
-                  className={`px-4 py-2 rounded-lg shadow transition text-white ${
-                    actionLoading === action.key
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-green-600 hover:bg-green-700"
-                  }`}
+                  className={`px-4 py-2 rounded-lg shadow transition text-white ${actionLoading === action.key
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                    }`}
                 >
                   {actionLoading === action.key
                     ? `${action.label}...`
@@ -107,7 +114,7 @@ function CommonView() {
         {config.title}
       </h2>
 
-     
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         {config.headerFields.map((field) => {
           let value = getValue(data, field.key);
@@ -118,16 +125,27 @@ function CommonView() {
               key={field.key}
               className="p-3 bg-white shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition"
             >
-              <p className="text-gray-500 text-xs">{field.label}</p>
-              <p className="font-semibold text-gray-800 text-sm mt-1 break-words">
-                {value ?? "-"}
-              </p>
+              <p className="text-gray-500 text-xs ">{field.label}</p>
+              {field.isStatus ? (
+                <span
+                  className={`px-2 py-1 rounded-lg text-xs font-medium ${config.backgroundStatus
+                      ? config.backgroundStatus(value)   
+                      : STATUS_COLORS[value] || "bg-gray-100 text-gray-800"
+                    }`}
+                >
+                  {value ?? "-"}
+                </span>
+              ) : (
+                <p className="font-semibold text-gray-800 text-sm mt-1 break-words">
+                  {value ?? "-"}
+                </p>
+              )}
             </div>
           );
         })}
       </div>
 
-   
+
       <h3 className="text-2xl font-semibold mb-4 text-gray-800">Orders</h3>
       <div className="overflow-x-auto w-full">
         <table className="min-w-full border border-gray-300 text-sm table-fixed">
@@ -152,15 +170,15 @@ function CommonView() {
                     value = new Date(value).toLocaleDateString();
                   if (col.isCurrency && value) value = `₹${value}`;
                   if (col.isStatus && value) {
+
+                    const statusClass = config.backgroundStatus
+                      ? config.backgroundStatus(value)
+                      : STATUS_COLORS[value] || "bg-gray-100 text-gray-800";
+                    console.log(statusClass);
+
                     value = (
                       <span
-                        className={`px-2 py-1 rounded text-white text-xs ${
-                          value === "active"
-                            ? "bg-green-500"
-                            : value === "inactive"
-                            ? "bg-red-500"
-                            : "bg-gray-500"
-                        }`}
+                        className={`px-2 py-1 rounded text-xs font-medium ${statusClass}`}
                       >
                         {value}
                       </span>

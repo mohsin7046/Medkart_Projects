@@ -422,7 +422,7 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
             total_sales_order: existingIndent.total_sales_order + 1,
             salesOrders: [
                 ...(existingIndent.salesOrders || []),
-                { salesOrderId: order.id }
+                { sales_order_id: order.id }
             ],
             total_remain_product: existingIndent.total_remain_product + quantity
         }
@@ -437,7 +437,7 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
                         total_remain_product: updatedIndent.total_remain_product,
                         salesOrders: {
                             create: {
-                                salesOrderId: order.id
+                                sales_order_id: order.id
                             }
                         }
                     }
@@ -452,7 +452,7 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
             total_sales_order: 1,
             total_remain_product: quantity,
             status: STATUS.OPEN,
-            salesOrders: [{ salesOrderId: order.id }]
+            salesOrders: [{ sales_order_id: order.id }]
         };
 
         indent = createdData
@@ -468,7 +468,7 @@ const handleIndent = async (product, order, quantity, indentMap, operations) => 
                     status: STATUS.OPEN,
                     salesOrders: {
                         create: {
-                            salesOrderId: order.id
+                            sales_order_id: order.id
                         }
                     }
                 }

@@ -44,8 +44,8 @@ export class PurchaseOrderRepository {
 
   async deletePurchaseOrderItems(order_id) {
     try {
-      return await prisma.purchaseOrderItem.updateMany({
-        where: { order_id , deleted_at: null },
+      return await prisma.purchaseOrderProduct.updateMany({
+        where: { purchase_order_id:order_id , deleted_at: null },
         data: { deleted_at: new Date() },
       });
     } catch (error) {
@@ -59,12 +59,34 @@ export class PurchaseOrderRepository {
     try {
       return await prisma.purchaseOrder.findUnique({
         where: { id: parseInt(id) },
-        include: {
-          vendor: { select: { id: true, name: true, status: true } },
-          purchaseOrderItems: {
-            include: { product: { select: { id: true, name: true, status: true } } },
+        select:{
+          order_number:true,
+          vendor:{
+            select:{
+              name:true,
+            }
           },
-        },
+          order_date:true,
+          total_amount:true,
+          total_order_qty:true,
+          status:true,
+          created_at:true,
+          products:{
+            select:{
+              product:{
+                select:{
+                  name:true,
+                  category:true,
+                  combination:true,
+                  gst_percentage:true
+                }
+              },
+              ordered_qty:true,
+              total_amount:true,
+              net_cost_per_qty:true
+            }
+          }
+        }
       });
     } catch (error) {
       poLogger.error(`Error fetching Purchase Order by ID (${id}): ${error.message}`);

@@ -28,6 +28,7 @@ createWorker('purchaseOrderQueue', async job => {
 
         case 'delete':
             poLogger.info(`🗑️ Deleting Purchase Order: ${payload.order_id}`);
+            await PurchaseOrderRepo.deletePurchaseOrderItems(payload.order_id)
 
             const deletePO = await PurchaseOrderRepo.deletePurchaseOrder(payload.order_id);
 

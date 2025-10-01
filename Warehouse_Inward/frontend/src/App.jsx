@@ -15,7 +15,8 @@ import {
   PurchaseInvoiceForm,
   SalesOrder,
   SalesOrderForm,
-  SalesIndent
+  SalesIndent,
+  PurchaseIndent
 } from "./components/importComponent.js";
 import CommonView from "./components/utility/CommonView.jsx";
 
@@ -61,7 +62,10 @@ function App() {
           <Route path={ROUTES.SALES_INDENT.LIST} element={<SalesIndent />} />
 
           <Route path={ROUTES.COMMON_VIEW.VIEW} element={<CommonView />} />
-  
+
+          <Route path={ROUTES.PURCHASE_INDENT.LIST} element={<PurchaseIndent />} />
+
+          
         </Routes>
       </div>
     </Router>

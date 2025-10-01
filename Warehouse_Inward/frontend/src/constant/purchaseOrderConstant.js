@@ -3,7 +3,7 @@ import { STATUS_COLORS } from "./constant";
 
 export const purchaseOrderColumns = [
   { key: "order_number", label: "Order Number" },
-  { key: "vendor_id", label: "Vendor ID" },
+  { key: "vendor", label: "Vendor Name",render: (vendor) => vendor?.name || "-" },
   {
     key: "order_date",
     label: "Order Date",
@@ -15,9 +15,8 @@ export const purchaseOrderColumns = [
     render: (val) => `₹${val}`,
   },
   {
-    key: "expected_delivery_date",
-    label: "Expected Delivery",
-    render: (val) => (val ? new Date(val).toLocaleDateString("en-GB") : "-"),
+    key: "total_order_qty",
+    label: "Total Order Qty",
   },
   { key: "status", label: "Status" ,background: (val)=> STATUS_COLORS[val]  },
 ];
@@ -35,3 +34,14 @@ export const purchaseOrderStatusFilters = [
 ];
 
 export const LIMITPAGE = 8;
+
+export const FILTER_KEY = "purchaseOrderFilters";
+
+export const defaultValue = {
+    page: 1,
+    searchTerm: "",
+    searchField: "name",
+    statusFilter: "all",
+    sortField: "created_at",
+    sortOrder: "d",
+  }

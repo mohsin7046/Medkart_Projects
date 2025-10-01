@@ -1,4 +1,4 @@
-import {prisma} from '../utilities/import.config.js'
+import { prisma } from '../utilities/import.config.js'
 import { productLogger, vendorLogger } from './logger.js'
 
 export const STATUS = Object.freeze({
@@ -9,46 +9,66 @@ export const STATUS = Object.freeze({
   ACTIVE: 'active',
   INACTIVE: 'inactive',
   PARTIAL_RECEVIED: 'partial received',
-  ALLOCATED:'allocated',
-  PROCESSING:"processing",
-  PAID:"paid",
-  UNPAID:"unpaid",
-  DISPATCHED:"dispatched",
-  NOT_DISPATCHED:"not dispatched",
-  OPEN:'open',
-  CLOSED:'closed'
+  ALLOCATED: 'allocated',
+  PROCESSING: "processing",
+  PAID: "paid",
+  UNPAID: "unpaid",
+  DISPATCHED: "dispatched",
+  NOT_DISPATCHED: "not dispatched",
+  OPEN: 'open',
+  CLOSED: 'closed',
+  SENT: 'PO SENT'
 })
 
 export const EACHSTATUS = Object.freeze({
-  product:['active','inactive'],
-  vendor:['active','inactive'],
-  po:['pending','partial received','cancelled','completed'],
-  grn:['pending','cancelled','completed'],
-  pi:['pending','cancelled','completed']
+  product: ['active', 'inactive'],
+  vendor: ['active', 'inactive'],
+  po: ['pending', 'partial received', 'cancelled', 'completed'],
+  grn: ['pending', 'cancelled', 'completed'],
+  pi: ['pending', 'cancelled', 'completed']
 })
 
 
 export const DETAILSFETCH = Object.freeze({
-  product: ['id','product_code', 'name', 'category', 'product_price','product_mrp',"unit_of_measure","hsn_code","gst_percentage","status","inventory_qty", ],
-  vendor: ['id','vendor_code','name', 'email', 'contact_person','contact_number', 'address','status'],
-  order: ['id','order_number','vendor_id','order_date','total_amount','expected_delivery_date','status'],
-  grn: ['id','grn_number','order_id','received_date','total_amount','status'],
-  invoice: ['id','invoice_number','invoice_date','total_amount','status',{goodReceiptNote:{select:{id:true}}}],
-  saleorder:['id','sales_order_number','name','total_order_qty','status','processed','order_type','created_at'],
-  saleindent:['id','indent_number','total_sales_order','total_remain_product','status','created_at',{product:{select:{name:true}}}],
-  purchaseindent:['id',"purchase_indent_number",'B2B_order_qty','B2C_order_qty','total_order_qty','total_amount','status',{ product: { select: { name: true } } },   // <-- add product name
-    { vendor: { select: { name: true } } }  ]
+  product: ['id', 'product_code', 'name', 'category', 'product_price', 'product_mrp', "unit_of_measure", "hsn_code", "gst_percentage", "status", "inventory_qty",],
+  vendor: ['id', 'vendor_code', 'name', 'email', 'contact_person', 'contact_number', 'address', 'status'],
+  order: ['id', 'order_number', { vendor: { select: { id: true, name: true } } }, 'order_date', 'total_amount', 'total_order_qty', 'status'],
+  grn: ['id', 'grn_number', 'order_id', 'received_date', 'total_amount', 'status'],
+  invoice: ['id', 'invoice_number', 'invoice_date', 'total_amount', 'status', { goodReceiptNote: { select: { id: true } } }],
+  saleorder: ['id', 'sales_order_number', 'name', 'total_order_qty', 'status', 'processed', 'order_type', 'created_at'],
+  saleindent: ['id', 'indent_number', 'total_sales_order', 'total_remain_product', 'status', 'created_at', { product: { select: { name: true } } }],
+  purchaseindent: ['id','purchase_indent_number','B2B_order_qty','B2C_order_qty','total_qty_to_be_order','total_order_qty','total_amount','status','created_at',
+    {
+      vendor: {
+        select: { id: true, name: true }   
+      }
+    },
+    {
+      items: {                         
+        select: {
+          id: true,
+          qty_to_be_order: true,
+          order_qty: true,
+          total_amount: true,
+          product: {
+            select: { id: true, name: true }   
+          }
+        }
+      }
+    }
+  ]
+
 })
 
 export const PREFIX = Object.freeze({
   ORDER: 'ORD-',
   PRODUCT: 'PC-',
-  INVOICE: 'INV-', 
-  GRN: 'GRN-', 
+  INVOICE: 'INV-',
+  GRN: 'GRN-',
   VENDOR: 'VC-',
-  SALE:'SO-',
-  INDENT:'IN-',
-  PURCHASE_IDENT:'PIN'
+  SALE: 'SO-',
+  INDENT: 'IN-',
+  PURCHASE_IDENT: 'PIN'
 })
 
 export const LIMIT = Object.freeze({
@@ -62,24 +82,24 @@ export const FEILD = Object.freeze({
   order: ['order_number'],
   grn: ['grn_number'],
   invoice: ['invoice_number'],
-  saleorder:['sales_order_number'],
-  saleindent:['indent_number'],
-  purchaseindent:['purchase_indent_number']
+  saleorder: ['sales_order_number'],
+  saleindent: ['indent_number'],
+  purchaseindent: ['purchase_indent_number']
 })
- 
+
 export const SEARCHFILTERNAME = Object.freeze({
   order: prisma.purchaseOrder,
   product: prisma.product,
   invoice: prisma.purchaseInvoice,
   grn: prisma.goodReceiptNote,
   vendor: prisma.vendor,
-  saleorder:prisma.salesOrder,
-  saleindent:prisma.salesIndent,
-  purchaseindent:prisma.purchaseIndent
+  saleorder: prisma.salesOrder,
+  saleindent: prisma.salesIndent,
+  purchaseindent: prisma.purchaseIndent
 })
 
 export const SETEXPIRY = Object.freeze({
-  expiryMonth:3
+  expiryMonth: 3
 })
 
 export const ENTITY = Object.freeze({
@@ -88,10 +108,10 @@ export const ENTITY = Object.freeze({
   po: "po",
   grn: "grn",
   pi: "pi",
-  so:"so",
-  si:"si",
-  so:"sale-order",
-  si:"sale-indent"
+  so: "so",
+  si: "si",
+  so: "sale-order",
+  si: "sale-indent"
 });
 
 
@@ -115,22 +135,22 @@ export const STATUSCODE = Object.freeze({
 
 
 export const PRIORITY = Object.freeze({
-  NORMAL:"normal",
-  HIGH:"high"
+  NORMAL: "normal",
+  HIGH: "high"
 })
 
 
 export const REDISWORKERQUEUE = Object.freeze({
-  productQueue:[prisma.product,productLogger],
-  vendorQueue:[prisma.vendor,vendorLogger]
+  productQueue: [prisma.product, productLogger],
+  vendorQueue: [prisma.vendor, vendorLogger]
 })
 
 export const categories = Object.freeze([
-  {  name: "tablet", uom: "pcs" },
-  {  name: "syrup", uom: "ml" },
-  {  name: "capsule", uom: "pcs" },
-  {  name: "injection", uom: "ml" },
-  {  name: "cream", uom: "kg" },
+  { name: "tablet", uom: "pcs" },
+  { name: "syrup", uom: "ml" },
+  { name: "capsule", uom: "pcs" },
+  { name: "injection", uom: "ml" },
+  { name: "cream", uom: "kg" },
 ]);
 
 export const combinations = Object.freeze([

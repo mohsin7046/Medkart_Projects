@@ -199,17 +199,17 @@ model SalesIndent {
   deleted_at           DateTime?
   product              Product   @relation(fields: [product_id], references: [id])
 
-  salesOrders    SalesIndentSO[]
+  salesOrders SalesIndentSO[]
 
   @@map("sales_indents")
 }
 
 model SalesIndentSO {
-  id            Int         @id @default(autoincrement())
-  salesIndentId Int
-  salesOrderId  Int
-  salesIndent   SalesIndent @relation(fields: [salesIndentId], references: [id])
-  salesOrder    SalesOrder  @relation(fields: [salesOrderId], references: [id])
+  id              Int         @id @default(autoincrement())
+  sales_indent_id Int
+  sales_order_id  Int
+  salesIndent     SalesIndent @relation(fields: [sales_indent_id], references: [id])
+  salesOrder      SalesOrder  @relation(fields: [sales_order_id], references: [id])
 
   @@map("sales_indent_sos")
 }
@@ -220,7 +220,8 @@ model PurchaseIndent {
   vendor_id              Int
   B2B_order_qty          Int
   B2C_order_qty          Int
-  total_order_qty        Int
+  total_qty_to_be_order  Int
+  total_order_qty        Int?
   total_amount           Float
   status                 String    @default("pending")
   created_at             DateTime  @default(now())
@@ -236,13 +237,14 @@ model PurchaseIndent {
 }
 
 model PurchaseIndentItem {
-  id               Int @id @default(autoincrement())
-  purchaseIndentId Int
-  product_id       Int
-  order_qty    Int
-  total_amount Float
+  id                 Int   @id @default(autoincrement())
+  purchase_indent_id Int
+  product_id         Int
+  qty_to_be_order    Int
+  order_qty          Int?
+  total_amount       Float
 
-  purchaseIndent PurchaseIndent @relation(fields: [purchaseIndentId], references: [id])
+  purchaseIndent PurchaseIndent @relation(fields: [purchase_indent_id], references: [id])
   product        Product        @relation(fields: [product_id], references: [id])
 
   @@map("purchase_indent_items")
@@ -260,7 +262,7 @@ model PurchaseOrder {
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
   deleted_at         DateTime?
-
+ 
   vendor          Vendor                 @relation(fields: [vendor_id], references: [id])
   purchaseIndent  PurchaseIndent?        @relation(fields: [purchase_indent_id], references: [id])
   products        PurchaseOrderProduct[]
@@ -275,7 +277,9 @@ model PurchaseOrderProduct {
   product_id        Int
   ordered_qty       Int
   total_amount      Int
+  net_cost_per_qty  Float
   created_at        DateTime @default(now())
+  deleted_at         DateTime?
 
   purchaseOrder PurchaseOrder @relation(fields: [purchase_order_id], references: [id])
   product       Product       @relation(fields: [product_id], references: [id])

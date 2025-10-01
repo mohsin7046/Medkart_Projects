@@ -1,3 +1,4 @@
+
 export const defaultEndPoint = 'http://localhost:5000/api/v1';
 
 export const ALLEndpoint = Object.freeze({
@@ -167,6 +168,17 @@ export const ALLEndpoint = Object.freeze({
     getSalesIndentById: {
       method: "GET",
       endpoint: `${defaultEndPoint}/sales-indent`
+    },
+  },
+
+  PurchaseIndentEnpoints:{
+    getPurchaseIndent:{
+      method:"GET",
+      endpoint:`${defaultEndPoint}/purchase-indent`
+    },
+    getPurchaseIndentById: {
+      method: "GET",
+      endpoint: `${defaultEndPoint}/purchase-indent`
     },
   }
 });

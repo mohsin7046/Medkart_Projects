@@ -8,113 +8,166 @@ import { prisma } from '../utilities/import.config.js'
 
 const PurchaseOrderRepo = new PurchaseOrderRepository();
 
-export const createPurchaseOrderAgainstPurchaseIndentService = async ({purchase_indent_ids}) => {
+export const createPurchaseOrderAgainstPurchaseIndentService = async (data) => {
   try {
-    console.log(purchase_indent_ids);
-  
-    const pendingIndents = await prisma.purchaseIndent.findMany({
-      where: { 
-        status: STATUS.PENDING, 
-        id: { in: purchase_indent_ids }
+    console.log(data);
+
+    const pendingPurchaseIndents = await prisma.purchaseIndent.findMany({
+      where: {
+        status: STATUS.PENDING,
+        vendor_id: data.vendor_id
       },
-      select: {
-        id: true,
-        product_id: true,
-        vendor_id: true,
-        sale_ident_ids: true,
-        total_order_qty: true,
-        total_amount: true
+      include: { items: true }
+    });
+
+    const incomingProductsMap = new Map();
+
+    data.items.forEach((item) => {
+      incomingProductsMap.set(item.product_id, item.ordered_qty);
+    });
+
+    const matchedItems = pendingPurchaseIndents.flatMap((indent) =>
+      indent.items.filter((item) => incomingProductsMap.has(item.product_id))
+    );
+
+
+    const updates = [];
+    const excessQuantityMap = new Map();
+
+    matchedItems.forEach((item) => {
+      const orderedQty = incomingProductsMap.get(item.product_id);
+      const currentOrderQty = item.order_qty || 0;
+      const qtyToBeOrder = item.qty_to_be_order;
+      const remainingQty = orderedQty - qtyToBeOrder;
+      const newOrderQty = Math.min(currentOrderQty + orderedQty, qtyToBeOrder);
+      const excessQty = 0;
+      if (remainingQty > 0) {
+        excessQty = remainingQty;
+      }
+
+      console.log();
+
+      if (excessQty > 0 && remainingQty > 0) {
+        const currentExcess = excessQuantityMap.get(item.product_id) || 0;
+        excessQuantityMap.set(item.product_id, currentExcess + excessQty);
+      }
+
+      updates.push(
+        prisma.purchaseIndentItem.update({
+          where: { id: item.id },
+          data: { order_qty: newOrderQty }
+        })
+      );
+    });
+
+    console.log('Excess Quantities:', excessQuantityMap);
+
+    const matchedProductIds = new Set(matchedItems.map(item => item.product_id));
+
+    data.items.forEach((item) => {
+      if (!matchedProductIds.has(item.product_id)) {
+        const currentExcess = excessQuantityMap.get(item.product_id) || 0;
+        excessQuantityMap.set(item.product_id, currentExcess + item.ordered_qty);
       }
     });
 
-    console.log(pendingIndents);
-    
-    if (!pendingIndents.length) {
-      console.log("No pending PurchaseIndents to convert.");
-      return { success: true, message: "No pending indents found", count: 0 };
+    excessQuantityMap.forEach((excessQty, productId) => {
+      updates.push(
+        prisma.product.update({
+          where: { id: productId },
+          data: {
+            inventory_qty: {
+              increment: excessQty
+            }
+          }
+        })
+      );
+    });
+
+    const indentItemsMap = new Map();
+
+    matchedItems.forEach((item) => {
+      if (!indentItemsMap.has(item.purchase_indent_id)) {
+        indentItemsMap.set(item.purchase_indent_id, []);
+      }
+      indentItemsMap.get(item.purchase_indent_id).push(item);
+    });
+
+    for (const [indentId, items] of indentItemsMap.entries()) {
+      const indent = pendingPurchaseIndents.find(pi => pi.id === indentId);
+
+      console.log('Indent Items:', items);
+
+      let totalOrderedQty = indent.total_order_qty || 0;
+
+      items.forEach((item) => {
+        const orderedQty = incomingProductsMap.get(item.product_id);
+        const currentOrderQty = item.order_qty || 0;
+        const qtyToBeOrder = item.qty_to_be_order;
+        const remainingQty = qtyToBeOrder - currentOrderQty;
+        const allocatedQty = Math.min(orderedQty, remainingQty);
+
+        totalOrderedQty += allocatedQty;
+      });
+
+      const totalQtyToBeOrder = indent.total_qty_to_be_order;
+      const finalTotalOrderQty = Math.min(totalQtyToBeOrder, totalOrderedQty);
+
+      updates.push(
+        prisma.purchaseIndent.update({
+          where: { id: indentId },
+          data: {
+            total_order_qty: finalTotalOrderQty,
+            status: finalTotalOrderQty == totalQtyToBeOrder ? STATUS.COMPLETED : STATUS.PENDING
+          }
+        })
+      );
     }
 
-    const vendorGroups = pendingIndents.reduce((acc, indent) => {
-      if (!acc.has(indent.vendor_id)) {
-        acc.set(indent.vendor_id, {
-          purchase_indent_ids: [],
-          total_amount: 0,
-          total_order_qty: 0,
-          products: []
-        });
+    const purchaseOrderData = {
+      order_number: generateRandom(PREFIX.ORDER),
+      vendor_id: data.vendor_id,
+      purchase_indent_id: pendingPurchaseIndents[0]?.id || null,
+      order_date: new Date(),
+      total_amount: data.items.reduce((sum, item) => {
+        const itemTotal = item.ordered_qty * item.net_cost_per_qty;
+        return sum + itemTotal;
+      }, 0),
+      total_order_qty: data.items.reduce((sum, item) => sum + item.ordered_qty, 0),
+      status: STATUS.SENT,
+      products: {
+        create: data.items.map((item) => ({
+          product_id: item.product_id,
+          ordered_qty: item.ordered_qty,
+          total_amount: item.ordered_qty * item.net_cost_per_qty,
+          net_cost_per_qty: item.net_cost_per_qty
+        }))
       }
-      
-      const group = acc.get(indent.vendor_id);
-      group.purchase_indent_ids.push(indent.id);
-      group.total_amount += indent.total_amount;
-      group.total_order_qty += indent.total_order_qty;
-      group.products.push({
-        id: indent.id,
-        product_id: indent.product_id,
-        ordered_qty: indent.total_order_qty,
-        amount: indent.total_amount
-      });
-      
-      return acc;
-    }, new Map());
+    };
 
-    console.log("VendorGroups", vendorGroups);
+    updates.push(
+      prisma.purchaseOrder.create({
+        data: purchaseOrderData,
+        include: { products: true }
+      })
+    );
 
+    const result = await prisma.$transaction(updates);
 
-    const result = await prisma.$transaction(async (tx) => {
-      const createdOrders = [];
+    const createdPurchaseOrder = result[result.length - 1];
 
-      
-      for (const [vendorId, group] of vendorGroups.entries()) {
-      
-        const purchaseOrder = await tx.purchaseOrder.create({
-          data: {
-            order_number: generateRandom(PREFIX.ORDER),
-            vendor_id: vendorId,
-            order_date: new Date(),
-            total_order_qty: group.total_order_qty,
-            total_amount: group.total_amount,
-            status: STATUS.PENDING,
-          },
-        });
-
-        createdOrders.push(purchaseOrder);
-
-        await tx.purchaseOrderProduct.createMany({
-          data: group.products.map(indent => ({
-            purchase_order_id: purchaseOrder.id,
-            product_id: indent.product_id,
-            ordered_qty: indent.ordered_qty,
-            total_amount: indent.amount,
-          }))
-        });
-
-        await tx.purchaseIndent.updateMany({
-          where: { 
-            id: { in: group.purchase_indent_ids }
-          },
-          data: {
-            status: STATUS.ACCEPTED,
-          }
-        });
-      }
-
-      return createdOrders;
-    });
-
-    console.log(`✅ Created ${result.length} PurchaseOrders from ${pendingIndents.length} PurchaseIndents.`);
-    
-    return { 
-      success: true, 
-      purchaseOrders: result, 
-      count: result.length 
+    return {
+      success: true,
+      purchaseOrder: createdPurchaseOrder,
+      excessQuantities: Object.fromEntries(excessQuantityMap),
+      message: 'Purchase Order created and Purchase Indents updated successfully'
     };
 
   } catch (error) {
     poLogger.error(`❌ Failed to create Purchase Order | Error: ${error.message}`);
     throw error;
   }
-}
+};
 
 
 

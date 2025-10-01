@@ -44,7 +44,8 @@ function PurchaseOrder() {
 
   const { deleteItem } = useDeleteData(
     ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.endpoint,
-    ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.method
+    ALLEndpoint.PurchaseOrderEndpoints.deletePurchaseOrder.method,
+    "Sure You want to cancel PO"
   );
 
   const handleDelete = (order) => {
@@ -53,6 +54,7 @@ function PurchaseOrder() {
       alert(`Cannot delete a ${order.status} order.`);
       return;
     }
+
     const order_id = order.id;
 
     deleteItem({
@@ -95,30 +97,15 @@ function PurchaseOrder() {
       onFilter={handleFilter}
       onSort={handleSort}
       onAdd={() => navigate(ROUTES.PURCHASE_ORDER.ADD)}
-      onEdit={(order) =>
-        navigate(ROUTES.PURCHASE_ORDER.EDIT(order.id))
-      }
+      // onEdit={(order) =>
+      //   navigate(ROUTES.PURCHASE_ORDER.EDIT(order.id))
+      // }
       onView={(order) =>{
+      
         navigate(ROUTES.PURCHASE_ORDER.VIEW('purchaseOrder', order.id))
       }
       }
-
       onDelete={(order) => {handleDelete(order)}}
-      extraAction={(order) => {
-        const isDisabled = [STATUS.COMPLETED,STATUS.CANCELLED].includes(order.status);
-        return (
-          <button
-            disabled={isDisabled}
-            onClick={() =>
-              navigate(ROUTES.GRN.ADD(order.id))
-            }
-            className={`bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition-colors ${isDisabled ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-          >
-            Create GRN
-          </button>
-        );
-      }}
     />
   );
 }

@@ -11,9 +11,9 @@ import { ENTITY, STATUSCODE } from '../../utilities/constant.js'
 export const createPurchaseOrderAgainstPurchaseIndent = catchAsync(async (req, res) => {
   req.component = ENTITY.po; 
 
-  const purchase_indent_ids = req.body;
-  
-  const newPO = await createPurchaseOrderAgainstPurchaseIndentService(purchase_indent_ids);
+  const data = req.body;
+
+  const newPO = await createPurchaseOrderAgainstPurchaseIndentService(data);
 
   return successResponse(res, newPO, 'Successfully created Purchase Order', STATUSCODE.OK);
 })

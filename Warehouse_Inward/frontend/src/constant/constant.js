@@ -13,7 +13,8 @@ export const STATUS = Object.freeze({
   DISPATCHED:"dispatched",
   NOT_DISPATCHED:"not dispatched",
   OPEN:'open',
-  CLOSED:'closed'
+  CLOSED:'closed',
+  SENT:'PO SENT'
 })
 
 export const categories = Object.freeze([
@@ -53,4 +54,5 @@ export const STATUS_COLORS = Object.freeze({
   [STATUS.NOT_DISPATCHED]: "bg-red-100 text-red-800",
   [STATUS.OPEN]: "bg-blue-100 text-blue-800",
   [STATUS.CLOSED]: "bg-gray-300 text-gray-800",
+  [STATUS.SENT] : "bg-blue-100 text-blue-800"
 });

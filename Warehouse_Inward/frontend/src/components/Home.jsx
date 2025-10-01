@@ -13,6 +13,7 @@ function Home() {
     else if (location.pathname.includes("purchase-invoice")) setSelected("purchase-invoice")
     else if (location.pathname.includes("sales-order")) setSelected("sales-order")
     else if (location.pathname.includes("sales-indent")) setSelected("sales-indent")
+    else if (location.pathname.includes("purchase-indent")) setSelected("purchase-indent")
   }, [location.pathname])
 
   return (
@@ -42,16 +43,7 @@ function Home() {
               Vendor Master
             </Link>
 
-            <Link
-              to="/purchase-order"
-              onClick={() => setSelected("purchase-order")}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                selected === "purchase-order" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
-              }`}
-            >
-              PurchaseOrder
-            </Link>
-
+  
             <Link
               to="/grn"
               onClick={() => setSelected("grn")}
@@ -89,6 +81,24 @@ function Home() {
               }`}
             >
               Sales Indent
+            </Link>
+            <Link
+              to="purchase-indent"
+              onClick={() => setSelected("purchase-indent")}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                selected === "purchase-indent" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              Purchase Indent
+            </Link>
+            <Link
+              to="/purchase-order"
+              onClick={() => setSelected("purchase-order")}
+              className={`px-3 py-1 rounded-md text-sm font-medium ${
+                selected === "purchase-order" ? "bg-gray-900 text-white" : "text-gray-300 hover:text-white"
+              }`}
+            >
+              PurchaseOrder
             </Link>
 
           </div>

@@ -1,12 +1,11 @@
 import { toast } from "react-toastify";
 import { useCallback } from "react";
 
-export const useDeleteData = (endpoint, method = "DELETE") => {
+export const useDeleteData = (endpoint, method = "DELETE",msg) => {
   const deleteItem = useCallback(
     async ({ idField, idValue, setState }) => {
      
-      
-      if (window.confirm("Are you sure you want to delete this item?")) {
+      if (window.confirm(msg||"Are you sure you want to delete this item?")) {
         try {
           const response = await fetch(endpoint, {
             method,

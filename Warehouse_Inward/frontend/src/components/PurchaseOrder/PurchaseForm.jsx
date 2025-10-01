@@ -18,10 +18,11 @@ function PurchaseOrderForm() {
     vendor_id: "",
     vendor_name: "",
     order_date: "",
-    expected_delivery_date: "",
-    items: [{ product_id: "", product_name: "", quantity: "", item_price: "", item_mrp: "" }],
+    total_amount: "",
+    total_order_qty: "",
+    items: [{ product_id: "", product_name: "", ordered_qty: "", net_cost_per_qty: "" }],
   });
-
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     if (!id) return;
@@ -44,9 +45,8 @@ function PurchaseOrderForm() {
             return {
               product_id: productActive ? item.product_id : "",
               product_name: productActive ? item.product.name : "",
-              quantity: item.quantity,
-              item_price: item.item_price,
-              item_mrp: item.item_mrp,
+              ordered_qty: item.quantity?.toString() || "",
+              net_cost_per_qty: item.item_price?.toString() || "",
             };
           }) || [];
 
@@ -67,7 +67,6 @@ function PurchaseOrderForm() {
     })();
   }, [id]);
 
-
   const updateField = (name, value) => {
     setFormDirty(true);
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -85,37 +84,42 @@ function PurchaseOrderForm() {
   const addItem = () =>
     setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, { product_id: "", product_name: "", quantity: "", item_price: "", item_mrp: "" }],
+      items: [...prev.items, { product_id: "", product_name: "", ordered_qty: "", net_cost_per_qty: "" }],
     }));
 
   const removeItem = (index) =>
     setFormData((prev) => ({ ...prev, items: prev.items.filter((_, i) => i !== index) }));
 
-  const handleVendorSelect = (vendor) => updateField("vendor_id", vendor.id);
-  const handleProductSelect = (index, product) => updateItem(index, "product_id", product.id);
+  const handleVendorSelect = (vendor) => {
+    updateField("vendor_id", vendor.id);
+    updateField("vendor_name", vendor.name);
+  };
 
+  const handleProductSelect = (index, product) => {
+    updateItem(index, "product_id", product.id);
+    updateItem(index, "product_name", product.name);
+  };
 
   const confirmNavigation = (path) => {
     if (formDirty && !window.confirm("Unsaved changes will be lost. Continue?")) return;
     navigate(path);
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const normalizedData = {
-      vendor_id: formData.vendor_id,
-      order_date: formData.order_date,
-      expected_delivery_date: formData.expected_delivery_date,
+       ...(id && {order_date:formData.order_date }),
+      vendor_id: parseInt(formData.vendor_id),
       items: formData.items.map((i) => ({
-        product_id: i.product_id,
-        quantity: parseFloat(i.quantity) || 0,
-        item_price: parseFloat(i.item_price) || 0,
-        item_mrp: parseFloat(i.item_mrp) || 0,
+        product_id: parseInt(i.product_id),
+        net_cost_per_qty: parseFloat(i.net_cost_per_qty) || 0,
+        ordered_qty: parseFloat(i.ordered_qty) || 0,
       })),
     };
+
+    console.log(normalizedData);
 
     try {
       const endpoint = id
@@ -130,9 +134,30 @@ function PurchaseOrderForm() {
 
       const data = await res.json();
       if (!res.ok) {
-        (Array.isArray(data.message) ? data.message : [data]).forEach((err) =>
-          toast.error(err.field ? `${err.field}: ${err.message}` : err.message || "Error")
-        );
+        let errorList = [];
+
+        if (Array.isArray(data.message)) {
+          errorList = data.message;
+          toast.error("Multiple errors occurred");
+        } else {
+          errorList = [{ message: data.message }];
+          toast.error(data.message);
+        }
+
+        const newErrors = {};
+        errorList.forEach((err) => {
+          if (err.field?.startsWith("items.")) {
+            const [, idx, fieldName] = err.field.split(".");
+            if (!newErrors.items) newErrors.items = {};
+            if (!newErrors.items[idx]) newErrors.items[idx] = {};
+            newErrors.items[idx][fieldName] = err.message;
+          } else if (err.field) {
+            newErrors[err.field] = err.message;
+          }
+        });
+
+        console.log(newErrors);
+        setErrors(newErrors);
         return;
       }
 
@@ -145,6 +170,10 @@ function PurchaseOrderForm() {
     }
   };
 
+  const selectedProductIds = formData.items
+    .map((item) => item.product_id)
+    .filter(Boolean);
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 px-4">
       <div className="w-full max-w-5xl bg-white shadow-lg rounded-xl p-8">
@@ -155,99 +184,121 @@ function PurchaseOrderForm() {
         {loading && <p className="text-center text-blue-600 mb-4">Loading...</p>}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-
           <div>
-            
-            <SearchSelect type="vendor" value={formData.vendor_name} onSelect={handleVendorSelect} />
+            <label className="block text-gray-700 font-medium mb-1">
+              Vendor <span className="text-red-500">*</span>
+            </label>
+            <SearchSelect type="vendor" value={formData.vendor_name} onSelect={handleVendorSelect} selectedIds={[]} />
+            {errors.vendor_id && (
+              <span className="text-red-500 text-xs mt-1">{errors.vendor_id}</span>
+            )}
           </div>
-
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InputField label="Order Date" type="date" name="order_date" value={formData.order_date} onChange={(e) => updateField("order_date", e.target.value)} required />
-            <InputField label="Expected Delivery Date" type="date" name="expected_delivery_date" value={formData.expected_delivery_date} onChange={(e) => updateField("expected_delivery_date", e.target.value)} required />
+            <div>
+              <InputField
+                label="Order Date"
+                type="date"
+                name="order_date"
+                value={formData.order_date}
+                onChange={(e) => updateField("order_date", e.target.value)}
+                required
+                readOnly
+              />
+              {errors.order_date && (
+                <span className="text-red-500 text-xs mt-1">{errors.order_date}</span>
+              )}
+            </div>
           </div>
-
 
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">
               Items <span className="text-red-500">*</span>
             </h3>
 
-            {formData.items.map((item, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end border rounded-lg p-4 bg-gray-50"
-              >
-       
-                <div className="md:col-span-4">
-                  <SearchSelect
-                    type="product"
-                    value={item.product_name}
-                    onSelect={(p) => handleProductSelect(index, p)}
-                  />
-                </div>
+            {formData.items.map((item, index) => {
+              const itemErrors = errors.items?.[index] || {};
 
-              
-                <div className="md:col-span-2">
-                  <InputField
-                    label="Qty"
-                    type="number"
-                    name="quantity"
-                    value={item.quantity}
-                    onChange={(e) => updateItem(index, "quantity", e.target.value)}
-                    min="0"
-                  />
-                </div>
+              return (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start border rounded-lg p-4 bg-gray-50"
+                >
+                  <div className="md:col-span-4 flex flex-col">
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Product <span className="text-red-500">*</span>
+                    </label>
+                    <SearchSelect
+                      type="product"
+                      value={item.product_name}
+                      onSelect={(p) => handleProductSelect(index, p)}
+                      selectedIds={selectedProductIds.filter(
+                        (id) => id !== item.product_id
+                      )}
+                    />
+                    {itemErrors.product_id && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.product_id}</span>
+                    )}
+                  </div>
 
-              
-                <div className="md:col-span-2">
-                  <InputField
-                    label="Price"
-                    type="number"
-                    name="item_price"
-                    value={item.item_price}
-                    onChange={(e) => updateItem(index, "item_price", e.target.value)}
-                    min="0"
-                    step="any"
-                  />
-                </div>
+                  <div className="md:col-span-2 flex flex-col">
+                    <InputField
+                      label="Qty"
+                      type="number"
+                      name="ordered_qty"
+                      value={item.ordered_qty}
+                      onChange={(e) => updateItem(index, "ordered_qty", e.target.value)}
+                      min="0"
+                    />
+                    {itemErrors.ordered_qty && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.ordered_qty}</span>
+                    )}
+                  </div>
 
-                
-                <div className="md:col-span-2">
-                  <InputField
-                    label="MRP"
-                    type="number"
-                    name="item_mrp"
-                    value={item.item_mrp}
-                    onChange={(e) => updateItem(index, "item_mrp", e.target.value)}
-                    min="0"
-                    step="any"
-                  />
-                </div>
+                  <div className="md:col-span-3 flex flex-col">
+                    <InputField
+                      label="Net Cost Per Qty"
+                      type="number"
+                      name="net_cost_per_qty"
+                      value={item.net_cost_per_qty}
+                      onChange={(e) => updateItem(index, "net_cost_per_qty", e.target.value)}
+                      min="0"
+                      step="any"
+                    />
+                    {itemErrors.net_cost_per_qty && (
+                      <span className="text-red-500 text-xs mt-1">{itemErrors.net_cost_per_qty}</span>
+                    )}
+                  </div>
 
-               
-                <div className="md:col-span-2 flex justify-center ">
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                  >
-                    Remove
-                  </button>
+                  <div className="md:col-span-2 flex justify-center items-end pb-2">
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <Button type="button" variant="primary" onClick={addItem}>
               + Add Item
             </Button>
           </div>
 
-
-
           <div className="flex justify-between">
-            <Button type="button" variant="secondary" onClick={() => confirmNavigation(ROUTES.PURCHASE_ORDER.LIST)}>Back</Button>
-            <Button type="submit" variant="primary" loading={loading}>{id ? "Update Order" : "Submit"}</Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => confirmNavigation(ROUTES.PURCHASE_ORDER.LIST)}
+            >
+              Back
+            </Button>
+            <Button type="submit" variant="primary" loading={loading}>
+              {id ? "Update Order" : "Submit"}
+            </Button>
           </div>
         </form>
       </div>

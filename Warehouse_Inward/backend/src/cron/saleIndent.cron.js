@@ -2,6 +2,7 @@ import cron from 'node-cron'
 import { prisma } from '../utilities/import.config.js'
 import { PREFIX, STATUS } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
+import { decimalConversion } from '../utilities/decimal.conversion.js'
 
 cron.schedule('* * * * *', async () => {
   console.log('Starting indent expiry cron job at:', new Date())
@@ -11,106 +12,8 @@ cron.schedule('* * * * *', async () => {
   timezone: "Asia/Kolkata"
 })
 
-// async function createPurchaseIndents() {
-//   try {
-//     const openSalesIndents = await prisma.salesIndent.findMany({
-//       where: {
-//         status: STATUS.OPEN,
-//         expired_at: null
-//       },
-//     });
-
-//     if (!openSalesIndents.length) {
-//       console.log("No OPEN SalesIndents found.");
-//       return;
-//     }
-
-//     const tx = [];
-
-//     for (const sIndent of openSalesIndents) {
-
-//       const salesOrderProducts = await prisma.salesOrderProduct.findMany({
-//         where: {
-//           product_id: sIndent.product_id,
-//           sales_order_id: { in: sIndent.sale_order_IDs },
-//           remaining_qty: { gt: 0 }
-//         },
-//         select: {
-//           product_id: true,
-//           vendor_id: true,
-//           ordered_qty: true,
-//           remaining_qty: true,
-//           allocated_qty: true,
-//           total_amount: true,
-//           salesOrder: {
-//             select: {
-//               order_type: true
-//             }
-//           }
-//         },
-
-//       });
-
-//       const vendorMap = new Map();
-
-//       for (const p of salesOrderProducts) {
-//         const key = `${p.product_id}_${p.vendor_id}`;
-
-//         if (!vendorMap.has(key)) {
-//           vendorMap.set(key, { B2B: 0, B2C: 0, total_amount: 0, product_id: p.product_id, vendor_id: p.vendor_id, sale_ident_ids: [] });
-//         }
-
-//         const v = vendorMap.get(key);
-
-//         if (p.salesOrder.order_type === "B2B") {
-//           v.B2B += p.remaining_qty;
-//         } else if (p.salesOrder.order_type === "B2C") {
-//           v.B2C += p.remaining_qty;
-//         }
-
-//         v.total_amount += p.total_amount;
-//         if (!v.sale_ident_ids.includes(sIndent.id)) {
-//           v.sale_ident_ids.push(sIndent.id);
-//         }
-//       }
-
-//       console.log("VendorMap : ", vendorMap);
-
-//       for (const [key, v] of vendorMap.entries()) {
-//         tx.push(
-//           prisma.purchaseIndent.create({
-//             data: {
-//               purchase_indent_number: generateRandom(PREFIX.PURCHASE_IDENT),
-//               product_id: v.product_id,
-//               vendor_id: v.vendor_id,
-//               sale_ident_ids: v.sale_ident_ids,
-//               B2B_order_qty: v.B2B,
-//               B2C_order_qty: v.B2C,
-//               total_order_qty: v.B2B + v.B2C,
-//               total_amount: v.total_amount,
-//               status: STATUS.PENDING
-//             }
-//           })
-//         );
-//       }
-//       tx.push(
-//         prisma.salesIndent.update({
-//           where: { id: sIndent.id },
-//           data: { status: STATUS.CLOSED, expired_at: new Date() }
-//         })
-//       );
-//     }
-
-//     await prisma.$transaction(tx);
-//     console.log(`✅ Created ${tx.length} PurchaseIndents.`);
-//   } catch (err) {
-//     console.error("Error creating PurchaseIndents:", err);
-//   }
-// }
-
 async function createPurchaseIndents() {
   try {
-    
     const openSalesIndents = await prisma.salesIndent.findMany({
       where: {
         status: STATUS.OPEN,
@@ -119,7 +22,7 @@ async function createPurchaseIndents() {
       include: {
         salesOrders: {
           select: {
-            salesOrderId: true
+            sales_order_id: true
           }
         }
       }
@@ -130,15 +33,13 @@ async function createPurchaseIndents() {
       return;
     }
 
-  
     const allSalesOrderIds = [
       ...new Set(
         openSalesIndents.flatMap(indent => 
-          indent.salesOrders.map(so => so.salesOrderId)
+          indent.salesOrders.map(so => so.sales_order_id)
         )
       )
     ];
-
     
     const allSalesOrderProducts = await prisma.salesOrderProduct.findMany({
       where: {
@@ -159,13 +60,12 @@ async function createPurchaseIndents() {
       }
     });
 
-    const tx = [];
+    const globalVendorMap = new Map();
 
     for (const sIndent of openSalesIndents) {
   
-      const indentSalesOrderIds = sIndent.salesOrders.map(so => so.salesOrderId);
+      const indentSalesOrderIds = sIndent.salesOrders.map(so => so.sales_order_id);
 
-     
       const salesOrderProducts = allSalesOrderProducts.filter(
         p => p.product_id === sIndent.product_id && 
              indentSalesOrderIds.includes(p.sales_order_id)
@@ -174,12 +74,9 @@ async function createPurchaseIndents() {
       if (!salesOrderProducts.length) {
         continue;
       }
-
-      const vendorMap = new Map();
-
       for (const p of salesOrderProducts) {
-        if (!vendorMap.has(p.vendor_id)) {
-          vendorMap.set(p.vendor_id, {
+        if (!globalVendorMap.has(p.vendor_id)) {
+          globalVendorMap.set(p.vendor_id, {
             B2B: 0,
             B2C: 0,
             total_amount: 0,
@@ -187,7 +84,7 @@ async function createPurchaseIndents() {
           });
         }
 
-        const v = vendorMap.get(p.vendor_id);
+        const v = globalVendorMap.get(p.vendor_id);
 
         if (p.salesOrder.order_type === "B2B") {
           v.B2B += p.remaining_qty;
@@ -204,36 +101,40 @@ async function createPurchaseIndents() {
         productData.qty += p.remaining_qty;
         productData.amount += p.total_amount;
       }
+    }
 
-      console.log("VendorMap for indent", sIndent.indent_number, ":", vendorMap);
+    console.log("Global VendorMap:", globalVendorMap);
 
-      for (const [vendorId, v] of vendorMap.entries()) {
-        const purchaseIndentNumber = generateRandom(PREFIX.PURCHASE_IDENT);
+    const tx = [];
 
-        const items = Array.from(v.products.entries()).map(([productId, data]) => ({
-          product_id: productId,
-          order_qty: data.qty,
-          total_amount: data.amount
-        }));
+    for (const [vendorId, v] of globalVendorMap.entries()) {
+      const purchaseIndentNumber = generateRandom(PREFIX.PURCHASE_IDENT);
 
-        tx.push(
-          prisma.purchaseIndent.create({
-            data: {
-              purchase_indent_number: purchaseIndentNumber,
-              vendor_id: vendorId,
-              B2B_order_qty: v.B2B,
-              B2C_order_qty: v.B2C,
-              total_order_qty: v.B2B + v.B2C,
-              total_amount: v.total_amount,
-              status: STATUS.PENDING,
-              items: {
-                create: items
-              }
+      const items = Array.from(v.products.entries()).map(([productId, data]) => ({
+        product_id: productId,
+        qty_to_be_order: data.qty,
+        total_amount: decimalConversion(data.amount)
+      }));
+
+      tx.push(
+        prisma.purchaseIndent.create({
+          data: {
+            purchase_indent_number: purchaseIndentNumber,
+            vendor_id: vendorId,
+            B2B_order_qty: v.B2B,
+            B2C_order_qty: v.B2C,
+            total_qty_to_be_order: v.B2B + v.B2C,
+            total_amount: decimalConversion(v.total_amount),
+            status: STATUS.PENDING,
+            items: {
+              create: items
             }
-          })
-        );
-      }
+          }
+        })
+      );
+    }
 
+    for (const sIndent of openSalesIndents) {
       tx.push(
         prisma.salesIndent.update({
           where: { id: sIndent.id },
@@ -251,7 +152,8 @@ async function createPurchaseIndents() {
     }
 
     await prisma.$transaction(tx);
-    console.log(`✅ Created ${tx.length / 2} PurchaseIndents with items.`);
+    console.log(`✅ Created ${globalVendorMap.size} PurchaseIndents with items.`);
+    console.log(`✅ Closed ${openSalesIndents.length} SalesIndents.`);
   } catch (err) {
     console.error("Error creating PurchaseIndents:", err);
     throw err;

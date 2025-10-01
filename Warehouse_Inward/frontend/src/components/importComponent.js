@@ -1,4 +1,3 @@
-
 import Home from "./Home";
 import Product from "./ProductMaster/Product";
 import ProductForm from "./ProductMaster/productForm";
@@ -13,6 +12,7 @@ import PurchaseInvoiceForm from "./PurchaseInvoice/PurchaseInvoiceForm";
 import SalesOrder from "./SalesOrder/salesOrder";
 import SalesOrderForm from "./SalesOrder/SalesOrderForm";
 import { SalesIndent } from "./SalesIndent/SalesIndent";
+import PurchaseIndent from "./PurchaseIndent/purchaseIndent";
 
 export {
   Home,
@@ -28,5 +28,6 @@ export {
   PurchaseInvoiceForm,
   SalesOrder,
   SalesOrderForm,
-  SalesIndent
+  SalesIndent,
+  PurchaseIndent
 };

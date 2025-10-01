@@ -1,24 +1,34 @@
-import { STATUS } from "./constant.js";
+import { STATUS, STATUS_COLORS } from "./constant.js";
 import { ALLEndpoint } from "./endPoints.js";
 
 export const VIEW_CONFIG = {
   purchaseOrder: {
-    title: "Purchase Order Details",
-    endpoint: ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint,
-    headerFields: [
-      { label: "Order Number", key: "order_number" },
-      { label: "Date", key: "order_date", isDate: true },
-      { label: "Total Amount", key: "total_amount", isCurrency: true },
-      { label: "Status", key: "status", isStatus: true },
-    ],
-    itemKey: "purchaseOrderItems",
-    itemColumns: [
-      { label: "Product ID", key: "product_id" },
-      { label: "Quantity", key: "quantity" },
-      { label: "Price", key: "item_price", isCurrency: true },
-      { label: "Total", key: "totalAmount", isCurrency: true },
-    ],
-  },
+  title: "Purchase Order Details",
+  endpoint: ALLEndpoint.PurchaseOrderEndpoints.getPurchaseOrderById.endpoint,
+
+  headerFields: [
+    { label: "Order Number", key: "order_number" },
+    { label: "Vendor Name", key: "vendor.name" },
+    { label: "Order Date", key: "order_date", isDate: true },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+    { label: "Total Order Qty", key: "total_order_qty" },
+    { label: "Status", key: "status", isStatus: true },
+    { label: "Created At", key: "created_at", isDate: true },
+  ],
+
+  itemKey: "products",
+
+  itemColumns: [
+    { label: "Product Name", key: "product.name" },
+    { label: "Product Category", key: "product.category" },
+    { label: "Product Combination", key: "product.combination" }, 
+    { label: "GST %", key: "product.gst_percentage" },
+    { label: "Ordered Qty", key: "ordered_qty" },
+    { label: "Net Cost / Qty", key: "net_cost_per_qty", isCurrency: true },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+  ],
+  backgroundStatus: (status) => STATUS_COLORS[status] || "bg-gray-100 text-gray-800",
+},
 
   grn: {
     title: "GRN Details",  
@@ -106,16 +116,16 @@ export const VIEW_CONFIG = {
       showWhen: (data) => ![STATUS.PROCESSING,STATUS.PARTIAL_RECEVIED,STATUS.ALLOCATED].includes(data.status),
     },
   ],
+  backgroundStatus : (status) => STATUS_COLORS[status]
 },
 
 salesIndent: {
   title: "Sales Indent Details",
   endpoint: ALLEndpoint.SalesIndentEndpoints.getSalesIndentById.endpoint,
 
-
   headerFields: [
     { label: "Indent Number", key: "indent_number" },
-    { label: "Status", key: "status", isStatus: true },
+    { label: "Status", key: "status", isStatus: true},
     { label: "Total Sales Order", key: "total_sales_order" },
     { label: "Total Remain Product", key: "total_remain_product" },
     { label: "Created At", key: "created_at", isDate: true },
@@ -139,5 +149,37 @@ salesIndent: {
     { label: "Vendor Name", key: "vendor_name" },
     { label: "Order Status", key: "order_status", isStatus: true },
   ],
+  backgroundStatus : (status) => STATUS_COLORS[status]
+},
+
+purchaseIndent: {
+  title: "Purchase Indent Details",
+  endpoint: ALLEndpoint.PurchaseIndentEnpoints.getPurchaseIndentById.endpoint,
+
+  headerFields: [
+    { label: "Purchase Indent Number", key: "purchase_indent_number" },
+    { label: "Vendor Name", key: "vendor.name" },
+    { label: "B2B Order Qty", key: "B2B_order_qty" },
+    { label: "B2C Order Qty", key: "B2C_order_qty" },
+    { label: "Total Qty To Be Ordered", key: "total_qty_to_be_order" },
+    { label: "Total Order Qty", key: "total_order_qty" },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+    { label: "Status", key: "status", isStatus: true },
+    { label: "Created At", key: "created_at", isDate: true },
+  ],
+
+  itemKey: "items",
+
+  itemColumns: [
+     { label: "Product Name", key: "product.name" },
+    { label: "Product Category", key: "product.category" },
+    { label: "Product Combination", key: "product.combination" },
+    { label: "Product GST %", key: "product.gst_percentage" },
+    { label: "Qty To Be Ordered", key: "qty_to_be_order" },
+    { label: "Ordered Qty", key: "order_qty" },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+  ],
+
+  backgroundStatus: (status) => STATUS_COLORS[status],
 }
-};
+}
