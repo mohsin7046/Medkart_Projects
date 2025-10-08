@@ -16,7 +16,11 @@ import {
   SalesOrder,
   SalesOrderForm,
   SalesIndent,
-  PurchaseIndent
+  PurchaseIndent,
+  GatePass,
+  GatePassForm,
+  Mrp_ptr_ratio,
+  MRP_PTR_RATIO_FORM
 } from "./components/importComponent.js";
 import CommonView from "./components/utility/CommonView.jsx";
 
@@ -56,7 +60,7 @@ function App() {
           <Route path={ROUTES.PURCHASE_INVOICE.ADD()} element={<PurchaseInvoiceForm />} />
 
           <Route path={ROUTES.SALES_ORDER.LIST} element={<SalesOrder />} />
-       <Route path={ROUTES.SALES_ORDER.ADD} element={<SalesOrderForm />} />
+          <Route path={ROUTES.SALES_ORDER.ADD} element={<SalesOrderForm />} />
           <Route path={ROUTES.SALES_ORDER.EDIT()} element={<SalesOrderForm />} />
 
           <Route path={ROUTES.SALES_INDENT.LIST} element={<SalesIndent />} />
@@ -64,6 +68,14 @@ function App() {
           <Route path={ROUTES.COMMON_VIEW.VIEW} element={<CommonView />} />
 
           <Route path={ROUTES.PURCHASE_INDENT.LIST} element={<PurchaseIndent />} />
+
+          <Route path={ROUTES.GATEPASS.LIST} element={<GatePass />} />
+          <Route path={ROUTES.GATEPASS.ADD} element={<GatePassForm />} />
+          <Route path={ROUTES.GATEPASS.EDIT()} element={<GatePassForm />} />
+
+          <Route path={ROUTES.MRP_PTR_RATIO.LIST} element={<Mrp_ptr_ratio />} />
+          <Route path={ROUTES.MRP_PTR_RATIO.ADD} element={<MRP_PTR_RATIO_FORM />} />
+          <Route path={ROUTES.MRP_PTR_RATIO.EDIT()} element={<MRP_PTR_RATIO_FORM />} />
 
           
         </Routes>

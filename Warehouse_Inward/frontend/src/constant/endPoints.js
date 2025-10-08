@@ -154,6 +154,10 @@ export const ALLEndpoint = Object.freeze({
       method: "POST",
       endpoint: `${defaultEndPoint}/sales-order/process`
     },
+    confirmSalesOrder:{
+      method: "POST",
+      endpoint: `${defaultEndPoint}/sales-order/confirm`
+    },
     getSalesOrderEdit:{
        method: "GET",
       endpoint: `${defaultEndPoint}/sales-order/edit`
@@ -180,5 +184,47 @@ export const ALLEndpoint = Object.freeze({
       method: "GET",
       endpoint: `${defaultEndPoint}/purchase-indent`
     },
+  },
+
+  GatePassEndpoints:{
+    addGatePass: {
+      method: "POST",
+      endpoint: `${defaultEndPoint}/gate-pass`
+    },
+    updateGatePass: {
+      method: "PUT",
+      endpoint: `${defaultEndPoint}/gate-pass`
+    },
+    getGatePass:{
+      method:'GET',
+      endpoint: `${defaultEndPoint}/gate-pass`
+    },
+    getGatePassById:{
+      method:'GET',
+      endpoint: `${defaultEndPoint}/gate-pass`
+    },
+    getGatePassByIdView:{
+      method:'GET',
+      endpoint: `${defaultEndPoint}/gate-pass/view`
+    }
+  },
+
+  Mrp_ptr_ratio_Endpoints:{
+    add_mrp_ptr_ratio: {
+      method: "POST",
+      endpoint: `${defaultEndPoint}/mrp_ptr_mapping`
+    },
+    update_mrp_ptr_ratio: {
+      method: "PUT",
+      endpoint: `${defaultEndPoint}/mrp_ptr_mapping`
+    },
+     get_mrp_ptr_ratioById:{
+      method:'GET',
+      endpoint: `${defaultEndPoint}/mrp_ptr_mapping`
+    },
+     get_mrp_ptr_ratio:{
+      method:'GET',
+      endpoint: `${defaultEndPoint}/mrp_ptr_mapping`
+    }
   }
 });

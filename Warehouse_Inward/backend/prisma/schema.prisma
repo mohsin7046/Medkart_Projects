@@ -29,9 +29,11 @@ model Vendor {
   updated_at     DateTime  @updatedAt
   deleted_at     DateTime?
 
-  purchaseOrders     PurchaseOrder[]
-  salesOrderProducts SalesOrderProduct[]
-  PurchaseIndent     PurchaseIndent[]
+  purchaseOrders           PurchaseOrder[]
+  PurchaseIndent           PurchaseIndent[]
+  GatePass                 GatePass[]
+  GoodReceiptNote          GoodReceiptNote[]
+  ProductVendorMrpPtrRatio ProductVendorMrpPtrRatio[]
 
   @@map("vendors")
 }
@@ -43,7 +45,7 @@ model Product {
   category            String
   combination         String[]
   product_mrp         Float
-  product_price       Float
+  product_ptr         Float
   last_purchase_price Float
   unit_of_measure     String
   description         String
@@ -55,54 +57,29 @@ model Product {
   deleted_at          DateTime?
   inventory_qty       Int?
 
-  purchaseOrderItems  PurchaseOrderProduct[]
-  GoodReceiptNoteItem GoodReceiptNoteItem[]
-  PurchaseInvoiceItem PurchaseInvoiceItem[]
-  salesOrderProducts  SalesOrderProduct[]
-  SalesIndent         SalesIndent[]
-  PurchaseIndentItem  PurchaseIndentItem[]
+  purchaseOrderItems       PurchaseOrderProduct[]
+  GoodReceiptNoteItem      GoodReceiptNoteItem[]
+  PurchaseInvoiceItem      PurchaseInvoiceItem[]
+  salesOrderProducts       SalesOrderProduct[]
+  SalesIndent              SalesIndent[]
+  PurchaseIndentItem       PurchaseIndentItem[]
+  ProductVendorMrpPtrRatio ProductVendorMrpPtrRatio[]
 
   @@map("products")
 }
 
-model GoodReceiptNote {
-  id            Int           @id @default(autoincrement())
-  grn_number    String        @unique
-  order_id      Int
-  purchaseOrder PurchaseOrder @relation(fields: [order_id], references: [id])
-  received_date DateTime
-  total_amount  Float
-  status        String        @default("pending") // pending, completed, cancelled
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+model ProductVendorMrpPtrRatio {
+  id            Int       @id @default(autoincrement())
+  product_id    Int
+  vendor_id     Int
+  mrp           Float
+  mrp_ptr_ratio Float
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
   deleted_at    DateTime?
 
-  goodReceiptNoteItems GoodReceiptNoteItem[]
-  PurchaseInvoice      PurchaseInvoice[]
-
-  @@map("good_receipt_notes")
-}
-
-model GoodReceiptNoteItem {
-  id              Int             @id @default(autoincrement())
-  grn_id          Int
-  goodReceiptNote GoodReceiptNote @relation(fields: [grn_id], references: [id])
-  product_id      Int
-  product         Product         @relation(fields: [product_id], references: [id])
-  batch_number    String
-  expiry_date     DateTime
-  recevied_qty    Int
-  ordered_qty     Int
-  damaged_qty     Int?
-  shortage_qty    Int?
-  item_price      Float
-  item_mrp        Float
-  total_amount    Float
-  created_at      DateTime        @default(now())
-  updated_at      DateTime        @updatedAt
-  deleted_at      DateTime?
-
-  @@map("good_receipt_note_items")
+  product Product @relation(fields: [product_id], references: [id])
+  vendor  Vendor  @relation(fields: [vendor_id], references: [id])
 }
 
 model PurchaseInvoice {
@@ -170,7 +147,6 @@ model SalesOrderProduct {
   id             Int       @id @default(autoincrement())
   sales_order_id Int
   product_id     Int
-  vendor_id      Int
   ordered_qty    Int
   allocated_qty  Int
   remaining_qty  Int
@@ -181,7 +157,6 @@ model SalesOrderProduct {
 
   salesOrder SalesOrder @relation(fields: [sales_order_id], references: [id])
   product    Product    @relation(fields: [product_id], references: [id])
-  vendor     Vendor     @relation(fields: [vendor_id], references: [id])
 
   @@map("sales_order_products")
 }
@@ -258,31 +233,87 @@ model PurchaseOrder {
   order_date         DateTime
   total_amount       Float
   total_order_qty    Int
-  status             String    @default("pending") // pending, partially received, completed, cancelled
+  status             String    @default("pending") // PO SENT,RECEVIED,CANCELLED,COMPLETED
   created_at         DateTime  @default(now())
   updated_at         DateTime  @updatedAt
   deleted_at         DateTime?
- 
-  vendor          Vendor                 @relation(fields: [vendor_id], references: [id])
-  purchaseIndent  PurchaseIndent?        @relation(fields: [purchase_indent_id], references: [id])
-  products        PurchaseOrderProduct[]
-  GoodReceiptNote GoodReceiptNote[]
+
+  vendor         Vendor                 @relation(fields: [vendor_id], references: [id])
+  purchaseIndent PurchaseIndent?        @relation(fields: [purchase_indent_id], references: [id])
+  products       PurchaseOrderProduct[]
 
   @@map("purchase_orders")
 }
 
 model PurchaseOrderProduct {
-  id                Int      @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   purchase_order_id Int
   product_id        Int
   ordered_qty       Int
   total_amount      Int
   net_cost_per_qty  Float
-  created_at        DateTime @default(now())
-  deleted_at         DateTime?
+  created_at        DateTime  @default(now())
+  deleted_at        DateTime?
 
   purchaseOrder PurchaseOrder @relation(fields: [purchase_order_id], references: [id])
   product       Product       @relation(fields: [product_id], references: [id])
 
   @@map("purchase_order_products")
+}
+
+model GatePass {
+  id               Int       @id @default(autoincrement())
+  gate_pass_number String    @unique 
+  vendor_id        Int
+  inward_type      String    //Purchase Inward or Good Return
+  invoice_date     DateTime
+  invoice_amount   Float 
+  no_of_boxes      Int
+  status           String    //In Checking, GRN In Progress, Inward Completed, Checked
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  deleted_at       DateTime?
+
+  vendor          Vendor            @relation(fields: [vendor_id], references: [id])
+  GoodReceiptNote GoodReceiptNote[]
+}
+
+model GoodReceiptNote {
+  id                       Int       @id @default(autoincrement())
+  grn_number               String    @unique
+  vendor_id                Int
+  gate_pass_id             Int
+  vendor                   Vendor    @relation(fields: [vendor_id], references: [id])
+  gatePass                 GatePass  @relation(fields: [gate_pass_id], references: [id])
+  total_amount             Float
+  total_qty                Int
+  total_products           Int
+  status                   String    @default("pending") // pending, on hold,completed, cancelled
+  created_at               DateTime  @default(now())
+  updated_at               DateTime  @updatedAt
+  deleted_at               DateTime?
+
+  goodReceiptNoteItems GoodReceiptNoteItem[]
+  PurchaseInvoice      PurchaseInvoice[]
+
+  @@map("good_receipt_notes")
+}
+
+model GoodReceiptNoteItem {
+  id              Int             @id @default(autoincrement())
+  grn_id          Int
+  goodReceiptNote GoodReceiptNote @relation(fields: [grn_id], references: [id])
+  product_id      Int
+  product         Product         @relation(fields: [product_id], references: [id])
+  batch_number    String
+  expiry_date     DateTime
+  billed_qty      Int
+  item_ptr        Float
+  item_mrp        Float
+  total_amount    Float
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  deleted_at      DateTime?
+
+  @@map("good_receipt_note_items")
 }

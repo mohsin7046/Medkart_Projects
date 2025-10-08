@@ -1,56 +1,55 @@
 import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
-import { STATUS } from '../../utilities/constant.js'
-import { statusSchema } from '../statusSchemaValidate.js'
 
 const purchaseOrderItemSchema = z.object({
   product_id: z
-    .number()
-    .min(1, 'Product id must be at least 2 characters long'),
+    .number({
+      required_error: 'Product ID is required',
+      invalid_type_error: 'Product ID must be a number',
+    })
+    .min(1, 'Invalid Product ID').optional(),
 
-  quantity: z
-    .number()
-    .int('Quantity must be an integer')
-    .positive('Quantity must be greater than 0')
-    .optional(),
+  ordered_qty: z
+    .number({
+      required_error: 'Ordered quantity is required',
+      invalid_type_error: 'Ordered quantity must be a number',
+    })
+    .int('Ordered quantity must be an integer')
+    .positive('Ordered quantity must be greater than 0').optional(),
 
-  item_price: z
-    .number()
-    .positive('Item price must be greater than 0')
-    .transform(decimalConversion)
-    .optional(),
-
-  item_mrp: z
-    .number()
-    .positive('Item MRP must be greater than 0')
-    .transform(decimalConversion)
-    .optional(),
+  net_cost_per_qty: z
+    .number({
+      required_error: 'Net cost per quantity is required',
+      invalid_type_error: 'Net cost per quantity must be a number',
+    })
+    .positive('Net cost per quantity must be greater than 0')
+    .transform(decimalConversion).optional(),
 
 }).strict()
 
 export const updatePurchaseOrderSchema = z.object({
-  vendor_id: z.number().min(1, 'Vendor id is required'),
+  vendor_id: z
+    .number({
+      required_error: 'Vendor ID is required',
+      invalid_type_error: 'Vendor ID must be a number',
+    })
+    .min(1, 'Invalid Vendor ID').optional(),
 
-  order_id: z.number().min(1, 'order id is required'),
+  purchase_indent_id: z
+    .number({
+      invalid_type_error: 'Purchase indent ID must be a number',
+    })
+    .optional()
+    .nullable(),
 
   order_date: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid order_date format'
+    .string({
+      required_error: 'Order date is required',
+      invalid_type_error: 'Order date must be a string',
     })
-    .optional(),
-
-  expected_delivery_date: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), {
-      message: 'Invalid expected_delivery_date format'
-    })
-    .optional(),
-
- status: statusSchema("po", [STATUS.CANCELLED, STATUS.COMPLETED]).optional(),
+    .transform((val) => new Date(val)).optional(),
 
   items: z
     .array(purchaseOrderItemSchema)
-    .min(1, 'At least one order item is required')
-    .optional()
+    .min(1, 'At least one order item is required').optional(),
 }).strict()

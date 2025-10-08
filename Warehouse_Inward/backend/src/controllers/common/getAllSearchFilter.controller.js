@@ -3,21 +3,21 @@ import { DETAILSFETCH, FEILD, SEARCHFILTERNAME } from "../../utilities/constant.
 import { errorResponse, successResponse } from "../../utilities/response.js";
 import { buildFilter } from "../../utilities/builderFilter.js";
 import { STATUSCODE } from "../../utilities/constant.js";
-import {buildSelect} from '../../utilities/builtSelectForDb.js'
+import { buildSelect } from '../../utilities/builtSelectForDb.js';
 
 export const getAllOrFiltered = catchAsync(async (req, res) => {
- 
-  const filters = req.query;  
+
+  const filters = req.query;
   const { name, field } = filters;
 
   if (!SEARCHFILTERNAME[name]) {
     return errorResponse(res, `Invalid name: ${name}`, STATUSCODE.BAD_REQUEST);
-  } 
+  }
 
   const model = SEARCHFILTERNAME[name];
   const allFields = FEILD[name];
 
-
+  // Build general filters (page, limit, status, sortby)
   const where = buildFilter(filters, {
     name: { field: "name", type: "string" },
     search: { field: "search", type: "exact" },
@@ -30,18 +30,30 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
   const { limit = 10, search, page = 1, status, sortby } = where;
 
   let query = {};
-
+    
   if (search) {
     if (field) {
-      query.OR = [
-        { [field]: { contains: search, mode: "insensitive" } },
-      ];
+      // If field is a nested relation like 'vendor.name'
+      if (field.includes(".")) {
+        const [relation, relField] = field.split(".");
+        query.OR = [
+          { [relation]: { is: { [relField]: { contains: search, mode: "insensitive" } } } }
+        ];
+      } else {
+        query.OR = [
+          { [field]: { contains: search, mode: "insensitive" } }
+        ];
+      }
     } else if (allFields?.length) {
-      query.OR = allFields.map((item) => ({
-        [item]: { contains: search, mode: "insensitive" },  
-      }));
+      query.OR = allFields.map((item) => {
+        if (item.includes(".")) {
+          const [relation, relField] = item.split(".");
+          return { [relation]: { is: { [relField]: { contains: search, mode: "insensitive" } } } };
+        }
+        return { [item]: { contains: search, mode: "insensitive" } };
+      });
     }
-  }      
+  }
 
   if (status) {
     query.status = status;
@@ -51,8 +63,9 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
 
   const whereCondition = {
     deleted_at: null,
-    ...query,
+    ...query
   };
+
 
   let orderBy = {};
   if (sortby) {
@@ -62,9 +75,8 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
     };
   }
 
-   
   const fieldsToFetch = DETAILSFETCH[name] || [];
-  const {select} = buildSelect(fieldsToFetch);
+  const { select } = buildSelect(fieldsToFetch);
 
   const [items, totalItems] = await Promise.all([
     model.findMany({
@@ -78,7 +90,6 @@ export const getAllOrFiltered = catchAsync(async (req, res) => {
   ]);
 
   const totalPages = Math.ceil(totalItems / limit);
-
 
   return successResponse(
     res,

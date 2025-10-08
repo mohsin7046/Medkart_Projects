@@ -39,7 +39,6 @@ export class SalesOrderRepository {
   }
 
    updateSalesOrderProducts(sales_order_id,product_id, data) {
-    console.log("FRom Db",data);
     
     try {
       return prisma.salesOrderProduct.updateMany({
@@ -70,6 +69,17 @@ export class SalesOrderRepository {
       return await prisma.salesOrder.findMany({ where, include });
     } catch (error) {
       saleLogger.error(`Failed to fetch SalesOrders | ${error.message}`);
+      throw error;
+    }
+  }
+
+  async existingSalesOrder(id){
+    try {
+      return await prisma.salesOrder.findFirst({
+        where:{id,deleted_at:null}
+      })
+    } catch (error) {
+      saleLogger.error(`Failed to find SalesOrders | ${error.message}`);
       throw error;
     }
   }
@@ -145,18 +155,13 @@ export class SalesOrderRepository {
                             combination: true,
                             inventory_qty:true,
                             product_mrp: true,
-                            product_price: true,
+                            product_ptr: true,
                             description: true,
                             hsn_code: true,
                             gst_percentage: true,
                             status: true
                         }
                     },
-                    vendor: {
-                        select: {
-                            name: true
-                        }
-                    }
                 }
             }
         }
@@ -181,13 +186,12 @@ export class SalesOrderRepository {
                 products: {
                     select: {
                         product_id: true,
-                        vendor_id: true,
                         ordered_qty: true,
                         product: {
                             select: {
                                 name: true,
                                 product_mrp: true,
-                                product_price: true
+                                product_ptr: true
                             }
                         }
                     }

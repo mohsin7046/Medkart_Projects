@@ -1,39 +1,33 @@
+
 import { errorResponse } from "../utilities/response.js";
-import { productLogger, vendorLogger, poLogger, grnLogger, piLogger, appLogger,saleLogger,indentLogger } from "../utilities/logger.js";
-import { STATUSCODE } from "../utilities/constant.js";
+import { handleAppError } from "../utilities/errorHandler.util.js";
+import { 
+  productLogger, vendorLogger, poLogger, grnLogger,
+  piLogger, appLogger, saleLogger, indentLogger,
+  purchaseindentLogger, gatePassLogger 
+} from "../utilities/logger.js";
 
 const loggerMap = {
-  "product": productLogger,
-  "vendor": vendorLogger,
-  "po": poLogger,
-  "grn": grnLogger,
-  "pi": piLogger,
-  "app": appLogger,
-  "so": saleLogger,
-  "si":indentLogger
+  product: productLogger,
+  vendor: vendorLogger,
+  po: poLogger,
+  grn: grnLogger,
+  pi: piLogger,
+  app: appLogger,
+  so: saleLogger,
+  si: indentLogger,
+  purchaseindent: purchaseindentLogger,
+  gatepass: gatePassLogger,
 };
 
-export const errorHandler = (err, req, res,next) => {
+export const errorHandler = (err, req, res, next) => {
   const component = req.component || "app";
   const logger = loggerMap[component] || appLogger;
 
-  if (err.name === "ZodError") {
+  const { message, data, statusCode } = handleAppError(err, logger);
+
+  console.log(message, data, statusCode );
   
-    const validationErrors = err.issues.map((issue) => ({
-      field: issue.path.join("."),
-      message: issue.message,
-    }));
 
-    logger.error(`Validation Error: ${JSON.stringify(validationErrors)}`);
-
-    return errorResponse(res, validationErrors || "Validation error", STATUSCODE.BAD_REQUEST);
-  }
-
-  logger.error(err.message || "Unexpected error");
-
-  return errorResponse(
-    res,
-    err.message || "Something went wrong",
-    err.statusCode || STATUSCODE.INTERNAL_SERVER_ERROR
-  );
+  return errorResponse(res, data || message, statusCode);
 };

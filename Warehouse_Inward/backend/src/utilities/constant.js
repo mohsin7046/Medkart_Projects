@@ -17,7 +17,14 @@ export const STATUS = Object.freeze({
   NOT_DISPATCHED: "not dispatched",
   OPEN: 'open',
   CLOSED: 'closed',
-  SENT: 'PO SENT'
+  SENT: 'PO SENT',
+  INCHECKING:'In checking',
+  GRNINPROGRESS:'GRN In Progress',
+  INWARDCOMPLETED:'Inward Completed',
+  CHECKED:'Checked',
+  CONFIRMED:'confirmed',
+  ONHOLD:'On Hold',
+  RECEVIED:'received'
 })
 
 export const EACHSTATUS = Object.freeze({
@@ -25,15 +32,16 @@ export const EACHSTATUS = Object.freeze({
   vendor: ['active', 'inactive'],
   po: ['pending', 'partial received', 'cancelled', 'completed'],
   grn: ['pending', 'cancelled', 'completed'],
-  pi: ['pending', 'cancelled', 'completed']
+  pi: ['pending', 'cancelled', 'completed'],
+  so:['']
 })
 
 
 export const DETAILSFETCH = Object.freeze({
-  product: ['id', 'product_code', 'name', 'category', 'product_price', 'product_mrp', "unit_of_measure", "hsn_code", "gst_percentage", "status", "inventory_qty",],
+  product: ['id', 'product_code', 'name', 'category', 'product_ptr', 'product_mrp', "unit_of_measure", "hsn_code", "gst_percentage", "status", "inventory_qty",],
   vendor: ['id', 'vendor_code', 'name', 'email', 'contact_person', 'contact_number', 'address', 'status'],
   order: ['id', 'order_number', { vendor: { select: { id: true, name: true } } }, 'order_date', 'total_amount', 'total_order_qty', 'status'],
-  grn: ['id', 'grn_number', 'order_id', 'received_date', 'total_amount', 'status'],
+  grn: ['id', 'grn_number', { gatePass: { select: { gate_pass_number:true } } }, 'total_qty', 'total_amount','total_products', 'status','created_at'],
   invoice: ['id', 'invoice_number', 'invoice_date', 'total_amount', 'status', { goodReceiptNote: { select: { id: true } } }],
   saleorder: ['id', 'sales_order_number', 'name', 'total_order_qty', 'status', 'processed', 'order_type', 'created_at'],
   saleindent: ['id', 'indent_number', 'total_sales_order', 'total_remain_product', 'status', 'created_at', { product: { select: { name: true } } }],
@@ -56,8 +64,9 @@ export const DETAILSFETCH = Object.freeze({
         }
       }
     }
-  ]
-
+  ],
+  gatepass:['id','gate_pass_number', { vendor: { select: { name: true } } },'invoice_date','invoice_amount','no_of_boxes','status','created_at'],
+  mrp_ptr_ratio:['id', { vendor: { select: { name: true } } }, { product: { select: { name: true } } },'mrp','mrp_ptr_ratio','created_at']
 })
 
 export const PREFIX = Object.freeze({
@@ -68,7 +77,8 @@ export const PREFIX = Object.freeze({
   VENDOR: 'VC-',
   SALE: 'SO-',
   INDENT: 'IN-',
-  PURCHASE_IDENT: 'PIN'
+  PURCHASE_IDENT: 'PI',
+  GATEPASS:'GP'
 })
 
 export const LIMIT = Object.freeze({
@@ -84,7 +94,9 @@ export const FEILD = Object.freeze({
   invoice: ['invoice_number'],
   saleorder: ['sales_order_number'],
   saleindent: ['indent_number'],
-  purchaseindent: ['purchase_indent_number']
+  purchaseindent: ['purchase_indent_number'],
+  gatepass:['gate_pass_number'],
+ mrp_ptr_ratio: ['vendor.name', 'product.name']
 })
 
 export const SEARCHFILTERNAME = Object.freeze({
@@ -95,7 +107,9 @@ export const SEARCHFILTERNAME = Object.freeze({
   vendor: prisma.vendor,
   saleorder: prisma.salesOrder,
   saleindent: prisma.salesIndent,
-  purchaseindent: prisma.purchaseIndent
+  purchaseindent: prisma.purchaseIndent,
+  gatepass:prisma.gatePass,
+  mrp_ptr_ratio:prisma.productVendorMrpPtrRatio,
 })
 
 export const SETEXPIRY = Object.freeze({
@@ -111,7 +125,9 @@ export const ENTITY = Object.freeze({
   so: "so",
   si: "si",
   so: "sale-order",
-  si: "sale-indent"
+  si: "sale-indent",
+  purchaseindent:"purchase-indent",
+  gatepass:"gatepass"
 });
 
 

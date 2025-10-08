@@ -1,6 +1,6 @@
 import { prisma } from "../utilities/import.config.js";
 import { productLogger } from "../utilities/logger.js";
-import { STATUS, combinations, categories } from "../utilities/constant.js";
+import { STATUS } from "../utilities/constant.js";
 
 export class ProductRepository {
 
@@ -12,7 +12,6 @@ export class ProductRepository {
       throw error;
     }
   }
-
 
   async updateProduct({ id = null, product_code = null, data }) {
     try {
@@ -29,7 +28,7 @@ export class ProductRepository {
             where: { product_code },
             data,
           });
-
+    
         default:
           break;
       }
@@ -42,7 +41,8 @@ export class ProductRepository {
     }
   }
 
-   updateProductWithoutAwait({ id = null, data }) {
+  
+  updateProductWithoutAwait({ id = null, data }) {
     try {
           return prisma.product.update({
             where: { id: parseInt(id) },
@@ -84,7 +84,7 @@ export class ProductRepository {
           id: true,
           name: true,
           product_mrp: true,
-          product_price: true,
+          product_ptr: true,
         },
         take: limit,
       });
@@ -116,50 +116,6 @@ export class ProductRepository {
       throw new Error("Either 'id' or 'ids' must be provided");
     } catch (error) {
       productLogger.error(`Error fetching products | ${error.message}`);
-      throw error;
-    }
-  }
-
-  async getCombinations(search) {
-    try {
-      let filtered = combinations;
-
-      if (search) {
-        filtered = combinations.filter((c) =>
-          c.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
-      const data = filtered.map((c) => ({ value: c, label: c }))
-
-      return data;
-
-    } catch (error) {
-      productLogger.error("Error fetching product combinations: " + error.message);
-      throw error;
-    }
-  }
-
-  async getCategories(search) {
-    try {
-      let filtered = categories;
-
-      if (search) {
-        filtered = categories.filter((c) =>
-          c.name.toLowerCase().includes(search.toLowerCase())
-        );
-      }
-
-      const data = filtered.map((c) => ({
-        value: c.name,
-        label: c.name,
-        uom: c.uom,
-      }))
-
-      return data;
-
-    } catch (error) {
-      productLogger.error("Error fetching product categories: " + error.message);
       throw error;
     }
   }

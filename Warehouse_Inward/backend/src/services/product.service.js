@@ -2,14 +2,15 @@ import { STATUS, LIMIT, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { productLogger } from '../utilities/logger.js'
 import { ProductRepository } from '../repository/product.repository.js'
+import { combinations, categories } from "../utilities/constant.js";
 
 const ProductRepo = new ProductRepository();
  
 export const addProductService = async (data) => {
   try {
 
-    if (data.product_mrp < data.product_price) {
-      productLogger.error("❌ Validation failed: MRP < Price while adding product");
+    if (data.product_mrp < data.product_ptr) {
+      productLogger.error("Validation failed: MRP < Price while adding product");
       throw new Error("Product MRP must be equal or greater than price");
     }
 
@@ -22,24 +23,23 @@ export const addProductService = async (data) => {
     category: data.category,
     combination: data.combination,
     product_mrp: data.product_mrp,
-    product_price: data.product_price,
+    product_ptr: data.product_ptr,
     last_purchase_price: data.last_purchase_price,
     unit_of_measure:  data.unit_of_measure,
     description: data.description,
     hsn_code: data.hsn_code,
     gst_percentage:   data.gst_percentage,
     status: data.status,
-    inventory_qty: 10, //TODO:Take From the Frontend
+    inventory_qty: data.inventory_qty,
     product_code
     });
-
+     
     if (!product) {
       productLogger.error("❌ Product creation failed in DB");
       throw new Error("Product could not be created");
     }
 
     productLogger.info("✅ Product created successfully: " + product_code);
-
     return product;
 
   } catch (err) {
@@ -52,7 +52,7 @@ export const addProductService = async (data) => {
 export const updateProductService = async (formData) => {
   try {
 
-    if (formData.product_mrp < formData.product_price) {
+    if (formData.product_mrp < formData.product_ptr) {
       productLogger.error("❌ Validation failed: MRP < Price for product_code " + formData.product_code);
       throw new Error("Product MRP must be equal or greater than price");
     }
@@ -85,9 +85,8 @@ export const searchProductService = async (q) => {
 
     const searchProduct = await ProductRepo.searchProducts(q, LIMIT.PRODUCT_LIMIT, STATUS.ACTIVE);
 
-    console.log("Search Results:", searchProduct); // Debug log
+    console.log("Search Results:", searchProduct); 
     
-
     if (!searchProduct || searchProduct.length === 0) {
       productLogger.warn("⚠️ No products found for query: " + q);
       return [];
@@ -154,8 +153,18 @@ export const getProductByIdService = async (id) => {
 
 export const getCategoriesService = async (search) => {
   try {
-    const categories = await ProductRepo.getCategories(search);
+      let filtered = combinations;
+
+      if (search) {
+        filtered = combinations.filter((c) =>
+          c.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      const categories = filtered.map((c) => ({ value: c, label: c }))
+
     return categories;
+
   } catch (error) {
     productLogger.error("❌ Error fetching product categories: " + error.message);
     throw error;
@@ -164,9 +173,20 @@ export const getCategoriesService = async (search) => {
 
 export const getCombinationsService = async (search) => {
   try {
-    const combinations = await ProductRepo.getCombinations(search);
-    console.log(combinations);
-    
+    let filtered = categories;
+
+      if (search) {
+        filtered = categories.filter((c) =>
+          c.name.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      const combinations = filtered.map((c) => ({
+        value: c.name,
+        label: c.name,
+        uom: c.uom,
+      }))
+
     return combinations;
   } catch (error) {
     productLogger.error("❌ Error fetching product combinations: " + error.message);

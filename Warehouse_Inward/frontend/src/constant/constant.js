@@ -14,7 +14,14 @@ export const STATUS = Object.freeze({
   NOT_DISPATCHED:"not dispatched",
   OPEN:'open',
   CLOSED:'closed',
-  SENT:'PO SENT'
+  SENT:'PO SENT',
+  INCHECKING:'In checking',
+  GRNINPROGRESS:'GRN In Progress',
+  INWARDCOMPLETED:'Inward Completed',
+  CHECKED:'Checked',
+  ONHOLD:'On Hold',
+  CONFIRMED:'confirmed',
+   RECEVIED:'received'
 })
 
 export const categories = Object.freeze([
@@ -36,7 +43,7 @@ export const combinations = Object.freeze([
   { value: "omeprazole", label: "omeprazole" },
 ]);
 
-export const numericFields = ["product_mrp", "product_price", "last_purchase_price", "gst_percentage"];
+export const numericFields = ["product_mrp", "product_ptr", "last_purchase_price", "gst_percentage"];
 
 export const STATUS_COLORS = Object.freeze({
   [STATUS.PENDING]: "bg-yellow-100 text-yellow-800",
@@ -54,5 +61,11 @@ export const STATUS_COLORS = Object.freeze({
   [STATUS.NOT_DISPATCHED]: "bg-red-100 text-red-800",
   [STATUS.OPEN]: "bg-blue-100 text-blue-800",
   [STATUS.CLOSED]: "bg-gray-300 text-gray-800",
-  [STATUS.SENT] : "bg-blue-100 text-blue-800"
+  [STATUS.SENT] : "bg-blue-100 text-blue-800",
+  [STATUS.INCHECKING]:"bg-red-100 text-red-800",
+  [STATUS.ONHOLD]:"bg-red-100 text-red-800",
+  [STATUS.GRNINPROGRESS]:"bg-yellow-100 text-yellow-800",
+  [STATUS.INWARDCOMPLETED]:"bg-purple-100 text-purple-800",
+  [STATUS.CONFIRMED]:"bg-green-100 text-green-800",
+  [STATUS.RECEVIED]:"bg-yellow-100 text-yellow-800"
 });

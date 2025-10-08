@@ -98,19 +98,6 @@ function GRNList() {
         navigate(ROUTES.GRN.VIEW('grn',grn.id))
       }
       onDelete={(grn) => handleDelete(grn)}
-      extraAction={(grn) => { 
-        const isDisabled = [STATUS.COMPLETED,STATUS.CANCELLED].includes(grn.status);
-
-        return(
-        <button
-          disabled={isDisabled}
-          onClick={() => navigate(ROUTES.PURCHASE_INVOICE.ADD(grn.id))}
-          className={`bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors ${isDisabled ? "opacity-50 cursor-not-allowed" : ""
-              }}`}
-        >
-          Create Invoice
-        </button>
-      )}}
     />
   );
 }

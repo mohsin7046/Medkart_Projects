@@ -30,29 +30,35 @@ export const VIEW_CONFIG = {
   backgroundStatus: (status) => STATUS_COLORS[status] || "bg-gray-100 text-gray-800",
 },
 
-  grn: {
-    title: "GRN Details",  
-    endpoint: ALLEndpoint.GRNEndpoints.getGRNById.endpoint,
-    headerFields: [
-      { label: "GRN Number", key: "grn_number" },
-      { label: "Order Number", key: "purchaseOrder.order_number" },
-      { label: "Received Date", key: "received_date", isDate: true },
-      { label: "Total Amount", key: "total_amount", isCurrency: true },
-      { label: "Status", key: "status", isStatus: true },
-    ],
-    itemKey: "goodReceiptNoteItems",
-    itemColumns: [
-      { label: "Product ID", key: "product_id" },
-      { label: "Batch", key: "batch_number" },
-      { label: "Expiry", key: "expiry_date", isDate: true },
-      { label: "Qty", key: "recevied_qty" },
-      { label: "Shortage Qty", key: "shortage_qty" },
-      { label: "Damaged Qty", key: "damaged_qty" },
-      { label: "Price", key: "item_price", isCurrency: true },
-      { label: "MRP", key: "item_mrp", isCurrency: true },
-      { label: "Total", key: "totalAmount", isCurrency: true },
-    ],
-  },
+ grn: {
+  title: "GRN Details",
+  endpoint: ALLEndpoint.GRNEndpoints.getGRNById.endpoint,
+
+  headerFields: [
+    { label: "GRN Number", key: "grn_number" },
+    { label: "Gate Pass ID", key: "gate_pass_id" },
+    { label: "Vendor Name", key: "vendor.name" },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+    { label: "Total Quantity", key: "total_qty" },
+    { label: "Total Products", key: "total_products" },
+    { label: "Status", key: "status", isStatus: true},
+  ],
+
+  itemKey: "goodReceiptNoteItems",
+
+  itemColumns: [
+    { label: "Product Name", key: "product.name" },
+    { label: "Batch Number", key: "batch_number" },
+    { label: "Expiry Date", key: "expiry_date", isDate: true },
+    { label: "Billed Quantity", key: "billed_qty" },
+    { label: "Item PTR", key: "item_ptr", isCurrency: true },
+    { label: "Item MRP", key: "item_mrp", isCurrency: true },
+    { label: "Total Amount", key: "total_amount", isCurrency: true },
+  ],
+
+  backgroundStatus: (status) => STATUS_COLORS[status],
+},
+
 
   invoice: {
     title: "Invoice Details",
@@ -93,12 +99,11 @@ export const VIEW_CONFIG = {
   ],
   itemKey: "products", 
   itemColumns: [
-    { label: "Product Name", key: "product.name" }, 
-    { label: "Vendor Name", key: "vendor.name" }, 
+    { label: "Product Name", key: "product.name" },  
     { label: "Ordered Qty", key: "ordered_qty" },
     { label: "Allocated Qty", key: "allocated_qty" },
     { label: "Remaining Qty", key: "remaining_qty" },
-    { label: "Price", key: "product.product_price", isCurrency: true },
+    { label: "Price", key: "product.product_ptr", isCurrency: true },
     { label: "MRP", key: "product.product_mrp", isCurrency: true },
     { label: "Inventory Qty", key: "product.inventory_qty" },
     { label: "GST %", key: "product.gst_percentage" },
@@ -144,9 +149,8 @@ salesIndent: {
     { label: "Product Name", key: "product_name" },
     { label: "Product Category", key: "product_category" },
     { label: "Product Combination", key: "product_combination" },
-    { label: "Product Price", key: "product_price", isCurrency: true },
+    { label: "Product Price", key: "product_ptr", isCurrency: true },
     { label: "Product MRP", key: "product_mrp", isCurrency: true },
-    { label: "Vendor Name", key: "vendor_name" },
     { label: "Order Status", key: "order_status", isStatus: true },
   ],
   backgroundStatus : (status) => STATUS_COLORS[status]
@@ -181,5 +185,27 @@ purchaseIndent: {
   ],
 
   backgroundStatus: (status) => STATUS_COLORS[status],
+},
+
+gatePass: {
+  title: "Gate Pass Details",
+  endpoint: ALLEndpoint.GatePassEndpoints.getGatePassByIdView.endpoint,
+
+  headerFields: [
+    { label: "Gate Pass Number", key: "gate_pass_number" },
+    { label: "Vendor Name", key: "vendor.name" },
+    { label: "Status", key: "status", isStatus: true},
+    { label: "Vendor Address", key: "vendor.address" },
+    { label: "Vendor Contact Number", key: "vendor.contact_number" },
+    { label: "Contact Person", key: "vendor.contact_person" },
+    { label: "Invoice Amount", key: "invoice_amount", isCurrency: true },
+    { label: "Invoice Date", key: "invoice_date", isDate: true },
+    { label: "Inward Type", key: "inward_type" },
+    { label: "Number of Boxes", key: "no_of_boxes" },
+  ],
+  
+
+  backgroundStatus: (status) => STATUS_COLORS[status],
 }
+
 }

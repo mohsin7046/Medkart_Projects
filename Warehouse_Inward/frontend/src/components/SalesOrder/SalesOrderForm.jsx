@@ -20,7 +20,7 @@ function SalesOrderForm() {
     contact_number: "",
     address: "",
     order_type: "B2C",
-    items: [{ product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+    items: [{ product_id: "", product_name: "", vendor_id: "", ordered_qty: "", product_mrp: "", product_ptr: "" }],
   });
   const [errors, setErrors] = useState({});
 
@@ -40,7 +40,7 @@ function SalesOrderForm() {
           product_name: i.product_name || "",
           ordered_qty: i.ordered_qty?.toString() || "",
           product_mrp: i.product_mrp?.toString() || "",
-          product_price: i.product_price?.toString() || "",
+          product_ptr: i.product_ptr?.toString() || "",
         })) || [];
 
         setFormData({
@@ -80,7 +80,7 @@ function SalesOrderForm() {
   const addItem = () =>
     setFormData((prev) => ({
       ...prev,
-      items: [...prev.items, { product_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_price: "" }],
+      items: [...prev.items, { product_id: "", product_name: "", ordered_qty: "", product_mrp: "", product_ptr: "" }],
     }));
 
   const removeItem = (index) =>
@@ -90,7 +90,7 @@ function SalesOrderForm() {
     updateItem(index, "product_id", product.id);
     updateItem(index, "product_name", product.name);
     updateItem(index, "product_mrp", product.product_mrp);
-    updateItem(index, "product_price", product.product_price);
+    updateItem(index, "product_ptr", product.product_ptr);
     updateItem(index, "vendor_id", product.vendor_id || "");
   };
 
@@ -173,7 +173,7 @@ function SalesOrderForm() {
 
   const totalQty = formData.items.reduce((sum, item) => sum + (parseFloat(item.ordered_qty) || 0), 0);
   const totalAmount = formData.items.reduce(
-    (sum, item) => sum + ((parseFloat(item.ordered_qty) || 0) * (parseFloat(item.product_price) || 0)),
+    (sum, item) => sum + ((parseFloat(item.ordered_qty) || 0) * (parseFloat(item.product_ptr) || 0)),
     0
   );
 
@@ -244,7 +244,7 @@ function SalesOrderForm() {
 
 
                   <div className="flex flex-col">
-                    <InputField label="Price" type="number" value={item.product_price} readOnly />
+                    <InputField label="Price" type="number" value={item.product_ptr} readOnly />
                   </div>
 
 

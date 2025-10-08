@@ -89,7 +89,7 @@ function CommonView() {
         </button>
 
         <div className="flex gap-3">
-          {config.actions?.map(
+          {config?.actions?.map(
             (action) =>
               (!action.showWhen || action.showWhen(data)) && (
                 <button
@@ -111,25 +111,25 @@ function CommonView() {
       </div>
 
       <h2 className="text-3xl font-bold text-gray-800 mb-6 border-b pb-2">
-        {config.title}
+        {config?.title}
       </h2>
 
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        {config.headerFields.map((field) => {
-          let value = getValue(data, field.key);
-          if (field.isDate && value) value = new Date(value).toLocaleDateString();
-          if (field.isCurrency && value) value = `₹${value}`;
+        {config?.headerFields?.map((field) => {
+          let value = getValue(data, field?.key);
+          if (field?.isDate && value) value = new Date(value).toLocaleDateString();
+          if (field?.isCurrency && value) value = `₹${value}`;
           return (
             <div
-              key={field.key}
+              key={field?.key}
               className="p-3 bg-white shadow-sm rounded-lg border border-gray-200 hover:shadow-md transition"
             >
-              <p className="text-gray-500 text-xs ">{field.label}</p>
-              {field.isStatus ? (
+              <p className="text-gray-500 text-xs ">{field?.label}</p>
+              {field?.isStatus ? (
                 <span
-                  className={`px-2 py-1 rounded-lg text-xs font-medium ${config.backgroundStatus
-                      ? config.backgroundStatus(value)   
+                  className={`px-2 py-1 rounded-lg text-xs font-medium ${config?.backgroundStatus
+                      ? config?.backgroundStatus(value)   
                       : STATUS_COLORS[value] || "bg-gray-100 text-gray-800"
                     }`}
                 >
@@ -146,32 +146,31 @@ function CommonView() {
       </div>
 
 
-      <h3 className="text-2xl font-semibold mb-4 text-gray-800">Orders</h3>
       <div className="overflow-x-auto w-full">
         <table className="min-w-full border border-gray-300 text-sm table-fixed">
           <thead className="bg-gray-100">
             <tr>
-              {config.itemColumns.map((col) => (
+              {config?.itemColumns?.map((col) => (
                 <th
-                  key={col.key}
+                  key={col?.key}
                   className="border border-gray-300 px-2 py-1 text-left font-medium text-gray-700"
                 >
-                  {col.label}
+                  {col?.label}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {data[config.itemKey]?.map((item, i) => (
+            {data[config?.itemKey]?.map((item, i) => (
               <tr key={i} className="bg-white">
-                {config.itemColumns.map((col) => {
-                  let value = getValue(item, col.key);
-                  if (col.isDate && value)
+                {config?.itemColumns.map((col) => {
+                  let value = getValue(item, col?.key);
+                  if (col?.isDate && value)
                     value = new Date(value).toLocaleDateString();
-                  if (col.isCurrency && value) value = `₹${value}`;
-                  if (col.isStatus && value) {
+                  if (col?.isCurrency && value) value = `₹${value}`;
+                  if (col?.isStatus && value) {
 
-                    const statusClass = config.backgroundStatus
+                    const statusClass = config?.backgroundStatus
                       ? config.backgroundStatus(value)
                       : STATUS_COLORS[value] || "bg-gray-100 text-gray-800";
                     console.log(statusClass);

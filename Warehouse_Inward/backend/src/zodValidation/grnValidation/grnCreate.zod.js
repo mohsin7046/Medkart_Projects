@@ -2,55 +2,67 @@ import { z } from 'zod'
 import { decimalConversion } from '../../utilities/decimal.conversion.js'
 
 const goodReceiptNoteItemSchema = z.object({
-  product_id: z.number().min(1, 'Product id is required'),
+  product_id: z
+    .number({ required_error: 'Product ID is required' })
+    .min(1, 'Invalid product ID'),
 
-  batch_number: z.string().min(1, 'Batch number is required'),
+  batch_number: z
+    .string({ required_error: 'Batch number is required' })
+    .min(1, 'Batch number cannot be empty'),
 
-  expiry_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid expiry_date format'
-  }),
+  expiry_date: z
+    .string({ required_error: 'Expiry date is required' })
+    .refine((val) => !isNaN(Date.parse(val)), {
+      message: 'Invalid expiry date format',
+    })
+    .transform((val) => new Date(val)),
 
-  recevied_qty: z
-    .number()
-    .int('Received quantity must be an integer')
-    .nonnegative('Received quantity cannot be negative'),
+  billed_qty: z
+    .number({ required_error: 'Billed quantity is required' })
+    .int('Billed quantity must be an integer')
+    .positive('Billed quantity must be greater than 0'),
 
-  ordered_qty: z
-    .number()
-    .int('Ordered quantity must be an integer')
-    .positive('Ordered quantity must be greater than 0'),
-
-  damaged_qty: z
-    .number()
-    .int('Damaged quantity must be an integer')
-    .nonnegative('Damaged quantity cannot be negative')
-    .optional(),
-
-  shortage_qty: z
-    .number()
-    .int('Shortage quantity must be an integer')
-    .optional(),
-
-  item_price: z
-    .number()
-    .positive('Item price must be greater than 0')
+  item_ptr: z
+    .number({ required_error: 'Item PTR is required' })
+    .positive('Item PTR must be greater than 0')
     .transform(decimalConversion),
 
   item_mrp: z
-    .number()
+    .number({ required_error: 'Item MRP is required' })
     .positive('Item MRP must be greater than 0')
     .transform(decimalConversion),
 
+  total_amount: z
+    .number({ required_error: 'Total amount is required' })
+    .nonnegative('Total amount must be 0 or greater')
+    .transform(decimalConversion),
 }).strict()
 
 export const createGoodReceiptNoteSchema = z.object({
-  order_id: z.number().min(1, 'Purchase id number is required'),
+ 
+  vendor_id: z
+    .number({ required_error: 'Vendor ID is required' })
+    .min(1, 'Invalid vendor ID'),
 
-  received_date: z.string().refine((val) => !isNaN(Date.parse(val)), {
-    message: 'Invalid received_date format'
-  }),
+  gate_pass_id: z
+    .number({ required_error: 'Gate Pass ID is required' })
+    .min(1, 'Invalid gate pass ID'),
+
+  total_amount: z
+    .number({ required_error: 'Total amount is required' })
+    .nonnegative('Total amount must be 0 or greater'),
+
+  total_qty: z
+    .number({ required_error: 'Total quantity is required' })
+    .int('Total quantity must be an integer')
+    .nonnegative('Total quantity must be 0 or greater'),
+
+  total_products: z
+    .number({ required_error: 'Total products count is required' })
+    .int('Total products must be an integer')
+    .positive('There must be at least one product'),
 
   items: z
     .array(goodReceiptNoteItemSchema)
-    .min(1, 'At least one GRN item is required')
+    .min(1, 'At least one GRN item is required'),
 }).strict()

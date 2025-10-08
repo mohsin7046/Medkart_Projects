@@ -4,7 +4,7 @@ import { STATUS_COLORS } from "./constant.js";
     { key: "product_code", label: "Product Code" },
     { key: "name", label: "Name" },
     { key: "category", label: "Category" },
-    { key: "product_price", label: "Price", render: (val) => `₹${val}` },
+    { key: "product_ptr", label: "Price", render: (val) => `₹${val}` },
     { key: "product_mrp", label: "MRP", render: (val) => `₹${val}` },
     { key: "unit_of_measure", label: "Unit" },
     { key: "hsn_code", label: "HSN" },

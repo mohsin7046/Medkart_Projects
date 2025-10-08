@@ -4,11 +4,15 @@ export const buildSelect = (fields) => {
 
   fields.forEach(field => {
     if (typeof field === "string" && field.includes(":")) {
+ 
       const [relation, relField] = field.split(":");
-      select[relation] = { select: { [relField]: true } };
+      if (!select[relation]) select[relation] = { select: {} };
+      select[relation].select[relField] = true;
     } else if (typeof field === "string") {
+     
       select[field] = true;
     } else if (typeof field === "object") {
+      
       if (field.include) {
         Object.assign(include, field.include);
       } else {
@@ -19,4 +23,3 @@ export const buildSelect = (fields) => {
 
   return { select, include };
 };
-

@@ -20,12 +20,13 @@ function ProductForm() {
     category: "",
     combination: [],
     product_mrp: "",
-    product_price: "",
+    product_ptr: "",
     last_purchase_price: "",
     unit_of_measure: "",
     hsn_code: "",
     gst_percentage: "",
     description: "",
+    inventory_qty:"",
     status: "active",
   });
 
@@ -48,12 +49,13 @@ function ProductForm() {
           category: data.category || "",
           combination: Array.isArray(data.combination) ? data.combination : [],
           product_mrp: data.product_mrp?.toString() || "",
-          product_price: data.product_price?.toString() || "",
+          product_ptr: data.product_ptr?.toString() || "",
           last_purchase_price: data.last_purchase_price?.toString() || "",
           unit_of_measure: data.unit_of_measure || "",
           hsn_code: data.hsn_code || "",
           gst_percentage: data.gst_percentage?.toString() || "",
           description: data.description || "",
+          inventory_qty:data.inventory_qty || "",
           status: data.status || "active",
         });
       } catch {
@@ -98,9 +100,10 @@ function ProductForm() {
       const payload = {
         ...formData,
         product_mrp: parseFloat(formData.product_mrp) || 0,
-        product_price: parseFloat(formData.product_price) || 0,
+        product_ptr: parseFloat(formData.product_ptr) || 0,
         last_purchase_price: parseFloat(formData.last_purchase_price) || 0,
         gst_percentage: parseFloat(formData.gst_percentage) || 0,
+        inventory_qty:parseInt(formData.inventory_qty) || 0
       };
 
       const res = await fetch(endpoint.endpoint, {
@@ -186,11 +189,12 @@ function ProductForm() {
           </div>
 
           <InputField label="Product MRP" name="product_mrp" value={formData.product_mrp} onChange={handleChange} required placeholder="Enter MRP" />
-          <InputField label="Product Price" name="product_price" value={formData.product_price} onChange={handleChange} required placeholder="Enter price" />
+          <InputField label="Product Price" name="product_ptr" value={formData.product_ptr} onChange={handleChange} required placeholder="Enter price" />
           <InputField label="Last Purchase Price" name="last_purchase_price" value={formData.last_purchase_price} onChange={handleChange} required placeholder="Enter last purchase price" />
           <InputField label="Unit of Measure" name="unit_of_measure" value={formData.unit_of_measure} onChange={handleChange} readOnly placeholder="Unit of measure" />
           <InputField label="HSN Code" name="hsn_code" value={formData.hsn_code} onChange={handleChange} required placeholder="Enter HSN code" />
           <InputField label="GST Percentage" name="gst_percentage" value={formData.gst_percentage} onChange={handleChange} required placeholder="Enter GST %" />
+          <InputField label="Inventory Qty" name="inventory_qty" value={formData.inventory_qty} onChange={handleChange} required placeholder="Enter Inventory Qty" />
 
           <TextAreaField label="Description" name="description" value={formData.description} onChange={handleChange} required placeholder="Enter description" />
 

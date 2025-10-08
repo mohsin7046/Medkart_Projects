@@ -27,8 +27,7 @@ export const purchaseOrderSearchFields = [
 
 export const purchaseOrderStatusFilters = [
   { key: "all", label: "All Status" },
-  { key: "pending", label: "Pending" },
-  { key: "partial received", label: "Partial Received" },
+  { key: "PO SENT", label: "PO SENT" },
   { key: "completed", label: "Completed" },
   { key: "cancelled", label: "Cancelled" },
 ];

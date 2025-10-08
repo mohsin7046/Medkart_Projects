@@ -13,7 +13,10 @@ import SalesOrder from "./SalesOrder/salesOrder";
 import SalesOrderForm from "./SalesOrder/SalesOrderForm";
 import { SalesIndent } from "./SalesIndent/SalesIndent";
 import PurchaseIndent from "./PurchaseIndent/purchaseIndent";
-
+import GatePass from "./GatePass/GatePass";
+import GatePassForm from "./GatePass/GatePassForm";
+import Mrp_ptr_ratio from "./MRP_PTR/Mrp_ptr_ratio";
+import MRP_PTR_RATIO_FORM from './MRP_PTR/Mrp_ptr_ration_form'
 export {
   Home,
   Product,
@@ -29,5 +32,9 @@ export {
   SalesOrder,
   SalesOrderForm,
   SalesIndent,
-  PurchaseIndent
+  PurchaseIndent,
+  GatePass,
+  GatePassForm,
+  Mrp_ptr_ratio,
+  MRP_PTR_RATIO_FORM
 };

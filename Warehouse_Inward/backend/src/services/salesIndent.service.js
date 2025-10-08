@@ -1,6 +1,4 @@
-import { getSalesOrderByIdService } from './salesOrder.service.js'
 import { indentLogger } from '../utilities/logger.js'
-import { STATUS } from '../utilities/constant.js'
 import { SalesIndentRepository } from '../repository/salesIndent.repository.js'
 
 const indentRepo = new SalesIndentRepository()
@@ -39,15 +37,10 @@ export const getFlattenedSalesIndentByIdService = async (id) => {
                       name: true,
                       category: true,
                       combination: true,
-                      product_price: true,
+                      product_ptr: true,
                       product_mrp: true
                     }
                   },
-                  vendor: {
-                    select: {
-                      name: true
-                    }
-                  }
                 }
               }
             }
@@ -96,9 +89,8 @@ export const getFlattenedSalesIndentByIdService = async (id) => {
         product_name: prod.product.name,
         product_category: prod.product.category,
         product_combination: prod.product.combination,
-        product_price: prod.product.product_price,
+        product_ptr: prod.product.product_ptr,
         product_mrp: prod.product.product_mrp,
-        vendor_name: prod.vendor?.name || null
       });
     });
   });

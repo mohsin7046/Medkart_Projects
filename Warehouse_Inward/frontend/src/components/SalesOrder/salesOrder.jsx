@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CommonDataTable from "../utility/commonDataTable.jsx";
 import { ALLEndpoint } from "../../constant/endPoints.js";
@@ -8,8 +8,8 @@ import { ROUTES } from "../../constant/routePath.js";
 import { LIMITPAGE, salesOrderColumns, salesOrderSearchFields, salesOrderStatusFilters } from "../../constant/salesOrderConstant.js";
 import { toast } from "react-toastify";
 import { STATUS } from "../../constant/constant.js";
-import { getFilterState,setFilterState } from "../../constant/commonFilterLocal.js";
-import { FILTER_KEY,defaultValue } from "../../constant/salesOrderConstant.js";
+import { getFilterState, setFilterState } from "../../constant/commonFilterLocal.js";
+import { FILTER_KEY, defaultValue } from "../../constant/salesOrderConstant.js";
 export const SalesOrder = () => {
 
   const initialFilters = getFilterState(FILTER_KEY, defaultValue);
@@ -123,15 +123,20 @@ export const SalesOrder = () => {
 
       const data = await res.json();
 
+      console.log(data);
+
       if (!res) {
         toast.error(data.error || "Failed to Process Sales Oder")
       }
 
+      const updatedStatus =
+        data?.updatedOrder?.status ||
+        data?.status ||
+        STATUS.PROCESSED;
+
       setSalesOrders((prevOrders) =>
         prevOrders.map((order) =>
-          ids === order.id
-            ? { ...order, status: STATUS.PROCESSED }
-            : order
+          ids === order.id ? { ...order, status: updatedStatus } : order
         )
       );
 
@@ -144,10 +149,30 @@ export const SalesOrder = () => {
     }
   }
 
+  const handleConfirm = async (id) => {
+    const res = await fetch(ALLEndpoint.SalesOrderEndpoints.confirmSalesOrder.endpoint, {
+      method: ALLEndpoint.SalesOrderEndpoints.confirmSalesOrder.method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const data = await res.json();
+    console.log(data);
+    
+    if (!res) {
+      toast.error(data.message || "Failed to Confirm Sales Oder")
+    }
+
+    toast.success(data.message||"Successfully confirmed SaleOrder")
+
+  }
+
   return (
     <div>
       <CommonDataTable
-        columns={salesOrderColumns}  
+        columns={salesOrderColumns}
         data={salesOrders}
         page={page}
         limit={limit}
@@ -174,22 +199,40 @@ export const SalesOrder = () => {
         }
         onClear={handleClearFilters}
         extraAction={(order) => {
-          const isDisabled = [STATUS.PENDING].includes(order.status);
-          console.log(isDisabled);
+          const isAllocated = order.status === STATUS.ALLOCATED;
+          const isConfirmed = order.status === STATUS.CONFIRMED;
 
           return (
-            <button
-              disabled={!isDisabled}
-              onClick={() =>
-                handleSubmit(order.id)
-              }
-              className={`bg-orange-500 text-white px-3 py-1 rounded-md hover:bg-orange-600 transition-colors ${!isDisabled ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-            >
-              Process Order
-            </button>
+            <div className="flex gap-4 mt-3">
+          
+              <button
+                disabled={isAllocated || isConfirmed}
+                onClick={() => handleSubmit(order.id)}
+                className={`px-4 py-2 rounded-md text-white font-medium transition-colors duration-200
+          ${isAllocated || isConfirmed
+                    ? "bg-orange-300 cursor-not-allowed opacity-60"
+                    : "bg-orange-500 hover:bg-orange-600"}
+        `}
+              >
+                Process Order
+              </button>
+
+             
+              <button
+                disabled={!isAllocated || isConfirmed}
+                onClick={() => handleConfirm(order.id)}
+                className={`px-4 py-2 rounded-md text-white font-medium transition-colors duration-200
+          ${!isAllocated || isConfirmed
+                    ? "bg-green-300 cursor-not-allowed opacity-60"
+                    : "bg-green-500 hover:bg-green-600"}
+        `}
+              >
+                Confirm Order
+              </button>
+            </div>
           );
         }}
+
         onSelectionChange={(ids) => setSelectedIds(ids)}
       />
       <button

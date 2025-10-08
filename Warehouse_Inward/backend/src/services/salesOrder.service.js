@@ -3,27 +3,29 @@ import { STATUS, PRIORITY, PREFIX } from '../utilities/constant.js'
 import { generateRandom } from '../utilities/generateRandom.js'
 import { decimalConversion } from '../utilities/decimal.conversion.js'
 import { saleLogger } from '../utilities/logger.js'
-import { salesIndentQueue, salesIndentQueueEvents, salesOrderQueue, salesOrderQueueEvents } from '../cache/queueManager.js'
+import { salesOrderQueue, salesOrderQueueEvents } from '../cache/queueManager.js'
 import { SalesOrderRepository } from '../repository/salesOrder.repository.js'
 import { ProductRepository } from '../repository/product.repository.js'
 import { SalesIndentRepository } from '../repository/salesIndent.repository.js'
-
+import { processB2CProduct,processB2BProduct, sortOrdersByPriority, extractProductIds, buildInventoryMap, buildIndentMap,  addOrderCompletionOperations, addSalesProductUpdateOperations } from '../helper/salesOrder.helper.js'
+import {executeConfirmationTransaction, fetchAndValidateSalesOrder, throwInsufficientInventoryError, validateAndPrepareInventory} from '../helper/salesOrderCofirm.helper.js'
 const saleOrderRepo = new SalesOrderRepository();
 const productRepo = new ProductRepository();
 const indentRepo = new SalesIndentRepository();
+
 
 export const createSaleOrderService = async (data) => {
     try {
         const sales_order_number = generateRandom(PREFIX.SALE);
 
-        const product_price = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
+        const product_ptr = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
 
         const itemsWithTotal = data.items.map((item) => ({
             product_id: item.product_id,
             ordered_qty: item.ordered_qty,
             allocated_qty: 0,
             remaining_qty: item.ordered_qty,
-            total_amount: decimalConversion(item.ordered_qty * (product_price.find(p => p.id === item.product_id)?.product_price || 0))
+            total_amount: decimalConversion(item.ordered_qty * (product_ptr.find(p => p.id === item.product_id)?.product_ptr || 0))
         }))
 
         const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.total_amount, 0));
@@ -31,12 +33,6 @@ export const createSaleOrderService = async (data) => {
         const total_order_qty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
 
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
-
-        const vendor = await prisma.vendor.findFirstOrThrow({
-            orderBy: {
-                id: 'desc',
-            },
-        });
 
         const changeddata = {
             sales_order_number,
@@ -55,7 +51,6 @@ export const createSaleOrderService = async (data) => {
             products: {
                 create: data.items.map((item, idx) => ({
                     product_id: item.product_id,
-                    vendor_id: vendor.id,
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
@@ -94,31 +89,15 @@ export const createSaleOrderService = async (data) => {
 
 export const updateSaleOrderService = async (data) => {
     try {
-        const product_price = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
+        const product_ptr = await productRepo.getProducts({ ids: data.items.map(i => i.product_id) });
 
         console.log(data.items);
 
         const itemsWithTotal = await Promise.all(
             data.items.map(async (item) => {
-                let vendorId = item?.vendor_id;
-
-                if (!vendorId || vendorId == null) {
-                    const vendor = await prisma.vendor.findFirstOrThrow({
-                        orderBy: { id: 'desc' },
-                    });
-
-                    if (!vendor) {
-                        throw new Error(`❌ Vendor not found for product_id: ${item.product_id}`);
-                    }
-
-                    vendorId = vendor.id;
-                }
-
-                const price = product_price.find(p => p.id === item.product_id)?.product_price || 0;
-
+                const price = product_ptr.find(p => p.id === item.product_id)?.product_ptr || 0;
                 return {
                     product_id: item.product_id,
-                    vendor_id: vendorId,
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
@@ -127,12 +106,10 @@ export const updateSaleOrderService = async (data) => {
             })
         );
 
-        console.log(itemsWithTotal);
-
-
         const total_amount = decimalConversion(itemsWithTotal.reduce((sum, item) => sum + item.total_amount, 0));
 
         const total_order_qty = data.items.reduce((sum, item) => sum + item.ordered_qty, 0);
+
         const priority = data.order_type === "B2B" ? PRIORITY.HIGH : PRIORITY.NORMAL;
 
 
@@ -151,7 +128,6 @@ export const updateSaleOrderService = async (data) => {
                 deleteMany: { sales_order_id: data.sales_order_id },
                 create: data.items.map((item, idx) => ({
                     product_id: item.product_id,
-                    vendor_id: itemsWithTotal[idx].vendor_id,
                     ordered_qty: item.ordered_qty,
                     allocated_qty: 0,
                     remaining_qty: item.ordered_qty,
@@ -191,9 +167,7 @@ export const updateSaleOrderService = async (data) => {
 
 export const deleteSalesOrderService = async (sales_order_id) => {
     try {
-        const existingSalesOrder = await prisma.salesOrder.findFirst({
-            where: { id: sales_order_id, deleted_at: null }
-        })
+        const existingSalesOrder = await saleOrderRepo.existingSalesOrder(sales_order_id)
 
         if (existingSalesOrder && ([STATUS.COMPLETED, STATUS.CANCELLED].includes(existingSalesOrder.status))) {
             saleLogger.error('Cannot delete completed or cancelled Sales Order');
@@ -227,6 +201,7 @@ export const deleteSalesOrderService = async (sales_order_id) => {
         throw error;
     }
 }
+
 
 
 export const getSalesOrderByIdService = async (id) => {
@@ -266,11 +241,10 @@ export const getSalesOrderForEditByIdService = async (id) => {
             ...fetchSalesOrder,
             items: fetchSalesOrder.products.map((p) => ({
                 product_id: p.product_id,
-                vendor_id: p.vendor_id,
                 ordered_qty: p.ordered_qty,
                 product_name: p.product?.name || "",
                 product_mrp: p.product?.product_mrp || 0,
-                product_price: p.product?.product_price || 0
+                product_ptr: p.product?.product_ptr || 0
             }))
         };
 
@@ -283,40 +257,28 @@ export const getSalesOrderForEditByIdService = async (id) => {
 }
 
 
+
 export const processSalesOrderService = async (data) => {
     const { sales_order_ids } = data
-    console.log(sales_order_ids);
-
+   
     const orderIds = Array.isArray(sales_order_ids) ? sales_order_ids : [sales_order_ids]
 
-    let salesOrders = await saleOrderRepo.findProductsInSalesOrders(orderIds);
+    let salesOrders = await saleOrderRepo.findProductsInSalesOrders(orderIds)
 
     if (!salesOrders.length) throw new Error('Sales order(s) not found')
 
-    salesOrders.sort((a, b) => {
-        if (a.priority === 'high' && b.priority !== 'high') return -1
-        if (a.priority !== 'high' && b.priority === 'high') return 1
-        return 0
-    })
+    salesOrders = sortOrdersByPriority(salesOrders)
 
-    const productIds = [...new Set(salesOrders.flatMap(o => o.products.map(p => p.product_id)))]
+    const productIds = extractProductIds(salesOrders)
+    const allProducts = await productRepo.getProducts({ ids: productIds })
+    const currentInventory = buildInventoryMap(allProducts)
 
-    const allProducts = await productRepo.getProducts({ ids: productIds });
+    const existingIndents = await indentRepo.existingIndentsByProductIds(productIds)
+    console.log("existingIndent at start", existingIndents)
 
-    const currentInventory = new Map()
-
-    allProducts.forEach(product => {
-        currentInventory.set(product.id, product.inventory_qty)
-    })
-
-    const existingIndents = await indentRepo.existingIndentsByProductIds(productIds);
-
-    console.log("existingIndent at start", existingIndents);
-
-    const indentMap = new Map(existingIndents.map(i => [i.product_id, i]))
-
+    const indentMap = buildIndentMap(existingIndents)
     const operations = []
-   
+
     for (const order of salesOrders) {
         let orderStatus = STATUS.ALLOCATED
         const isB2B = order.order_type === 'B2B'
@@ -327,75 +289,28 @@ export const processSalesOrderService = async (data) => {
             if (!dbProduct) throw new Error(`Product ${product.product_id} not found`)
 
             const currentInventoryQty = currentInventory.get(dbProduct.id)
-            const shortage = product.ordered_qty - currentInventoryQty
-            const canFullyAllocate = shortage <= 0
-
+            
             let allocated_qty, remaining_qty, newInventory
 
             if (isB2B) {
-                allocated_qty = Math.max(0, Math.min(currentInventoryQty, product.ordered_qty))
-                remaining_qty = Math.max(0, shortage)
-                newInventory = Math.max(0, currentInventoryQty - allocated_qty)
-
-                if (shortage > 0 && allocated_qty > 0) {
-                    orderStatus = STATUS.PARTIAL_RECEVIED
-                    const indentResult = await handleIndent(product, order, shortage, indentMap, operations)
-                    console.log("Indent Result", indentResult);
-
-
-                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
-                        indentMap.set(dbProduct.id, indentResult?.indent)
-                    }
-                }
-                else if (shortage > 0 && allocated_qty <= 0) {
-                    orderStatus = STATUS.PROCESSING
-                    const indentResult = await handleIndent(product, order, shortage, indentMap, operations)
-                    console.log("Indent Result", indentResult);
-
-                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
-                        indentMap.set(dbProduct.id, indentResult?.indent)
-                    }
-
-                }
+                const result = await processB2BProduct(product, order, currentInventoryQty, indentMap, operations)
+                allocated_qty = result.allocated_qty
+                remaining_qty = result.remaining_qty
+                newInventory = result.newInventory
+                orderStatus = result.orderStatus
             } else {
-
-                if (canFullyAllocate) {
-                    allocated_qty = product.ordered_qty
-                    remaining_qty = 0
-                    newInventory = Math.max(0, currentInventoryQty - product.ordered_qty)
-                } else {
-                    allocated_qty = 0
-                    remaining_qty = product.ordered_qty
-                    newInventory = currentInventoryQty
-                    orderStatus = STATUS.PROCESSING
-
-                    const indentResult = await handleIndent(product, order, product.ordered_qty, indentMap, operations)
-
-                    console.log("Indent Result", indentResult);
-
-                    if (indentResult?.indent && !indentMap.get(dbProduct.id)) {
-                        indentMap.set(dbProduct.id, indentResult?.indent)
-                    }
-
-                }
+                const result = await processB2CProduct(product, order, currentInventoryQty, indentMap, operations)
+                allocated_qty = result.allocated_qty
+                remaining_qty = result.remaining_qty
+                newInventory = result.newInventory
+                orderStatus = result.orderStatus
             }
 
             currentInventory.set(dbProduct.id, newInventory)
-
-            operations.push(
-                saleOrderRepo.updateSalesOrderProducts(order.id, dbProduct.id, { allocated_qty, remaining_qty }),
-
-                productRepo.updateProductWithoutAwait({ id: dbProduct.id, data: { inventory_qty: newInventory } })
-            )
+            addSalesProductUpdateOperations(operations, order.id, dbProduct.id, allocated_qty, remaining_qty,saleOrderRepo)
         }
 
-        operations.push(
-            saleOrderRepo.updateSalesOrderwithoutAwait(order.id, {
-                processed: true,
-                status: orderStatus,
-                processed_date: new Date()
-            }),
-        )
+        addOrderCompletionOperations(operations, order.id, orderStatus,saleOrderRepo)
     }
 
     await prisma.$transaction(operations)
@@ -404,80 +319,15 @@ export const processSalesOrderService = async (data) => {
 }
 
 
-let processedOrders = new Set();
+export const confirmSalesOrderService = async (sales_order_id) => {
+    
+  const salesOrderData = await fetchAndValidateSalesOrder(sales_order_id)
 
-const handleIndent = async (product, order, quantity, indentMap, operations) => {
-    const existingIndent = indentMap.get(product.product_id)
-    console.log("existingIndent in handleIdent", existingIndent);
+  const { inventoryChecks, insufficientProducts } = validateAndPrepareInventory(salesOrderData.products)
 
-    const isOrderAlreadyProcessed = processedOrders.has(order.id)
-    console.log("OrderId and productId in handle", order.id, product.product_id);
+  if (insufficientProducts.length > 0) {
+    throwInsufficientInventoryError(salesOrderData.sales_order_number, insufficientProducts)
+  }
 
-    let indent = null;
-    let isNew = false;
-
-    if (existingIndent) {
-
-        const updatedIndent = {
-            total_sales_order: existingIndent.total_sales_order + 1,
-            salesOrders: [
-                ...(existingIndent.salesOrders || []),
-                { sales_order_id: order.id }
-            ],
-            total_remain_product: existingIndent.total_remain_product + quantity
-        }
-
-        indent = updatedIndent;
-
-        operations.push(
-            prisma.salesIndent.update({
-                where: { indent_number: existingIndent.indent_number },
-                    data: {
-                        total_sales_order: updatedIndent.total_sales_order,
-                        total_remain_product: updatedIndent.total_remain_product,
-                        salesOrders: {
-                            create: {
-                                sales_order_id: order.id
-                            }
-                        }
-                    }
-            })
-        )
-
-    } else if (!existingIndent) {
-        const indentNumber = generateRandom(PREFIX.INDENT)
-        const createdData = {
-            indent_number: indentNumber,
-            product_id: product.product_id,
-            total_sales_order: 1,
-            total_remain_product: quantity,
-            status: STATUS.OPEN,
-            salesOrders: [{ sales_order_id: order.id }]
-        };
-
-        indent = createdData
-        isNew = true;
-
-        operations.push(
-            prisma.salesIndent.create({
-                data: {
-                    indent_number: indentNumber,
-                    product_id: product.product_id,
-                    total_sales_order: 1,
-                    total_remain_product: quantity,
-                    status: STATUS.OPEN,
-                    salesOrders: {
-                        create: {
-                            sales_order_id: order.id
-                        }
-                    }
-                }
-            })
-        )
-
-    }
-
-    processedOrders.add(order.id)
-
-    return { indent, isNew }
+  return await executeConfirmationTransaction(sales_order_id, inventoryChecks)
 }

@@ -1,3 +1,5 @@
+import MRP_PTR_RATIO from "../components/MRP_PTR/Mrp_ptr_ratio";
+
 export const ROUTES = {
   HOME: "/",
   
@@ -48,6 +50,19 @@ export const ROUTES = {
   PURCHASE_INDENT:{
     LIST: "/purchase-indent", 
     VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
+  },
+
+  GATEPASS:{
+    LIST: "/gate-pass",
+    ADD: "/gate-pass/add",
+    EDIT: (id = ":id") => `/gate-pass/edit/${id}`,
+    VIEW: (type = ":type",id = ':id') => `/view/${type}/${id}`
+  },
+
+  MRP_PTR_RATIO:{
+    LIST: "/mrp-ptr-ratio",
+    ADD: "/mrp-ptr-ratio/add",
+    EDIT: (id = ":id") => `/mrp-ptr-ratio/edit/${id}`,
   },
 
   COMMON_VIEW:{

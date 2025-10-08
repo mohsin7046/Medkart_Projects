@@ -23,7 +23,7 @@ export const createSalesOrderSchema = z.object({
 
   email: z
     .string()
-    .email('Invalid email format'),
+    .email('Invalid email format'),  
 
   contact_number: z
     .string()

@@ -15,11 +15,10 @@ createWorker('grnQueue', async (job) => {
     try {
         switch (operation) {
             case 'create':
-                grnLogger.info(`📦 Creating GRN for : ${payload.data.order_id}`);
-                
+                grnLogger.info(`📦 Creating GRN for `);
+          
                 const newGRN = await grnRepo.createGRN(payload.data);
-                console.log(newGRN);
-                
+            
                 return { status: 'success', data: newGRN };
 
             case 'update':  

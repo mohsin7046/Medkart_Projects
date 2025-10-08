@@ -102,9 +102,35 @@ export class PurchaseOrderRepository {
         ...(include ? { include } : {}),
       });
     } catch (error) {
-      grnLogger.error(`Error finding PO (order_id: ${order_id}) | ${error.message}`);
+      poLogger.error(`Error finding PO (order_id: ${order_id}) | ${error.message}`);
       throw error;
     }
   }
 
+  async findPOByOrderVendorId({vendor_id = null, select = null, include = null}) {
+    try {
+      return await prisma.purchaseOrder.findFirst({
+        where: { vendor_id, deleted_at: null },
+        ...(select ? { select } : {}),
+        ...(include ? { include } : {}),
+      });
+    } catch (error) {
+      poLogger.error(`Error finding PO (order_id: ${order_id}) | ${error.message}`);
+      throw error;
+    }
+  }
+
+  async updatePurchaseOrderByVendorId({vendor_id,status,data}){
+    console.log(vendor_id,status,data);
+    
+    try {
+      await prisma.purchaseOrder.updateMany({
+        where:{vendor_id,status},
+        data
+      })
+    } catch (error) {
+      poLogger.error(`Error finding PO (order_id: ${vendor_id}) | ${error.message}`);
+      throw error;
+    }
+  }
 }

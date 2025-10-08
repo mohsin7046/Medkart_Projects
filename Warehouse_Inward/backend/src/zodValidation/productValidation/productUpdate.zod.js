@@ -4,6 +4,7 @@ import { statusSchema } from '../statusSchemaValidate.js'
 
 export const updateProductSchema = z.object({
   id: z.number().optional(),
+
   product_code: z.string()
     .optional(),
 
@@ -31,7 +32,7 @@ export const updateProductSchema = z.object({
     .transform(decimalConversion)
     .optional(),
 
-  product_price: z
+  product_ptr: z
     .number()
     .positive('Price must be a positive number')
     .transform(decimalConversion)
@@ -56,6 +57,9 @@ export const updateProductSchema = z.object({
     .max(100, 'GST % cannot exceed 100')
     .transform(decimalConversion)
     .optional(),
+
+  inventory_qty: z.number()
+    .int('Inventory quantity must be an integer').optional(),
 
   description: z
     .string()

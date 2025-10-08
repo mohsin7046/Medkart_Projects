@@ -19,7 +19,7 @@ export const createProductSchema = z.object({
     .positive('MRP must be a positive number')
     .transform(decimalConversion),
 
-  product_price: z
+  product_ptr: z
     .number()
     .positive('Price must be a positive number')
     .transform(decimalConversion),
@@ -40,6 +40,9 @@ export const createProductSchema = z.object({
     .min(0, 'GST % must be at least 0')
     .max(100, 'GST % cannot exceed 100')
     .transform(decimalConversion),
+
+  inventory_qty: z.number()
+    .int('Inventory quantity must be an integer'),
 
   description: z
     .string()
